@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ghost Hunter — 管理員後台</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Share+Tech+Mono&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#020810;--card:rgba(4,16,32,0.95);--border:rgba(0,210,255,0.25);
+  --cyan:#00d2ff;--cyan2:#66eeff;--green:#22ff77;--red:#ff2255;
+  --gold:#ffd700;--orange:#ff7a00;--purple:#b84eff;
+  --text:#e0f4ff;--subtext:rgba(200,235,255,0.5);--radius:12px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{
+  min-height:100vh;background:var(--bg);color:var(--text);
+  font-family:'Nunito',sans-serif;
+  background-image:
+    linear-gradient(rgba(0,102,255,0.08) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,102,255,0.08) 1px,transparent 1px);
+  background-size:40px 40px;
+}
+.container{max-width:1100px;margin:0 auto;padding:20px}
+
+/* ─── Login screen ─── */
+#loginScreen{
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+.login-box{
+  background:var(--card);border:1px solid var(--cyan);border-radius:20px;
+  padding:40px 36px;width:100%;max-width:420px;text-align:center;
+  box-shadow:0 0 40px rgba(0,210,255,0.15);
+}
+.login-box h1{
+  font-family:'Bangers',cursive;font-size:36px;letter-spacing:3px;color:var(--cyan);
+  margin-bottom:6px;text-shadow:0 0 20px rgba(0,210,255,0.5);
+}
+.login-box .sub{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--subtext);
+  margin-bottom:28px;letter-spacing:2px}
+.login-box input{
+  width:100%;background:rgba(0,210,255,0.05);border:2px solid rgba(0,210,255,0.2);
+  border-radius:10px;padding:14px;font-size:18px;color:var(--cyan2);
+  font-family:'Share Tech Mono',monospace;outline:none;margin-bottom:14px;
+  text-align:center;letter-spacing:4px;-webkit-appearance:none;
+  transition:border-color 0.2s;
+}
+.login-box input:focus{border-color:var(--cyan)}
+.login-btn{
+  width:100%;background:linear-gradient(135deg,var(--cyan),#0080cc);
+  border:none;border-radius:10px;padding:16px;
+  font-family:'Bangers',cursive;font-size:22px;letter-spacing:3px;
+  color:#001020;cursor:pointer;transition:all 0.2s;
+  box-shadow:0 4px 20px rgba(0,210,255,0.3);
+}
+.login-btn:active{transform:scale(0.97)}
+.login-err{color:var(--red);font-size:13px;margin-top:10px;min-height:20px;letter-spacing:1px}
+
+/* ─── Dashboard layout ─── */
+#adminDash{display:none}
+.top-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 0;margin-bottom:20px;
+  border-bottom:1px solid var(--border);
+}
+.top-bar .logo{
+  font-family:'Bangers',cursive;font-size:22px;letter-spacing:3px;color:var(--cyan);
+}
+.top-bar .meta{
+  font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--subtext);
+  text-align:right;
+}
+.logout-btn{
+  background:rgba(255,34,85,0.1);border:1px solid rgba(255,34,85,0.3);
+  border-radius:8px;padding:7px 14px;font-size:13px;font-weight:700;
+  color:var(--red);cursor:pointer;transition:all 0.2s;font-family:'Nunito',sans-serif;
+}
+.logout-btn:hover{background:rgba(255,34,85,0.2)}
+
+/* Stats row */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px;margin-bottom:24px}
+.stat-card{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:18px;text-align:center;
+  box-shadow:0 4px 16px rgba(0,0,0,0.4);
+}
+.stat-card .sc-val{
+  font-family:'Bangers',cursive;font-size:44px;line-height:1;
+  color:var(--cyan);text-shadow:0 0 16px rgba(0,210,255,0.5);
+}
+.stat-card .sc-label{font-size:12px;color:var(--subtext);margin-top:6px;letter-spacing:1px}
+
+/* Vote chart */
+.vote-chart{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  padding:20px;margin-bottom:20px;
+}
+.vote-chart h3{
+  font-family:'Bangers',cursive;font-size:20px;letter-spacing:2px;color:var(--gold);
+  margin-bottom:16px;
+}
+.vote-bars{display:flex;flex-direction:column;gap:12px}
+.vote-bar-row{display:flex;align-items:center;gap:12px}
+.vote-bar-label{width:180px;font-size:13px;font-weight:700;color:var(--text);flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.vote-bar-wrap{flex:1;height:24px;background:rgba(255,255,255,0.05);border-radius:4px;overflow:hidden;position:relative}
+.vote-bar-fill{height:100%;border-radius:4px;transition:width 0.8s cubic-bezier(0.25,1,0.5,1)}
+.vote-bar-count{width:40px;text-align:right;font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--subtext);flex-shrink:0}
+
+/* Tabs */
+.tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.tab{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;
+  color:var(--subtext);cursor:pointer;transition:all 0.2s;
+}
+.tab.active{background:rgba(0,210,255,0.12);border-color:rgba(0,210,255,0.4);color:var(--cyan)}
+.tab:hover{color:var(--text)}
+
+/* Table */
+.table-wrap{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+  overflow:hidden;margin-bottom:16px;
+}
+.table-actions{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;
+}
+.table-actions .ta-title{font-family:'Bangers',cursive;font-size:18px;letter-spacing:2px;color:var(--cyan)}
+.table-actions .ta-right{display:flex;gap:8px;align-items:center}
+.search-input{
+  background:rgba(0,210,255,0.06);border:1px solid rgba(0,210,255,0.2);
+  border-radius:8px;padding:7px 12px;font-size:13px;color:var(--text);
+  font-family:'Nunito',sans-serif;outline:none;width:180px;
+}
+.search-input::placeholder{color:var(--subtext)}
+.export-btn{
+  background:rgba(34,255,119,0.1);border:1px solid rgba(34,255,119,0.35);
+  border-radius:8px;padding:7px 14px;font-size:12px;font-weight:700;
+  color:var(--green);cursor:pointer;white-space:nowrap;font-family:'Nunito',sans-serif;
+}
+.export-btn:hover{background:rgba(34,255,119,0.18)}
+.refresh-btn{
+  background:rgba(0,210,255,0.08);border:1px solid rgba(0,210,255,0.3);
+  border-radius:8px;padding:7px 12px;font-size:12px;font-weight:700;
+  color:var(--cyan);cursor:pointer;font-family:'Nunito',sans-serif;
+}
+.refresh-btn:hover{background:rgba(0,210,255,0.15)}
+
+table{width:100%;border-collapse:collapse}
+thead th{
+  background:rgba(0,210,255,0.06);padding:10px 14px;
+  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:2px;
+  color:var(--cyan);text-align:left;border-bottom:1px solid var(--border);
+  white-space:nowrap;cursor:pointer;user-select:none;
+}
+thead th:hover{color:var(--cyan2)}
+tbody tr{border-bottom:1px solid rgba(255,255,255,0.05);transition:background 0.15s}
+tbody tr:hover{background:rgba(0,210,255,0.04)}
+tbody td{padding:10px 14px;font-size:13px;color:var(--text);white-space:nowrap}
+.badge{
+  display:inline-block;border-radius:4px;padding:2px 8px;
+  font-size:11px;font-weight:700;letter-spacing:0.5px;
+}
+.badge.done{background:rgba(34,255,119,0.15);border:1px solid rgba(34,255,119,0.4);color:var(--green)}
+.badge.todo{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);color:var(--subtext)}
+.badge.boss{background:rgba(255,215,0,0.12);border:1px solid rgba(255,215,0,0.4);color:var(--gold)}
+.badge.red{background:rgba(255,34,85,0.12);border:1px solid rgba(255,34,85,0.35);color:var(--red)}
+
+/* No data */
+.no-data{text-align:center;padding:48px 20px;font-size:14px;color:var(--subtext);font-style:italic}
+
+/* Detail drawer */
+.drawer-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:200;
+  align-items:flex-start;justify-content:flex-end;
+}
+.drawer-overlay.open{display:flex;animation:slideIn 0.25s}
+@keyframes slideIn{from{opacity:0}to{opacity:1}}
+.drawer-box{
+  background:#020c18;border-left:1px solid var(--border);
+  width:340px;height:100vh;overflow-y:auto;padding:24px 20px;
+  box-shadow:-8px 0 40px rgba(0,0,0,0.6);
+}
+.drawer-close{
+  background:rgba(255,255,255,0.07);border:none;border-radius:8px;
+  padding:7px 14px;font-size:13px;font-weight:700;color:var(--text);
+  cursor:pointer;margin-bottom:20px;font-family:'Nunito',sans-serif;
+}
+.drawer-title{font-family:'Bangers',cursive;font-size:24px;letter-spacing:2px;color:var(--cyan);margin-bottom:14px}
+.detail-row{display:flex;justify-content:space-between;align-items:flex-start;
+  padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);
+}
+.detail-key{font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--subtext);letter-spacing:1px}
+.detail-val{font-size:13px;font-weight:700;text-align:right;max-width:200px;word-break:break-all}
+
+/* Mobile responsive */
+@media(max-width:768px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .vote-bar-label{width:130px;font-size:12px}
+  table{font-size:12px}
+  tbody td{padding:8px 10px}
+  thead th{padding:8px 10px}
+  .drawer-box{width:90vw}
+}
+@media(max-width:480px){
+  .stats-row{grid-template-columns:1fr 1fr}
+  .top-bar .meta{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div style="font-size:48px;margin-bottom:12px">🔐</div>
+    <h1>ADMIN PORTAL</h1>
+    <div class="sub">GHOST HUNTER MIDNIGHT SIGNAL</div>
+    <input type="password" id="adminPass" placeholder="••••••••••••" autocomplete="off"
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">🔑 進入後台</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- Dashboard -->
+<div id="adminDash">
+  <div class="container">
+    <!-- Top bar -->
+    <div class="top-bar">
+      <div>
+        <div class="logo">👻 ADMIN PORTAL</div>
+        <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--subtext)">Ghost Hunter Midnight Signal</div>
+      </div>
+      <div style="display:flex;gap:12px;align-items:center">
+        <div class="meta" id="lastRefresh"></div>
+        <button class="logout-btn" onclick="doLogout()">登出</button>
+      </div>
+    </div>
+
+    <!-- Stats row -->
+    <div class="stats-row" id="statsRow"></div>
+
+    <!-- Vote chart -->
+    <div class="vote-chart">
+      <h3>🗳️ 第四關投票統計</h3>
+      <div class="vote-bars" id="voteChartBars"></div>
+    </div>
+
+    <!-- User table section -->
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('all',this)">全部玩家</div>
+      <div class="tab" onclick="switchTab('done',this)">已全通</div>
+      <div class="tab" onclick="switchTab('boss',this)">已擊敗 BOSS</div>
+      <div class="tab" onclick="switchTab('incomplete',this)">進行中</div>
+    </div>
+    <div class="table-wrap">
+      <div class="table-actions">
+        <span class="ta-title" id="tableTitle">全部玩家</span>
+        <div class="ta-right">
+          <input type="search" class="search-input" id="searchInput" placeholder="搜尋學號或姓名…" oninput="renderTable()">
+          <button class="export-btn" onclick="exportCSV()">⬇️ CSV 匯出</button>
+          <button class="refresh-btn" onclick="loadData()">🔄</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <table id="userTable">
+          <thead>
+            <tr>
+              <th onclick="sortBy('sid')">學號</th>
+              <th onclick="sortBy('name')">姓名</th>
+              <th>Lv.1</th>
+              <th>Lv.2</th>
+              <th>Lv.3</th>
+              <th>Lv.4</th>
+              <th>裝備數</th>
+              <th>BOSS</th>
+              <th>全通</th>
+              <th>建立時間</th>
+            </tr>
+          </thead>
+          <tbody id="userTbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--subtext);margin-bottom:40px">
+      此後台僅限管理員使用。所有資料儲存於本機 localStorage，重新整理後仍保留。
+    </div>
+  </div>
+</div>
+
+<!-- Detail drawer -->
+<div class="drawer-overlay" id="detailDrawer" onclick="closeDrawer()">
+  <div class="drawer-box" onclick="event.stopPropagation()">
+    <button class="drawer-close" onclick="closeDrawer()">✕ 關閉</button>
+    <div class="drawer-title" id="drawerTitle">玩家詳情</div>
+    <div id="drawerContent"></div>
+  </div>
+</div>
+
+<script>
+const DB_KEY='ghost_hunter_db_v1';
+const ADMIN_PASS='halloween2026';
+const EQUIP_INFO={sword:{icon:'⚔️',name:'聖劍'},shield:{icon:'🛡️',name:'聖盾'},grail:{icon:'🏆',name:'聖杯'},armor:{icon:'🦺',name:'盔甲'}};
+const VOTE_LABELS={zone1:'🪦 Origin.exe 展區',zone2:'👻 Ghost Database 展區',zone3:'🎃 Pumpkin Code 展區',zone4:'📸 Ghost Mode ON 展區'};
+const VOTE_COLORS={zone1:'#00bcd4',zone2:'#ff0066',zone3:'#ff6600',zone4:'#ff5500'};
+
+let currentFilter='all';
+let sortKey='name';
+let sortDir=1;
+let allUsers=[];
+
+function getDB(){
+  try{return JSON.parse(localStorage.getItem(DB_KEY)||'{"users":{},"voteStats":{"zone1":0,"zone2":0,"zone3":0,"zone4":0}}')}
+  catch{return{users:{},voteStats:{zone1:0,zone2:0,zone3:0,zone4:0}}}
+}
+
+function doLogin(){
+  const pass=document.getElementById('adminPass').value;
+  if(pass===ADMIN_PASS){
+    document.getElementById('loginScreen').style.display='none';
+    document.getElementById('adminDash').style.display='';
+    loadData();
+  } else {
+    document.getElementById('loginErr').textContent='❌ 密碼錯誤，請再試一次';
+    setTimeout(()=>document.getElementById('loginErr').textContent='',2500);
+  }
+}
+function doLogout(){
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('adminDash').style.display='none';
+  document.getElementById('adminPass').value='';
+}
+document.getElementById('adminPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+
+function loadData(){
+  const db=getDB();
+  allUsers=Object.values(db.users||{});
+  renderStats(allUsers,db.voteStats||{});
+  renderVoteChart(db.voteStats||{});
+  renderTable();
+  document.getElementById('lastRefresh').textContent='更新：'+new Date().toLocaleTimeString('zh-TW');
+}
+
+function renderStats(users,votes){
+  const total=users.length;
+  const allDone=users.filter(u=>[1,2,3,4].every(lv=>u.progress['level'+lv].completed)).length;
+  const bossed=users.filter(u=>u.bossDefeated).length;
+  const totalVotes=Object.values(votes).reduce((a,b)=>a+b,0);
+  document.getElementById('statsRow').innerHTML=`
+    <div class="stat-card"><div class="sc-val">${total}</div><div class="sc-label">🧑 總帳號數</div></div>
+    <div class="stat-card"><div class="sc-val" style="color:var(--green)">${allDone}</div><div class="sc-label">✅ 四關全通</div></div>
+    <div class="stat-card"><div class="sc-val" style="color:var(--gold)">${bossed}</div><div class="sc-label">💀 擊敗 BOSS</div></div>
+    <div class="stat-card"><div class="sc-val" style="color:var(--purple)">${totalVotes}</div><div class="sc-label">🗳️ 投票總數</div></div>
+  `;
+}
+
+function renderVoteChart(votes){
+  const total=Math.max(1,Object.values(votes).reduce((a,b)=>a+b,0));
+  const bars=Object.entries(VOTE_LABELS).map(([k,label])=>{
+    const cnt=votes[k]||0;
+    const pct=Math.round(cnt/total*100);
+    return`<div class="vote-bar-row">
+      <span class="vote-bar-label">${label}</span>
+      <div class="vote-bar-wrap">
+        <div class="vote-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,${VOTE_COLORS[k]},${VOTE_COLORS[k]}88)"></div>
+      </div>
+      <span class="vote-bar-count">${cnt}</span>
+    </div>`;
+  });
+  document.getElementById('voteChartBars').innerHTML=bars.join('');
+}
+
+let filterMode='all';
+function switchTab(mode,el){
+  filterMode=mode;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  const titles={all:'全部玩家',done:'已四關全通',boss:'已擊敗 BOSS',incomplete:'進行中'};
+  document.getElementById('tableTitle').textContent=titles[mode]||'玩家';
+  renderTable();
+}
+
+function sortBy(key){
+  if(sortKey===key) sortDir*=-1;
+  else{sortKey=key;sortDir=1}
+  renderTable();
+}
+
+function renderTable(){
+  const q=(document.getElementById('searchInput').value||'').toLowerCase();
+  let users=[...allUsers];
+  // Filter
+  if(filterMode==='done') users=users.filter(u=>[1,2,3,4].every(lv=>u.progress['level'+lv].completed));
+  if(filterMode==='boss') users=users.filter(u=>u.bossDefeated);
+  if(filterMode==='incomplete') users=users.filter(u=>![1,2,3,4].every(lv=>u.progress['level'+lv].completed));
+  // Search
+  if(q) users=users.filter(u=>(u.sid+'').toLowerCase().includes(q)||u.name.toLowerCase().includes(q));
+  // Sort
+  users.sort((a,b)=>{
+    let va=a[sortKey]||'',vb=b[sortKey]||'';
+    if(typeof va==='string') va=va.toLowerCase();
+    if(typeof vb==='string') vb=vb.toLowerCase();
+    if(va<vb) return -sortDir; if(va>vb) return sortDir; return 0;
+  });
+  if(users.length===0){
+    document.getElementById('userTbody').innerHTML=`<tr><td colspan="10"><div class="no-data">暫無符合資料</div></td></tr>`;
+    return;
+  }
+  document.getElementById('userTbody').innerHTML=users.map(u=>{
+    const p=u.progress||{};
+    const allDone=[1,2,3,4].every(lv=>p['level'+lv].completed);
+    const createdAt=u.createdAt?new Date(u.createdAt).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'--';
+    return`<tr onclick="showDetail('${u.sid}')" style="cursor:pointer">
+      <td style="font-family:'Share Tech Mono',monospace;color:var(--cyan2)">${u.sid}</td>
+      <td style="font-weight:700">${u.name}</td>
+      <td>${badge(p.level1?.completed)}</td>
+      <td>${badge(p.level2?.completed)}</td>
+      <td>${badge(p.level3?.completed)}</td>
+      <td>${badge(p.level4?.completed)}</td>
+      <td style="text-align:center;font-family:'Bangers',cursive;font-size:18px;color:var(--gold)">${(u.equipmentOrder||[]).length}/4</td>
+      <td>${u.bossDefeated?`<span class="badge boss">💀 已擊敗</span>`:`<span class="badge todo">⏳ 未挑戰</span>`}</td>
+      <td>${allDone?`<span class="badge done">✅ 全通</span>`:`<span class="badge red">${[1,2,3,4].filter(lv=>!p['level'+lv].completed).length} 關未過</span>`}</td>
+      <td style="color:var(--subtext);font-size:12px">${createdAt}</td>
+    </tr>`;
+  }).join('');
+}
+
+function badge(done){
+  return done?`<span class="badge done">✓</span>`:`<span class="badge todo">-</span>`;
+}
+
+function showDetail(sid){
+  const user=allUsers.find(u=>u.sid===sid); if(!user) return;
+  const p=user.progress||{};
+  const eq=(user.equipmentOrder||[]).map(e=>(EQUIP_INFO[e]||{icon:'?',name:e}).icon+' '+(EQUIP_INFO[e]||{}).name).join('、')||'無';
+  const vote=p.level4?.vote?VOTE_LABELS[p.level4.vote]||p.level4.vote:'未投票';
+  const order=[1,2,3,4]
+    .filter(lv=>p['level'+lv]?.completed&&p['level'+lv].completedAt)
+    .map(lv=>({lv,at:p['level'+lv].completedAt}))
+    .sort((a,b)=>new Date(a.at)-new Date(b.at))
+    .map(o=>`Lv.${o.lv} (${new Date(o.at).toLocaleTimeString('zh-TW',{hour:'2-digit',minute:'2-digit'})})`)
+    .join(' → ');
+
+  document.getElementById('drawerTitle').textContent=`${user.name} (${user.sid})`;
+  document.getElementById('drawerContent').innerHTML=`
+    <div class="detail-row"><span class="detail-key">學號</span><span class="detail-val" style="color:var(--cyan2)">${user.sid}</span></div>
+    <div class="detail-row"><span class="detail-key">姓名</span><span class="detail-val">${user.name}</span></div>
+    <div class="detail-row"><span class="detail-key">建立時間</span><span class="detail-val">${new Date(user.createdAt).toLocaleString('zh-TW')}</span></div>
+    <div style="margin:14px 0 6px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--cyan);letter-spacing:2px">PROGRESS</div>
+    <div class="detail-row"><span class="detail-key">Lv.1 起源測驗</span><span class="detail-val">${p.level1?.completed?`✅ ${p.level1.score}分`:'❌'}</span></div>
+    <div class="detail-row"><span class="detail-key">Lv.2 鬼怪文化</span><span class="detail-val">${p.level2?.completed?`✅ ${p.level2.score}分`:'❌'}</span></div>
+    <div class="detail-row"><span class="detail-key">Lv.3 南瓜秘密</span><span class="detail-val">${p.level3?.completed?`✅ ${p.level3.score}分`:'❌'}</span></div>
+    <div class="detail-row"><span class="detail-key">Lv.4 投票打卡</span><span class="detail-val">${p.level4?.completed?'✅ 已投票':'❌'}</span></div>
+    <div class="detail-row"><span class="detail-key">投票給</span><span class="detail-val" style="font-size:12px">${vote}</span></div>
+    <div style="margin:14px 0 6px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--gold);letter-spacing:2px">EQUIPMENT</div>
+    <div class="detail-row"><span class="detail-key">已取得裝備</span><span class="detail-val">${eq}</span></div>
+    <div class="detail-row"><span class="detail-key">取得順序</span><span class="detail-val" style="font-size:12px">${(user.equipmentOrder||[]).map(e=>(EQUIP_INFO[e]||{icon:'?'}).icon).join(' → ')||'無'}</span></div>
+    <div style="margin:14px 0 6px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--red);letter-spacing:2px">BOSS</div>
+    <div class="detail-row"><span class="detail-key">BOSS 狀態</span><span class="detail-val">${user.bossDefeated?'💀 已擊敗':'⏳ 未挑戰'}</span></div>
+    <div class="detail-row"><span class="detail-key">擊敗時間</span><span class="detail-val">${user.bossDefeatedAt?new Date(user.bossDefeatedAt).toLocaleString('zh-TW'):'--'}</span></div>
+    <div style="margin:14px 0 6px;font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--green);letter-spacing:2px">COMPLETION ORDER</div>
+    <div style="font-size:12px;color:var(--text);line-height:1.7;padding:4px 0">${order||'尚未完成任何關卡'}</div>
+  `;
+  document.getElementById('detailDrawer').classList.add('open');
+}
+function closeDrawer(){document.getElementById('detailDrawer').classList.remove('open')}
+
+function exportCSV(){
+  const db=getDB();
+  const users=Object.values(db.users||{});
+  const headers=['學號','姓名','建立時間','Lv1完成','Lv1分數','Lv2完成','Lv2分數','Lv3完成','Lv3分數','Lv4完成','投票選項','裝備取得順序','BOSS擊敗','BOSS擊敗時間','四關全通'];
+  const rows=users.map(u=>{
+    const p=u.progress||{};
+    const allDone=[1,2,3,4].every(lv=>p['level'+lv]?.completed);
+    const vote=p.level4?.vote?VOTE_LABELS[p.level4.vote]:''
+    return[
+      u.sid,u.name,u.createdAt,
+      p.level1?.completed?'是':'否',p.level1?.score||0,
+      p.level2?.completed?'是':'否',p.level2?.score||0,
+      p.level3?.completed?'是':'否',p.level3?.score||0,
+      p.level4?.completed?'是':'否',vote,
+      (u.equipmentOrder||[]).join('>'),
+      u.bossDefeated?'是':'否',u.bossDefeatedAt||'',
+      allDone?'是':'否'
+    ].map(v=>`"${String(v||'').replace(/"/g,'""')}"`);
+  });
+  const csv=[headers.map(h=>`"${h}"`).join(','),...rows.map(r=>r.join(','))].join('\n');
+  const BOM='\uFEFF';
+  const blob=new Blob([BOM+csv],{type:'text/csv;charset=utf-8;'});
+  const link=document.createElement('a');
+  link.href=URL.createObjectURL(blob);
+  link.download='ghost_hunter_data_'+new Date().toISOString().slice(0,10)+'.csv';
+  link.click();
+}
+
+// Auto refresh every 30s
+setInterval(loadData,30000);
+</script>
+</body>
+</html>

@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Ghost Hunter — 勇者地圖</title>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Share+Tech+Mono&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#030106;--card:rgba(10,2,20,0.9);--border:rgba(0,210,255,0.3);
+  --orange:#ff7a00;--orange2:#ff9c2b;--purple:#8a2be2;--purple2:#b84eff;
+  --green:#22ff77;--red:#ff2255;--gold:#ffd700;--cream:#fff0d8;
+  --text:#f0e0ff;--subtext:rgba(240,224,255,0.55);--radius:12px;
+  --cyan:#00d2ff;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;overflow-x:hidden}
+body::before{
+  content:'';position:fixed;inset:0;z-index:-1;
+  background-color:var(--bg);
+  background-image:
+    linear-gradient(rgba(0,102,255,0.15) 1.5px,transparent 1.5px),
+    linear-gradient(90deg,rgba(0,102,255,0.15) 1.5px,transparent 1.5px),
+    radial-gradient(rgba(157,0,255,0.25) 2px,transparent 0);
+  background-size:50px 50px,50px 50px,25px 25px;
+}
+
+.page{max-width:520px;margin:0 auto;padding:14px 14px 60px;position:relative;z-index:1}
+
+/* Header */
+.map-header{
+  display:flex;align-items:center;gap:10px;margin-bottom:14px;
+  padding:12px 0;border-bottom:1px solid rgba(0,210,255,0.2);
+}
+.back-link{
+  background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.3);
+  border-radius:8px;padding:8px 12px;font-size:13px;font-weight:700;
+  color:var(--cyan);text-decoration:none;flex-shrink:0;
+}
+.map-header h1{
+  font-family:'Bangers',cursive;font-size:20px;letter-spacing:2px;
+  color:var(--gold);flex:1;text-align:center;
+}
+.map-header .user-tag{
+  font-size:12px;color:var(--subtext);font-family:'Share Tech Mono',monospace;flex-shrink:0;
+  text-align:right;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+
+/* Map container - horizontally scrollable on mobile */
+.map-wrapper{
+  width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;
+  border:1px solid rgba(0,210,255,0.2);border-radius:10px;
+  margin-bottom:14px;position:relative;
+  box-shadow:0 4px 24px rgba(0,0,0,0.6),0 0 30px rgba(0,210,255,0.1);
+  background:rgba(3,1,6,0.95);
+}
+.campus-svg{
+  display:block;
+  /* On mobile: fixed width for readability, allows horizontal scroll */
+  width:700px;
+  height:auto;
+}
+@media(min-width:720px){
+  .campus-svg{width:100%}
+}
+
+/* Story box */
+.story-box{
+  background:rgba(5,2,15,0.9);border:1px dashed rgba(34,255,119,0.4);
+  border-radius:10px;padding:14px 16px;margin-bottom:14px;
+  font-family:'Share Tech Mono',monospace;font-size:15px;color:var(--green);
+  line-height:1.5;text-align:center;min-height:60px;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.4s;
+}
+.story-box.gold{border-color:rgba(255,215,0,0.5);color:var(--gold);background:rgba(20,10,0,0.9)}
+
+/* Equipment bar */
+.equip-bar{
+  display:flex;gap:8px;margin-bottom:14px;
+}
+.eq-slot{
+  flex:1;background:rgba(255,255,255,0.03);border:1.5px dashed rgba(255,255,255,0.12);
+  border-radius:8px;padding:8px 6px;text-align:center;transition:all 0.35s;
+}
+.eq-slot.owned{
+  border-style:solid;border-color:var(--gold);background:rgba(255,215,0,0.07);
+  box-shadow:0 0 14px rgba(255,215,0,0.2);
+}
+.eq-slot .eq-icon{font-size:20px;display:block;margin-bottom:2px}
+.eq-slot .eq-name{font-size:10px;color:var(--subtext);font-weight:700}
+.eq-slot.owned .eq-name{color:var(--gold)}
+
+/* Actions */
+.actions{display:flex;gap:10px}
+.action-btn{
+  flex:1;border:1.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);
+  border-radius:10px;padding:14px;font-family:'Nunito',sans-serif;font-size:14px;
+  font-weight:700;color:var(--text);cursor:pointer;text-align:center;
+  text-decoration:none;display:block;transition:all 0.2s;
+}
+.action-btn:active{background:rgba(255,255,255,0.1)}
+.action-btn.primary{
+  background:linear-gradient(135deg,var(--orange),#ff3a00);
+  border-color:transparent;color:white;
+  box-shadow:0 4px 16px rgba(255,80,0,0.3);
+}
+
+/* Reward overlay */
+.reward-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.93);
+  z-index:500;align-items:center;justify-content:center;
+  padding:20px;backdrop-filter:blur(6px);
+}
+.reward-overlay.open{display:flex;animation:fadeIn 0.35s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.reward-box{
+  background:linear-gradient(180deg,#120028 0%,#050010 100%);
+  border:3px solid var(--gold);border-radius:18px;
+  padding:36px 28px;text-align:center;max-width:380px;width:100%;
+  box-shadow:0 0 60px rgba(255,215,0,0.5);
+  animation:rewardPop 0.5s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes rewardPop{from{transform:scale(0.4);opacity:0}to{transform:scale(1);opacity:1}}
+.reward-box .rb-badge{
+  font-size:12px;letter-spacing:4px;color:var(--gold);font-family:'Share Tech Mono',monospace;
+  margin-bottom:12px;
+}
+.reward-box .rb-title{
+  font-family:'Bangers',cursive;font-size:32px;letter-spacing:2px;color:var(--gold);
+  margin-bottom:18px;text-shadow:0 0 20px rgba(255,215,0,0.6);
+}
+.reward-box .rb-icon{
+  font-size:86px;display:block;margin-bottom:14px;
+  animation:iconFloat 2s ease-in-out infinite;
+}
+@keyframes iconFloat{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-10px) rotate(5deg)}}
+.reward-box .rb-name{
+  font-family:'Bangers',cursive;font-size:28px;color:var(--cream);
+  letter-spacing:2px;margin-bottom:8px;
+}
+.reward-box .rb-desc{font-size:14px;color:var(--subtext);margin-bottom:24px;line-height:1.5}
+.reward-box .rb-btn{
+  width:100%;background:linear-gradient(135deg,var(--gold),#ff8c00);
+  border:none;border-radius:10px;padding:16px;
+  font-family:'Bangers',cursive;font-size:22px;letter-spacing:2px;
+  color:#1a0000;cursor:pointer;
+}
+.reward-box .rb-btn:active{transform:scale(0.97)}
+
+/* Boss fight overlay */
+.boss-overlay{
+  display:none;position:fixed;inset:0;
+  background:radial-gradient(ellipse at center,rgba(40,0,0,0.98),rgba(5,0,10,0.99));
+  z-index:600;align-items:center;justify-content:center;
+  padding:20px;flex-direction:column;
+  backdrop-filter:blur(6px);
+}
+.boss-overlay.open{display:flex;animation:fadeIn 0.5s}
+.boss-scene{text-align:center;max-width:380px;width:100%}
+.boss-scene .bs-title{
+  font-family:'Bangers',cursive;font-size:38px;letter-spacing:4px;color:var(--red);
+  text-shadow:0 0 20px rgba(255,34,85,0.7);margin-bottom:20px;
+  animation:bossFlash 0.5s infinite alternate;
+}
+@keyframes bossFlash{from{opacity:0.8}to{opacity:1;text-shadow:0 0 40px rgba(255,34,85,0.9)}}
+.battle-arena{
+  display:flex;align-items:center;justify-content:space-around;
+  padding:24px 0;margin-bottom:20px;position:relative;
+}
+.battle-arena::before{
+  content:'⚡';position:absolute;left:50%;transform:translateX(-50%);
+  font-size:40px;animation:battleSpark 0.4s infinite alternate;
+}
+@keyframes battleSpark{from{transform:translateX(-50%) scale(0.8);opacity:0.5}to{transform:translateX(-50%) scale(1.2);opacity:1}}
+.warrior-battle{font-size:80px;animation:attackRight 0.8s ease-in-out infinite alternate}
+@keyframes attackRight{from{transform:translateX(0) scaleX(1)}to{transform:translateX(15px) scaleX(1)}}
+.boss-battle{font-size:80px;animation:attackLeft 0.8s ease-in-out infinite alternate}
+@keyframes attackLeft{from{transform:translateX(0)}to{transform:translateX(-15px)}}
+
+/* Victory final */
+.victory-overlay{
+  display:none;position:fixed;inset:0;
+  background:
+    radial-gradient(ellipse at 30% 30%,rgba(138,43,226,0.6),transparent 55%),
+    radial-gradient(ellipse at 70% 70%,rgba(255,80,0,0.5),transparent 60%),
+    rgba(5,0,12,0.97);
+  z-index:700;align-items:center;justify-content:center;
+  padding:20px;flex-direction:column;
+  backdrop-filter:blur(8px);
+}
+.victory-overlay.open{display:flex;animation:fadeIn 0.6s}
+.victory-box{
+  background:linear-gradient(180deg,#1a0a00 0%,#080015 100%);
+  border:3px solid var(--gold);border-radius:20px;
+  padding:40px 28px;text-align:center;max-width:400px;width:100%;
+  box-shadow:0 0 80px rgba(255,215,0,0.6);
+  animation:rewardPop 0.7s cubic-bezier(0.34,1.56,0.64,1);
+  position:relative;
+}
+.victory-box::before{content:'✦ VICTORY ✦';position:absolute;top:-15px;left:50%;transform:translateX(-50%);
+  background:#080015;padding:0 16px;font-family:'Share Tech Mono',monospace;
+  font-size:14px;color:var(--gold);letter-spacing:4px}
+.victory-box .vb-icon{font-size:74px;display:block;margin-bottom:14px;animation:iconFloat 2s infinite ease-in-out}
+.victory-box .vb-title{font-family:'Bangers',cursive;font-size:44px;letter-spacing:3px;color:var(--gold);
+  text-shadow:0 0 30px rgba(255,215,0,0.6);margin-bottom:14px}
+.victory-box .vb-msg{font-size:15px;color:var(--text);line-height:1.7;margin-bottom:12px}
+.victory-box .vb-loc{font-family:'Bangers',cursive;font-size:26px;color:var(--orange2);
+  letter-spacing:2px;margin:14px 0;line-height:1.3;text-shadow:0 0 15px rgba(255,120,0,0.5)}
+.victory-box .vb-hint{font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--subtext);margin-top:10px}
+.victory-box .vb-btn{
+  width:100%;background:linear-gradient(135deg,var(--gold),#ff8c00);
+  border:none;border-radius:10px;padding:16px;
+  font-family:'Bangers',cursive;font-size:22px;letter-spacing:2px;
+  color:#1a0000;cursor:pointer;margin-top:18px;
+}
+
+/* Confetti */
+.cpiece{position:fixed;top:-10px;width:8px;height:14px;z-index:999;pointer-events:none;animation:cfall linear forwards}
+@keyframes cfall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+
+<!-- Reward overlay -->
+<div class="reward-overlay" id="rewardOverlay">
+  <div class="reward-box">
+    <div class="rb-badge">// 寶箱開啟 //</div>
+    <div class="rb-title">🎁 獲得裝備！</div>
+    <span class="rb-icon" id="rbIcon">⚔️</span>
+    <div class="rb-name" id="rbName">聖劍</div>
+    <div class="rb-desc" id="rbDesc">傳說武器</div>
+    <button class="rb-btn" onclick="closeReward()">⚡ 收下裝備！</button>
+  </div>
+</div>
+
+<!-- Boss fight overlay -->
+<div class="boss-overlay" id="bossOverlay">
+  <div class="boss-scene">
+    <div class="bs-title">💀 BOSS FIGHT 💀</div>
+    <div class="battle-arena">
+      <div class="warrior-battle" id="warriorSprite">🧙</div>
+      <div class="boss-battle" id="bossSprite">😈</div>
+    </div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:14px;color:var(--red);letter-spacing:2px;animation:bossFlash 0.5s infinite alternate;text-align:center" id="battleMsg">激烈戰鬥中…</div>
+  </div>
+</div>
+
+<!-- Victory overlay -->
+<div class="victory-overlay" id="victoryOverlay">
+  <div class="victory-box">
+    <span class="vb-icon">🏆</span>
+    <div class="vb-title">VICTORY!</div>
+    <div class="vb-msg">魔王已被擊敗！<br>校園平安了，勇者萬歲！</div>
+    <div class="vb-msg">請前往領取獎品：</div>
+    <div class="vb-loc">📍 管院 8 樓<br>人文科學觀摩室</div>
+    <div class="vb-hint">// 憑此畫面或學號領取 //</div>
+    <button class="vb-btn" onclick="closeVictory()">🎊 太棒了！</button>
+  </div>
+</div>
+
+<div class="page">
+  <div class="map-header">
+    <a href="index.html" class="back-link">← 首頁</a>
+    <h1>校園冒險地圖</h1>
+    <div class="user-tag" id="userTag">--</div>
+  </div>
+
+  <!-- Campus map (scrollable on mobile) -->
+  <div class="map-wrapper">
+    <svg class="campus-svg" id="campusSvg" viewBox="0 0 1000 440" xmlns="http://www.w3.org/2000/svg">
+      <!-- Built by JS -->
+    </svg>
+  </div>
+
+  <div class="story-box" id="storyBox">載入勇者資料中…</div>
+
+  <!-- Equipment bar -->
+  <div class="equip-bar" id="equipBar"></div>
+
+  <!-- Actions -->
+  <div class="actions">
+    <a href="index.html" class="action-btn">🏠 首頁</a>
+    <button class="action-btn" onclick="goNextQr()">📷 繼續闖關</button>
+  </div>
+</div>
+
+<script>
+const DB_KEY='ghost_hunter_db_v1';
+const SESSION_KEY='ghost_hunter_session';
+function getDB(){
+  try{return JSON.parse(localStorage.getItem(DB_KEY)||'{"users":{},"voteStats":{"zone1":0,"zone2":0,"zone3":0,"zone4":0}}')}
+  catch{return{users:{},voteStats:{zone1:0,zone2:0,zone3:0,zone4:0}}}
+}
+function saveDB(db){localStorage.setItem(DB_KEY,JSON.stringify(db))}
+function getCurrentUser(){
+  const sid=localStorage.getItem(SESSION_KEY)||''; if(!sid)return null;
+  return getDB().users[sid]||null;
+}
+function saveUser(user){const db=getDB();db.users[user.sid]=user;saveDB(db)}
+
+// ─── Equipment info ───
+const EQ_INFO={
+  sword:{icon:'⚔️',name:'聖劍',desc:'斬斷邪靈的傳說武器'},
+  shield:{icon:'🛡️',name:'聖盾',desc:'抵擋黑暗咒術的光盾'},
+  grail:{icon:'🏆',name:'聖杯',desc:'蘊含淨化之力的神器'},
+  armor:{icon:'🦺',name:'盔甲',desc:'全身防禦的英雄鎧甲'}
+};
+
+// ─── Map building definitions ───
+// viewBox: 0 0 1000 440
+// Buildings from original SVG (preserved exactly):
+//   管理大樓: rect x=300 y=20 w=290 h=145 → Level 2, START, BOSS
+//   第一醫學大樓: polygon 490,200 710,200 710,310 620,310 620,345 490,345 → Level 1
+//   圖書館: rect x=680 y=40 w=120 h=100 → Level 3
+//   活動中心 (was 工學): rect x=850 y=60 w=135 h=200 → Level 4
+//   第二醫學大樓: polygon 20,160 190,160 190,250 240,250 240,345 20,345 → decoration
+
+// Warrior standing positions INSIDE buildings (avoiding text labels):
+// Scale 0.45 → warrior ≈24px tall, head at center-12, feet at center+12
+const WARRIOR_POS={
+  start:  {x:555,y:150},  // 管理大樓 bottom-right of building, past badge
+  boss:   {x:340,y:45},   // 管理大樓 top-left, above title text
+  level1: {x:680,y:215},  // 第一醫學 right section, between top and title y=241
+  level2: {x:555,y:150},  // 管理大樓 (same as start; level 2 IS at mgmt)
+  level3: {x:755,y:55},   // 圖書館 top area, above title y=83
+  level4: {x:917,y:80},   // 活動中心 top area, above label y=142
+};
+
+// Open-space waypoints (corridors between buildings):
+// corridor_y182: y=182, horizontal corridor below 管理(ends y=165) above 第一醫學(starts y=200)
+// corridor_y145: y=145, below 管理(ends y=165) but above 第一醫學(starts y=200) → valid horizontal band at y=145 to y=165
+// corridor_x640: x≈640, between 管理right(x=590) and 圖書館left(x=680) and above 第一醫學right(x=710), at y<200 is open
+// corridor_NE: x=810, y=145 — right of 圖書館(ends x=800), below 活動中心left(x=850), above 第一醫學
+
+// ─── Path routing ───
+// Returns array of {x,y} waypoints (not including from/to positions)
+function getWaypoints(fromId, toId){
+  const pts=WARRIOR_POS;
+  // Define routes as tuples of waypoint arrays
+  const routes={
+    // mgmt/start→others
+    'start-level1':[[555,182],[660,182]],
+    'start-level3':[[640,150],[755,148]],
+    'start-level4':[[640,145],[810,145]],
+    'start-boss':[],  // within same building
+    // level2 === same position as start
+    'level2-level1':[[555,182],[660,182]],
+    'level2-level3':[[640,150],[755,148]],
+    'level2-level4':[[640,145],[810,145]],
+    'level2-boss':[],
+    // level1↔others
+    'level1-level3':[[660,182],[755,182],[755,148]],
+    'level1-level4':[[660,182],[810,150]],
+    'level1-boss':[[660,182],[555,182],[445,100]],
+    // level3↔others
+    'level3-level4':[[808,55]],
+    'level3-boss':[[638,55],[555,80],[445,80]],
+    // level4↔boss
+    'level4-boss':[[850,80],[640,80],[445,80]],
+  };
+  const key=`${fromId}-${toId}`;
+  const rkey=`${toId}-${fromId}`;
+  if(routes[key]) return routes[key];
+  // Try reverse
+  if(routes[rkey]) return [...routes[rkey]].reverse();
+  return [];
+}
+
+function levelToLocId(level){
+  if(level===2) return 'start'; // level2 is at mgmt (start)
+  return 'level'+level;
+}
+
+// ─── Build SVG ───
+function buildSvg(user,warriorPos,opts){
+  opts=opts||{};
+  const eq=user.equipmentOrder||[];
+  const p=user.progress||{};
+  const done={1:p.level1.completed,2:p.level2.completed,3:p.level3.completed,4:p.level4.completed};
+  const bossDefeated=opts.bossDefeated||user.bossDefeated;
+
+  // Path trace (dashed line showing visited route)
+  const visited=getVisitedPath(user);
+  const pathStr=visited.length>1?
+    'M '+visited.map(pt=>`${pt.x} ${pt.y}`).join(' L '):null;
+
+  return `
+<defs>
+  <radialGradient id="chestGlow"><stop offset="0%" stop-color="#ffd700" stop-opacity="0.7"/><stop offset="100%" stop-color="#ffd700" stop-opacity="0"/></radialGradient>
+  <radialGradient id="bossAura"><stop offset="0%" stop-color="#ff0055" stop-opacity="0.6"/><stop offset="100%" stop-color="#ff0055" stop-opacity="0"/></radialGradient>
+  <linearGradient id="gf1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff5500" stop-opacity="0.18"/><stop offset="100%" stop-color="#ff5500" stop-opacity="0.07"/></linearGradient>
+  <linearGradient id="gf2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#00e1ff" stop-opacity="0.22"/><stop offset="100%" stop-color="#00e1ff" stop-opacity="0.08"/></linearGradient>
+  <linearGradient id="gf3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ffee00" stop-opacity="0.18"/><stop offset="100%" stop-color="#ffee00" stop-opacity="0.07"/></linearGradient>
+  <linearGradient id="gf4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#ff0066" stop-opacity="0.22"/><stop offset="100%" stop-color="#ff0066" stop-opacity="0.08"/></linearGradient>
+  <linearGradient id="gflib" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#9d00ff" stop-opacity="0.28"/><stop offset="100%" stop-color="#9d00ff" stop-opacity="0.12"/></linearGradient>
+</defs>
+
+<!-- Background -->
+<rect width="1000" height="440" fill="#030106"/>
+<!-- Grid lines -->
+<g stroke="#0066ff" stroke-width="1" opacity="0.15">
+  ${[43,86,129,172,215,258,301,344,387].map(y=>`<line x1="0" y1="${y}" x2="1000" y2="${y}"/>`).join('')}
+  ${[100,200,300,400,500,600,700,800,900].map(x=>`<line x1="${x}" y1="0" x2="${x}" y2="440"/>`).join('')}
+</g>
+
+<!-- ── Decoration buildings ── -->
+<!-- 第二醫學大樓 (decoration) -->
+<g opacity="0.5">
+  <polygon points="20,160 190,160 190,250 240,250 240,345 20,345" fill="url(#gf3)" stroke="#ffee00" stroke-width="1.3"/>
+  <text x="118" y="205" text-anchor="middle" fill="#ffee00" font-size="11" font-family="'Noto Sans TC',sans-serif" font-weight="bold">第二醫學大樓</text>
+  <text x="118" y="220" text-anchor="middle" fill="#ffe033" font-size="8" font-family="'Share Tech Mono',monospace">2ND MED SCI</text>
+</g>
+<!-- 文物館 -->
+<g opacity="0.5">
+  <ellipse cx="60" cy="390" rx="55" ry="32" fill="url(#gflib)" stroke="#9d00ff" stroke-width="1.3"/>
+  <text x="60" y="386" text-anchor="middle" fill="#c060ff" font-size="11" font-family="'Noto Sans TC',sans-serif" font-weight="bold">文物館</text>
+  <text x="60" y="400" text-anchor="middle" fill="#9d00ff" font-size="8" font-family="'Share Tech Mono',monospace">MUSEUM</text>
+</g>
+
+<!-- ── Quest buildings ── -->
+
+<!-- 管理大樓 (Level 2 + START + BOSS) -->
+<g>
+  <rect x="300" y="20" width="290" height="145" rx="6" fill="url(#gf4)" stroke="#ff0066" stroke-width="${done[2]?'2.5':'1.8'}" opacity="${done[2]?'1':'0.9'}"/>
+  <line x1="300" y1="90" x2="590" y2="90" stroke="#ff0066" stroke-width="0.6" opacity="0.35"/>
+  <line x1="445" y1="20" x2="445" y2="165" stroke="#ff0066" stroke-width="0.5" opacity="0.3"/>
+  <text x="445" y="63" text-anchor="middle" fill="#ff0066" font-size="14" font-family="'Noto Sans TC',sans-serif" font-weight="bold">管理大樓</text>
+  <text x="445" y="80" text-anchor="middle" fill="#ff3388" font-size="9" font-family="'Share Tech Mono',monospace">MANAGEMENT · START · BOSS</text>
+  <rect x="345" y="100" width="200" height="26" rx="4" fill="rgba(255,0,102,0.12)" stroke="#ff0066" stroke-width="1"/>
+  <text x="445" y="118" text-anchor="middle" fill="#ff0066" font-size="10" font-family="'Share Tech Mono',monospace">👻 GHOST DB (Lv.2)</text>
+  <text x="445" y="150" text-anchor="middle" fill="rgba(255,150,150,0.6)" font-size="8" font-family="'Share Tech Mono',monospace">BOSS ZONE: LEFT · START ZONE: RIGHT</text>
+  <!-- Corners -->
+  <rect x="300" y="20" width="8" height="8" fill="#ff0066" opacity="0.7"/><rect x="582" y="20" width="8" height="8" fill="#ff0066" opacity="0.7"/>
+  <rect x="300" y="157" width="8" height="8" fill="#ff0066" opacity="0.7"/><rect x="582" y="157" width="8" height="8" fill="#ff0066" opacity="0.7"/>
+  ${done[2]?'<circle cx="445" cy="48" r="5" fill="#ff0066" opacity="0.4"><animate attributeName="opacity" values="0.4;0.1;0.4" dur="2s" repeatCount="indefinite"/></circle>':''}
+  ${done[2]?buildChest(385,190,true):''}
+</g>
+
+<!-- 第一醫學大樓 (Level 1) -->
+<g>
+  <polygon points="490,200 710,200 710,310 620,310 620,345 490,345" fill="url(#gf2)" stroke="#00e1ff" stroke-width="${done[1]?'2.5':'1.8'}" opacity="${done[1]?'1':'0.9'}"/>
+  <line x1="490" y1="255" x2="710" y2="255" stroke="#00e1ff" stroke-width="0.5" opacity="0.35"/>
+  <text x="595" y="234" text-anchor="middle" fill="#00e1ff" font-size="13" font-family="'Noto Sans TC',sans-serif" font-weight="bold">第一醫學大樓</text>
+  <text x="595" y="249" text-anchor="middle" fill="#33ccff" font-size="8.5" font-family="'Share Tech Mono',monospace">1ST MED SCI · Lv.1</text>
+  <rect x="525" y="268" width="140" height="26" rx="4" fill="rgba(0,225,255,0.12)" stroke="#00e1ff" stroke-width="1"/>
+  <text x="595" y="286" text-anchor="middle" fill="#00e1ff" font-size="10" font-family="'Share Tech Mono',monospace">🪦 ORIGIN.EXE</text>
+  <rect x="490" y="200" width="8" height="8" fill="#00e1ff" opacity="0.7"/><rect x="702" y="200" width="8" height="8" fill="#00e1ff" opacity="0.7"/>
+  <rect x="490" y="337" width="8" height="8" fill="#00e1ff" opacity="0.7"/>
+  ${done[1]?buildChest(595,370,true):''}
+</g>
+
+<!-- 圖書館 (Level 3) -->
+<g>
+  <rect x="680" y="40" width="120" height="100" rx="10" fill="url(#gflib)" stroke="#9d00ff" stroke-width="${done[3]?'2.5':'1.8'}" opacity="${done[3]?'1':'0.9'}"/>
+  <text x="740" y="78" text-anchor="middle" fill="#c060ff" font-size="13" font-family="'Noto Sans TC',sans-serif" font-weight="bold">圖書館</text>
+  <text x="740" y="93" text-anchor="middle" fill="#9d00ff" font-size="9" font-family="'Share Tech Mono',monospace">LIBRARY · Lv.3</text>
+  <rect x="688" y="103" width="104" height="24" rx="4" fill="rgba(157,0,255,0.12)" stroke="#9d00ff" stroke-width="1"/>
+  <text x="740" y="120" text-anchor="middle" fill="#c060ff" font-size="10" font-family="'Share Tech Mono',monospace">🎃 PUMPKIN CODE</text>
+  <rect x="680" y="40" width="8" height="8" fill="#9d00ff" opacity="0.7"/><rect x="792" y="40" width="8" height="8" fill="#9d00ff" opacity="0.7"/>
+  <rect x="680" y="132" width="8" height="8" fill="#9d00ff" opacity="0.7"/><rect x="792" y="132" width="8" height="8" fill="#9d00ff" opacity="0.7"/>
+  ${done[3]?buildChest(740,168,true):''}
+</g>
+
+<!-- 活動中心 (Level 4, was 工學大樓) -->
+<g>
+  <rect x="850" y="60" width="135" height="200" rx="6" fill="url(#gf1)" stroke="#ff5500" stroke-width="${done[4]?'2.5':'1.8'}" opacity="${done[4]?'1':'0.9'}"/>
+  <line x1="850" y1="120" x2="985" y2="120" stroke="#ff5500" stroke-width="0.5" opacity="0.35"/>
+  <line x1="917" y1="60" x2="917" y2="260" stroke="#ff5500" stroke-width="0.5" opacity="0.35"/>
+  <text x="917" y="145" text-anchor="middle" fill="#ff5500" font-size="13" font-family="'Noto Sans TC',sans-serif" font-weight="bold">活動中心</text>
+  <text x="917" y="160" text-anchor="middle" fill="#ff7733" font-size="8.5" font-family="'Share Tech Mono',monospace">ACTIVITY CTR · Lv.4</text>
+  <rect x="865" y="180" width="104" height="26" rx="4" fill="rgba(255,85,0,0.12)" stroke="#ff5500" stroke-width="1"/>
+  <text x="917" y="198" text-anchor="middle" fill="#ff5500" font-size="10" font-family="'Share Tech Mono',monospace">🗳️ VOTE STAGE</text>
+  <rect x="850" y="60" width="8" height="8" fill="#ff5500" opacity="0.7"/><rect x="977" y="60" width="8" height="8" fill="#ff5500" opacity="0.7"/>
+  <rect x="850" y="252" width="8" height="8" fill="#ff5500" opacity="0.7"/><rect x="977" y="252" width="8" height="8" fill="#ff5500" opacity="0.7"/>
+  ${done[4]?buildChest(917,270,true):''}
+</g>
+
+<!-- Path trace (dashed green line showing warrior's journey) -->
+${pathStr?`<path d="${pathStr}" fill="none" stroke="#22ff77" stroke-width="2.5" stroke-dasharray="7 5" opacity="0.65" stroke-linecap="round"><animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.8s" repeatCount="indefinite"/></path>`:''}
+
+<!-- START marker at mgmt  -->
+<g transform="translate(310,185)">
+  <polygon points="0,-10 6,4 -6,4" fill="#22ff77" opacity="0.8"/>
+  <text x="0" y="14" text-anchor="middle" fill="#22ff77" font-size="8" font-family="'Share Tech Mono',monospace">START</text>
+</g>
+
+<!-- BOSS marker at mgmt -->
+${!bossDefeated?buildBoss(370,190):`
+<g transform="translate(370,190)">
+  <circle r="16" fill="url(#bossAura)" opacity="0.4"/>
+  <text x="0" y="-2" text-anchor="middle" font-size="18">💀</text>
+  <text x="0" y="14" text-anchor="middle" fill="#22ff77" font-size="8" font-family="'Share Tech Mono',monospace">DEFEATED</text>
+</g>`}
+
+<!-- Legend (top-left overlay) -->
+<rect x="8" y="8" width="145" height="110" rx="4" fill="rgba(3,1,6,0.85)" stroke="#0066ff" stroke-width="0.8" opacity="0.7"/>
+<text x="80" y="24" text-anchor="middle" fill="#00d2ff" font-size="9" font-family="'Share Tech Mono',monospace">CAMPUS LEGEND</text>
+<rect x="15" y="32" width="8" height="8" rx="1" fill="rgba(0,225,255,0.25)" stroke="#00e1ff" stroke-width="0.8"/>
+<text x="29" y="41" fill="#00e1ff" font-size="8.5" font-family="'Noto Sans TC',sans-serif">第一醫學大樓 Lv.1</text>
+<rect x="15" y="48" width="8" height="8" rx="1" fill="rgba(255,0,102,0.25)" stroke="#ff0066" stroke-width="0.8"/>
+<text x="29" y="57" fill="#ff0066" font-size="8.5" font-family="'Noto Sans TC',sans-serif">管理大樓 Lv.2/BOSS</text>
+<rect x="15" y="64" width="8" height="8" rx="1" fill="rgba(157,0,255,0.25)" stroke="#9d00ff" stroke-width="0.8"/>
+<text x="29" y="73" fill="#c060ff" font-size="8.5" font-family="'Noto Sans TC',sans-serif">圖書館 Lv.3</text>
+<rect x="15" y="80" width="8" height="8" rx="1" fill="rgba(255,85,0,0.25)" stroke="#ff5500" stroke-width="0.8"/>
+<text x="29" y="89" fill="#ff7733" font-size="8.5" font-family="'Noto Sans TC',sans-serif">活動中心 Lv.4</text>
+<text x="15" y="107" fill="#ffd700" font-size="9">🎁 = 寶箱  💀 = BOSS</text>
+
+<!-- Compass -->
+<g transform="translate(960,30)" opacity="0.7">
+  <circle r="18" fill="rgba(0,210,255,0.05)" stroke="#00d2ff" stroke-width="1"/>
+  <polygon points="0,-13 3.5,0 0,3.5 -3.5,0" fill="#ff0066"/>
+  <polygon points="0,13 3.5,0 0,-3.5 -3.5,0" fill="#00d2ff"/>
+  <text y="-17" text-anchor="middle" fill="#ff0066" font-size="8" font-family="'Share Tech Mono',monospace">N</text>
+</g>
+
+<!-- Status bar -->
+<rect x="0" y="422" width="1000" height="18" fill="rgba(0,210,255,0.04)" stroke="#00d2ff" stroke-width="0.5" opacity="0.5"/>
+<text x="14" y="435" fill="#00d2ff" font-size="8" font-family="'Share Tech Mono',monospace" opacity="0.7">SYS: QUEST_ACTIVE ■ ${Object.values(done).filter(Boolean).length}/4 CLEARED</text>
+
+<!-- Warrior (always on top) -->
+<g id="warriorGroup" transform="translate(${warriorPos.x},${warriorPos.y})">
+  ${buildWarrior(eq)}
+</g>
+  `;
+}
+
+function buildChest(cx,cy,open){
+  const glow=open?`<circle cx="0" cy="${-cy+cy}" r="30" fill="url(#chestGlow)" transform="translate(0,-8)"/>`:''
+  return `<g transform="translate(${cx},${cy})">
+    ${open?`<circle r="30" fill="url(#chestGlow)"/>`:''}
+    <ellipse cx="0" cy="16" rx="16" ry="3" fill="#000" opacity="0.5"/>
+    ${open?`
+      <rect x="-15" y="0" width="30" height="16" fill="#8b4513" stroke="#4a1810" stroke-width="1.2" rx="2"/>
+      <path d="M-15 0 Q-15 -12 0 -12 Q 15 -12 15 0 L 15 -7 Q 15 -19 0 -19 Q -15 -19 -15 -7 Z" fill="#5a2d08" stroke="#4a1810" stroke-width="1.2" transform="translate(0,-3) rotate(-18)"/>
+      <ellipse cx="0" cy="1" rx="11" ry="3" fill="#ffd700" opacity="0.7"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/></ellipse>
+      <text x="-13" y="-14" font-size="9" fill="#ffd700">✦</text>
+      <text x="10" y="-17" font-size="8" fill="#ffd700">✦</text>
+      <text x="-1" y="-22" font-size="10" fill="#ffd700">✨</text>
+    `:`
+      <rect x="-15" y="0" width="30" height="16" fill="#4a3520" stroke="#2a1810" stroke-width="1.2" rx="2" opacity="0.7"/>
+      <path d="M-15 0 Q-15-10 0-10 Q 15-10 15 0 Z" fill="#3a2510" stroke="#2a1810" stroke-width="1.2" opacity="0.7"/>
+      <rect x="-2" y="-4" width="4" height="8" fill="#888" opacity="0.7"/>
+    `}
+  </g>`;
+}
+
+function buildBoss(cx,cy){
+  return `<g transform="translate(${cx},${cy})">
+    <circle r="28" fill="url(#bossAura)"><animate attributeName="r" values="28;34;28" dur="1.8s" repeatCount="indefinite"/></circle>
+    <ellipse cx="0" cy="18" rx="18" ry="4" fill="#000" opacity="0.5"/>
+    <path d="M-16 16 Q-20 -2 -9 -12 Q 0 -18 9 -12 Q 20 -2 16 16 Z" fill="#2a0510" stroke="#ff0055" stroke-width="1.5"/>
+    <ellipse cx="0" cy="-2" rx="11" ry="12" fill="#3a1818" stroke="#ff0055" stroke-width="1.4"/>
+    <ellipse cx="-4" cy="-4" rx="2.5" ry="3"><animate attributeName="fill" values="#ff1a1a;#ffaa00;#ff1a1a" dur="1s" repeatCount="indefinite"/></ellipse>
+    <ellipse cx="4" cy="-4" rx="2.5" ry="3"><animate attributeName="fill" values="#ff1a1a;#ffaa00;#ff1a1a" dur="1s" repeatCount="indefinite"/></ellipse>
+    <path d="M-9-11 L-13-19 L-7-13 Z" fill="#1a0808" stroke="#ff0055" stroke-width="0.7"/>
+    <path d="M 9-11 L 13-19 L  7-13 Z" fill="#1a0808" stroke="#ff0055" stroke-width="0.7"/>
+    <path d="M-6 4 L-4 9 L-2 4 L 0 9 L 2 4 L 4 9 L 6 4" stroke="#fff" stroke-width="1.3" fill="none"/>
+    <text x="0" y="30" text-anchor="middle" font-family="Bangers" font-size="11" fill="#ff0055">BOSS</text>
+  </g>`;
+}
+
+function buildWarrior(equipment){
+  const hasSword=equipment.includes('sword');
+  const hasShield=equipment.includes('shield');
+  const hasGrail=equipment.includes('grail');
+  const hasArmor=equipment.includes('armor');
+
+  return `<g transform="scale(0.45)" style="filter:drop-shadow(0 0 6px rgba(34,255,119,0.6))">
+    <!-- Shadow -->
+    <ellipse cx="0" cy="38" rx="16" ry="3.5" fill="#000" opacity="0.5"/>
+    <!-- Legs -->
+    <rect x="-7" y="16" width="6" height="18" fill="#3a2818" rx="2"/>
+    <rect x="1" y="16" width="6" height="18" fill="#3a2818" rx="2"/>
+    <!-- Boots -->
+    <rect x="-9" y="32" width="9" height="6" fill="#1e100a" rx="2"/>
+    <rect x="0" y="32" width="9" height="6" fill="#1e100a" rx="2"/>
+    <!-- Body/armor -->
+    <rect x="-11" y="-4" width="22" height="24" fill="${hasArmor?'#7a8fa8':'#7a8590'}" rx="3" stroke="${hasArmor?'#b0d0f0':'#506070'}" stroke-width="1.2"/>
+    ${hasArmor?`
+      <rect x="-10" y="-3" width="20" height="22" fill="rgba(180,220,255,0.15)" rx="2"/>
+      <path d="M-8 2 L 0 8 L 8 2" fill="none" stroke="#b0d0f0" stroke-width="1.5"/>
+      <path d="M-8 10 L 0 16 L 8 10" fill="none" stroke="#b0d0f0" stroke-width="1"/>
+      <text x="0" y="-6" text-anchor="middle" font-size="8" fill="#b0d0f0">★</text>
+    `:`<path d="M-7 0 L 0 7 L 7 0" fill="none" stroke="#506070" stroke-width="1.2"/>`}
+    <!-- Belt -->
+    <rect x="-11" y="15" width="22" height="4" fill="#2a1c0c"/>
+    <rect x="-2" y="14" width="4" height="6" fill="#ffd700"/>
+    <!-- Cape -->
+    <path d="M-9-2 Q-15 14 -11 26 L-8 22 L-4 24 L 0 20 L 4 24 L 8 22 L 11 26 Q 15 14 9-2 Z" fill="#7a1820" stroke="#4a0810" stroke-width="0.8" opacity="0.9"/>
+    <!-- Head -->
+    <circle cx="0" cy="-14" r="9" fill="#f5d0a0"/>
+    <!-- Hair/helmet -->
+    ${hasArmor?`
+      <path d="M-9-18 Q-9-24 0-24 Q 9-24 9-18 L 9-12 L 8-14 L 6-12 L 3-14 L 0-12 L-3-14 L-6-12 L-8-14 L-9-12 Z" fill="#5090c0"/>
+      <path d="M-9-18 L 9-18" stroke="#80b0e0" stroke-width="1"/>
+      <rect x="-9" y="-24" width="18" height="4" fill="#4080b0" rx="1"/>
+    `:`<path d="M-9-17 Q-9-23 0-23 Q 9-23 9-17 L 9-11 L 7-13 L 4-11 L 2-13 L 0-11 L-2-13 L-4-11 L-7-13 L-9-11 Z" fill="#3a2010"/>`}
+    <!-- Eyes -->
+    <circle cx="-2.5" cy="-14" r="1.2" fill="#000"/>
+    <circle cx="2.5" cy="-14" r="1.2" fill="#000"/>
+    <!-- Eyebrows (determined) -->
+    <path d="M-5-18 L-1-17" stroke="#3a2010" stroke-width="1.4" stroke-linecap="round"/>
+    <path d="M 1-17 L  5-18" stroke="#3a2010" stroke-width="1.4" stroke-linecap="round"/>
+    <!-- Mouth (heroic smile) -->
+    <path d="M-2-9 Q 0-7.5 2-9" stroke="#8a4040" stroke-width="1.1" fill="none" stroke-linecap="round"/>
+
+    <!-- RIGHT arm (sword) -->
+    ${hasSword?`
+      <rect x="9" y="-4" width="6" height="13" fill="#f5d0a0" rx="2" transform="rotate(-22 12 4)"/>
+      <g transform="translate(22,-10) rotate(18)">
+        <polygon points="-2,-30 2,-30 3,4 0,8 -3,4" fill="#dde8f0" stroke="#8090a0" stroke-width="0.8"/>
+        <line x1="-0.5" y1="-28" x2="-0.5" y2="2" stroke="#fff" stroke-width="0.7" opacity="0.8"/>
+        <rect x="-7" y="4" width="14" height="3" fill="#ffd700" stroke="#a88800" stroke-width="0.6" rx="0.5"/>
+        <rect x="-2" y="7" width="4" height="8" fill="#3a2010" rx="1"/>
+        <circle cx="0" cy="16" r="2.5" fill="#ffd700" stroke="#a88800" stroke-width="0.5"/>
+      </g>
+    `:`<rect x="9" y="2" width="6" height="13" fill="#f5d0a0" rx="2"/>`}
+
+    <!-- LEFT arm (shield/grail) -->
+    ${hasShield?`
+      <rect x="-15" y="1" width="6" height="13" fill="#f5d0a0" rx="2"/>
+      <g transform="translate(-22,8)">
+        <path d="M-10-9 L 10-9 L 10 4 Q 10 13 0 17 Q-10 13-10 4 Z" fill="#4a80d8" stroke="#2a60a0" stroke-width="1.5"/>
+        <path d="M 0-5 L 4 0 L 0 11 L-4 0 Z" fill="#ffd700" stroke="#a88800" stroke-width="0.6"/>
+        <circle cx="0" cy="0" r="1.5" fill="#fff"/>
+      </g>
+    `:hasGrail?`
+      <rect x="-15" y="-3" width="6" height="13" fill="#f5d0a0" rx="2" transform="rotate(22 -12 4)"/>
+      <g transform="translate(-22,-4)">
+        <path d="M-6-6 L 6-6 L 5 2 Q 5 7 0 8 Q-5 7-5 2 Z" fill="#ffd700" stroke="#a88800" stroke-width="1"/>
+        <ellipse cx="0" cy="-6" rx="6" ry="1.5" fill="#ffe040" stroke="#a88800" stroke-width="0.7"/>
+        <rect x="-1" y="8" width="2" height="4" fill="#ffd700"/>
+        <ellipse cx="0" cy="13" rx="4" ry="1.2" fill="#ffd700" stroke="#a88800" stroke-width="0.7"/>
+        <circle cx="-2" cy="-4" r="0.8" fill="#fff"/>
+        <circle cx="3" cy="-2" r="0.6" fill="#fff" opacity="0.8"/>
+      </g>
+    `:`<rect x="-15" y="2" width="6" height="13" fill="#f5d0a0" rx="2"/>`}
+
+    <!-- Belt items if both shield+grail -->
+    ${hasShield&&hasGrail?`
+      <g transform="translate(-6,18) scale(0.45)">
+        <path d="M-6-6 L 6-6 L 5 2 Q 5 7 0 8 Q-5 7-5 2 Z" fill="#ffd700" stroke="#a88800" stroke-width="0.8"/>
+        <ellipse cx="0" cy="-6" rx="6" ry="1.5" fill="#ffe040" stroke="#a88800" stroke-width="0.6"/>
+        <ellipse cx="0" cy="10" rx="4" ry="1.2" fill="#ffd700"/>
+      </g>`:''}
+  </g>`;
+}
+
+// ─── Path calculation for visited journey ───
+function getVisitedPath(user){
+  const order=getCompletionOrder(user.progress);
+  if(order.length===0) return [WARRIOR_POS.start];
+  const pts=[WARRIOR_POS.start];
+  order.forEach(lv=>{
+    const locId=levelToLocId(lv);
+    const fromId=getPrevLocId(order,lv);
+    const wpts=getWaypoints(fromId,locId);
+    wpts.forEach(wp=>pts.push(wp));
+    pts.push(WARRIOR_POS[locId]);
+  });
+  if(user.bossDefeated){
+    const lastLocId=levelToLocId(order[order.length-1]);
+    const wpts=getWaypoints(lastLocId,'boss');
+    wpts.forEach(wp=>pts.push(wp));
+    pts.push(WARRIOR_POS.boss);
+  }
+  // Dedupe consecutive identical points
+  return pts.filter((p,i)=>i===0||Math.hypot(p.x-pts[i-1].x,p.y-pts[i-1].y)>3);
+}
+
+function getPrevLocId(order,level){
+  const idx=order.indexOf(level);
+  if(idx===0) return 'start';
+  return levelToLocId(order[idx-1]);
+}
+
+function getCompletionOrder(progress){
+  const items=[];
+  [1,2,3,4].forEach(lv=>{
+    const p=progress['level'+lv];
+    if(p.completed&&p.completedAt) items.push({lv,at:p.completedAt});
+  });
+  items.sort((a,b)=>new Date(a.at)-new Date(b.at));
+  return items.map(i=>i.lv);
+}
+
+// ─── Current warrior position based on progress ───
+function getCurrentWarriorPos(user){
+  const order=getCompletionOrder(user.progress);
+  if(user.bossDefeated) return WARRIOR_POS.boss;
+  if(order.length===0) return WARRIOR_POS.start;
+  const lastLv=order[order.length-1];
+  return WARRIOR_POS[levelToLocId(lastLv)];
+}
+
+// ─── Animation flow ───
+let animationRunning=false;
+function delay(ms){return new Promise(r=>setTimeout(r,ms))}
+function setStory(msg,gold=false){
+  const el=document.getElementById('storyBox');
+  el.textContent=msg;
+  el.className='story-box'+(gold?' gold':'');
+}
+
+async function walkWarriorTo(target,fromPos){
+  const dist=Math.hypot(target.x-fromPos.x,target.y-fromPos.y);
+  if(dist<6) return;
+  const dur=Math.min(1200,Math.max(600,dist*4));
+  return new Promise(resolve=>{
+    const start=performance.now();
+    const sx=fromPos.x,sy=fromPos.y;
+    function frame(now){
+      const t=Math.min(1,(now-start)/dur);
+      const x=sx+(target.x-sx)*t;
+      const baseY=sy+(target.y-sy)*t;
+      const bounce=Math.sin(t*Math.PI*8)*2.5;
+      const y=baseY+bounce*(1-t);
+      const wg=document.getElementById('warriorGroup');
+      if(wg) wg.setAttribute('transform',`translate(${x},${y})`);
+      if(t<1) requestAnimationFrame(frame);
+      else{
+        if(wg) wg.setAttribute('transform',`translate(${target.x},${target.y})`);
+        resolve();
+      }
+    }
+    requestAnimationFrame(frame);
+  });
+}
+
+async function animateNewCompletion(user,newLevel,newEqKey){
+  if(animationRunning) return;
+  animationRunning=true;
+
+  const order=getCompletionOrder(user.progress);
+  const newLocId=levelToLocId(newLevel);
+  const targetPos=WARRIOR_POS[newLocId];
+  
+  // Start: warrior at previous position
+  const prevOrder=order.slice(0,order.indexOf(newLevel));
+  const fromLocId=prevOrder.length>0?levelToLocId(prevOrder[prevOrder.length-1]):'start';
+  const fromPos=WARRIOR_POS[fromLocId];
+  
+  // Draw initial state
+  const tmpUser=JSON.parse(JSON.stringify(user));
+  tmpUser.progress['level'+newLevel].completed=false;
+  tmpUser.equipmentOrder=user.equipmentOrder.filter(e=>e!==newEqKey);
+  document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,fromPos);
+  renderEquipBar(tmpUser.equipmentOrder);
+
+  setStory('勇者出發前往 '+WARRIOR_POS[newLocId===newLocId?newLocId:'start']+'…');
+  await delay(600);
+
+  // Walk through waypoints
+  let currentPos={...fromPos};
+  const waypoints=[...getWaypoints(fromLocId,newLocId),targetPos];
+  
+  for(const wp of waypoints){
+    const dist=Math.hypot(wp.x-currentPos.x,wp.y-currentPos.y);
+    if(dist>5){
+      setStory('勇者移動中…路徑繞過建築！');
+      await walkWarriorTo(wp,currentPos);
+    }
+    currentPos={...wp};
+    // Redraw to update path
+    document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,currentPos);
+    const wg=document.getElementById('warriorGroup');
+    if(wg) wg.setAttribute('transform',`translate(${currentPos.x},${currentPos.y})`);
+  }
+
+  setStory('✨ 到達目的地！寶箱發出金光…');
+  await delay(700);
+
+  // Reveal chest
+  tmpUser.progress['level'+newLevel].completed=true;
+  document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,currentPos);
+  await delay(600);
+
+  // Show reward popup
+  await showRewardPopup(newEqKey);
+
+  // Update equipment
+  tmpUser.equipmentOrder=[...tmpUser.equipmentOrder,newEqKey];
+  renderEquipBar(tmpUser.equipmentOrder);
+  document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,currentPos);
+
+  // Check for boss fight
+  const allDone=[1,2,3,4].every(lv=>tmpUser.progress['level'+lv].completed);
+  if(allDone&&!user.bossDefeated){
+    setStory('⚔️ 四件裝備集齊！前往管理大樓 BOSS 區…');
+    await delay(1000);
+    await animateBossFight(user,currentPos,tmpUser);
+  } else {
+    const remaining=[1,2,3,4].filter(lv=>!tmpUser.progress['level'+lv].completed).length;
+    setStory(remaining>0?`🎁 獲得 ${EQ_INFO[newEqKey].name}！還有 ${remaining} 關待攻略…`:`🏆 四關全通！前往管理大樓迎戰 BOSS！`);
+  }
+  animationRunning=false;
+}
+
+async function animateBossFight(user,currentPos,currentState){
+  const bossPos=WARRIOR_POS.boss;
+  const lastLocId=levelToLocId(getCompletionOrder(user.progress).slice(-1)[0]||'start');
+  
+  setStory('⚔️ 勇者朝管理大樓 BOSS 區進發！');
+  await delay(500);
+  
+  // Walk to boss
+  const waypoints=[...getWaypoints(lastLocId,'boss'),bossPos];
+  let currentPosWalk={...currentPos};
+  for(const wp of waypoints){
+    const dist=Math.hypot(wp.x-currentPosWalk.x,wp.y-currentPosWalk.y);
+    if(dist>5){
+      await walkWarriorTo(wp,currentPosWalk);
+    }
+    currentPosWalk={...wp};
+    document.getElementById('campusSvg').innerHTML=buildSvg(currentState,currentPosWalk);
+    const wg=document.getElementById('warriorGroup');
+    if(wg) wg.setAttribute('transform',`translate(${currentPosWalk.x},${currentPosWalk.y})`);
+  }
+
+  setStory('💥 最終決戰開始！');
+  await delay(400);
+
+  // Boss fight animation
+  document.getElementById('bossOverlay').classList.add('open');
+  document.getElementById('warriorSprite').textContent='🧙';
+  document.getElementById('bossSprite').textContent='😈';
+  
+  const msgs=['激烈戰鬥中…','勇者發動攻擊！⚔️','魔王反擊！😈','勇者使出全力！🔥','魔王力量在衰退…','勇者的光芒越來越強！✨'];
+  for(let i=0;i<msgs.length;i++){
+    document.getElementById('battleMsg').textContent=msgs[i];
+    await delay(800);
+  }
+  
+  // Boss defeated
+  document.getElementById('bossSprite').textContent='💀';
+  document.getElementById('battleMsg').textContent='魔王已被擊敗！🏆';
+  await delay(800);
+  document.getElementById('bossOverlay').classList.remove('open');
+
+  // Save boss defeated
+  user.bossDefeated=true;
+  user.bossDefeatedAt=new Date().toISOString();
+  saveUser(user);
+  
+  // Final map
+  document.getElementById('campusSvg').innerHTML=buildSvg(user,bossPos,{bossDefeated:true});
+  setStory('🏆 VICTORY! 魔王已被擊敗！',true);
+  
+  launchConfetti();
+  await delay(1200);
+  launchConfetti();
+  await delay(600);
+  
+  // Show victory
+  document.getElementById('victoryOverlay').classList.add('open');
+  launchConfetti();
+}
+
+function showRewardPopup(eqKey){
+  return new Promise(resolve=>{
+    const info=EQ_INFO[eqKey]||{icon:'?',name:'?',desc:'?'};
+    document.getElementById('rbIcon').textContent=info.icon;
+    document.getElementById('rbName').textContent=info.name;
+    document.getElementById('rbDesc').textContent=info.desc;
+    document.getElementById('rewardOverlay').classList.add('open');
+    launchConfetti();
+    window._rewardResolve=resolve;
+  });
+}
+
+function closeReward(){
+  document.getElementById('rewardOverlay').classList.remove('open');
+  if(window._rewardResolve){window._rewardResolve();window._rewardResolve=null}
+}
+
+function closeVictory(){
+  document.getElementById('victoryOverlay').classList.remove('open');
+}
+
+function goNextQr(){
+  window.location.href='index.html';
+}
+
+// ─── Equipment bar ───
+function renderEquipBar(equip){
+  const all=['sword','shield','grail','armor'];
+  document.getElementById('equipBar').innerHTML=all.map(e=>{
+    const has=equip.includes(e);
+    const info=EQ_INFO[e];
+    return`<div class="eq-slot ${has?'owned':''}">
+      <span class="eq-icon">${has?info.icon:'❓'}</span>
+      <span class="eq-name">${has?info.name:'???'}</span>
+    </div>`;
+  }).join('');
+}
+
+// ─── Confetti ───
+function launchConfetti(){
+  const colors=['#ff7a00','#ffd700','#b84eff','#22ff77','#ff2255','#ff9c2b'];
+  for(let i=0;i<60;i++){
+    const c=document.createElement('div'); c.className='cpiece';
+    c.style.left=Math.random()*100+'vw';
+    c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDuration=(1.5+Math.random()*2)+'s';
+    c.style.animationDelay=(Math.random()*0.4)+'s';
+    c.style.transform=`rotate(${Math.random()*360}deg)`;
+    document.body.appendChild(c);
+    setTimeout(()=>c.remove(),4000);
+  }
+}
+
+// ─── Init ───
+(function(){
+  const user=getCurrentUser();
+  if(!user){
+    setStory('請先在首頁登入！');
+    document.getElementById('campusSvg').innerHTML=buildSvg(
+      {equipmentOrder:[],progress:{level1:{completed:false},level2:{completed:false},level3:{completed:false},level4:{completed:false}},bossDefeated:false},
+      WARRIOR_POS.start
+    );
+    renderEquipBar([]);
+    return;
+  }
+
+  document.getElementById('userTag').textContent=user.name;
+  const urlParams=new URLSearchParams(window.location.search);
+  const reward=urlParams.get('reward');
+  const level=parseInt(urlParams.get('level'));
+
+  if(reward&&level){
+    // Just completed a level — animate
+    setTimeout(()=>animateNewCompletion(user,level,reward),400);
+  } else {
+    // Static view
+    const wpos=getCurrentWarriorPos(user);
+    document.getElementById('campusSvg').innerHTML=buildSvg(user,wpos);
+    renderEquipBar(user.equipmentOrder||[]);
+    const order=getCompletionOrder(user.progress);
+    if(user.bossDefeated){
+      setStory('🏆 VICTORY! 魔王已被擊敗！前往管院 8 樓領取禮物！',true);
+    } else if(order.length===0){
+      setStory('冒險尚未開始。掃描展板 QR Code，挑戰第一關！');
+    } else if([1,2,3,4].every(lv=>user.progress['level'+lv].completed)){
+      setStory('⚔️ 四件裝備集齊！回首頁查看 BOSS 狀態！');
+    } else {
+      setStory(`已通過 ${order.length} / 4 關。繼續探索校園！`);
+    }
+  }
+})();
+</script>
+</body>
+</html>
