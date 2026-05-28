@@ -5,8 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghost Hunter — 管理員後台</title>
 <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Share+Tech+Mono&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
 :root{
   --bg:#020810;--card:rgba(4,16,32,0.95);--border:rgba(0,210,255,0.25);
@@ -301,6 +299,8 @@ tbody td{padding:10px 14px;font-size:13px;color:var(--text);white-space:nowrap}
   </div>
 </div>
 
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
 const DB_KEY='ghost_hunter_db_v1';
 const ADMIN_PASS='halloween2026';
@@ -380,7 +380,7 @@ async function loadData(){
 
 function renderStats(users,votes){
   const total=users.length;
-  const allDone=users.filter(u=>[1,2,3,4].every(lv=>u.progress['level'+lv].completed)).length;
+  const allDone=users.filter(u=>[1,2,3,4].every(lv=>u.progress?.['level'+lv]?.completed)).length;
   const bossed=users.filter(u=>u.bossDefeated).length;
   const totalVotes=Object.values(votes).reduce((a,b)=>a+b,0);
   document.getElementById('statsRow').innerHTML=`
@@ -427,9 +427,9 @@ function renderTable(){
   const q=(document.getElementById('searchInput').value||'').toLowerCase();
   let users=[...allUsers];
   // Filter
-  if(filterMode==='done') users=users.filter(u=>[1,2,3,4].every(lv=>u.progress['level'+lv].completed));
+  if(filterMode==='done') users=users.filter(u=>[1,2,3,4].every(lv=>u.progress?.['level'+lv]?.completed));
   if(filterMode==='boss') users=users.filter(u=>u.bossDefeated);
-  if(filterMode==='incomplete') users=users.filter(u=>![1,2,3,4].every(lv=>u.progress['level'+lv].completed));
+  if(filterMode==='incomplete') users=users.filter(u=>![1,2,3,4].every(lv=>u.progress?.['level'+lv]?.completed));
   // Search
   if(q) users=users.filter(u=>(u.sid+'').toLowerCase().includes(q)||u.name.toLowerCase().includes(q));
   // Sort
@@ -445,7 +445,7 @@ function renderTable(){
   }
   document.getElementById('userTbody').innerHTML=users.map(u=>{
     const p=u.progress||{};
-    const allDone=[1,2,3,4].every(lv=>p['level'+lv].completed);
+    const allDone=[1,2,3,4].every(lv=>p?.['level'+lv]?.completed);
     const createdAt=u.createdAt?new Date(u.createdAt).toLocaleString('zh-TW',{month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'}):'--';
     return`<tr onclick="showDetail('${u.sid}')" style="cursor:pointer">
       <td style="font-family:'Share Tech Mono',monospace;color:var(--cyan2)">${u.sid}</td>
