@@ -560,7 +560,8 @@ async function handleLogin(){
   const cloudUser = await loadUserFromCloud(sid);
   const db=getDB();
   if(!db.users[sid]){
-    db.users[sid] = cloudUser || createUser(sid,name); saveDB(db);
+    const newUser = cloudUser || createUser(sid,name);
+    saveUser(newUser);
     showToast(cloudUser ? '☁️ 歡迎回來，'+cloudUser.name+'（雲端進度已同步）' : '🎃 帳號建立成功！');
   } else {
     if(cloudUser){ db.users[sid]=cloudUser; saveDB(db); }
