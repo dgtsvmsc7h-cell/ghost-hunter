@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Ghost Hunter — 打卡牆投票</title>
 <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Creepster&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
 :root{
   --bg:#070012;--card:rgba(15,2,30,0.9);--border:rgba(255,120,0,0.35);
@@ -182,6 +184,49 @@ body{
 const DB_KEY='ghost_hunter_db_v1';
 const SESSION_KEY='ghost_hunter_session';
 
+// ── Firebase 設定（請替換為你的專案資訊）──
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDAMI3neAeRNrfVdG1NenlI6osL1qN6vyM",
+  authDomain: "ghost-hunter-c8ec6.firebaseapp.com",
+  projectId: "ghost-hunter-c8ec6",
+  storageBucket: "ghost-hunter-c8ec6.firebasestorage.app",
+  messagingSenderId: "822859188160",
+  appId: "1:822859188160:web:80eff0b443c7939224aa25"
+};
+let fbStore = null;
+(function initFirebase(){
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    fbStore = firebase.firestore();
+  }catch(e){ console.warn('Firebase 未初始化，使用本機儲存', e); }
+})();
+async function syncUserToCloud(user){
+  if(!fbStore) return;
+  try{ await fbStore.collection('users').doc(user.sid).set(user); }
+  catch(e){ console.warn('雲端寫入失敗', e); }
+}
+async function loadUserFromCloud(sid){
+  if(!fbStore) return null;
+  try{
+    const snap = await fbStore.collection('users').doc(sid).get();
+    if(snap.exists){
+      const data = snap.data();
+      const db = getDB(); db.users[sid] = data; saveDB(db);
+      return data;
+    }
+  }catch(e){ console.warn('雲端讀取失敗', e); }
+  return null;
+}
+async function incrementVoteInCloud(voteKey){
+  if(!fbStore) return;
+  try{
+    await fbStore.collection('voteStats').doc('stats').set(
+      {[voteKey]: firebase.firestore.FieldValue.increment(1)},
+      {merge: true}
+    );
+  }catch(e){ console.warn('投票雲端同步失敗', e); }
+}
+
 function getDB(){
   try{return JSON.parse(localStorage.getItem(DB_KEY)||'{"users":{},"voteStats":{"zone1":0,"zone2":0,"zone3":0,"zone4":0}}')}
   catch{return{users:{},voteStats:{zone1:0,zone2:0,zone3:0,zone4:0}}}
@@ -191,7 +236,7 @@ function getCurrentUser(){
   const sid=localStorage.getItem(SESSION_KEY)||''; if(!sid) return null;
   return getDB().users[sid]||null;
 }
-function saveUser(user){const db=getDB();db.users[user.sid]=user;saveDB(db)}
+function saveUser(user){const db=getDB();db.users[user.sid]=user;saveDB(db);syncUserToCloud(user);}
 
 // Create stars
 for(let i=0;i<30;i++){
@@ -234,13 +279,14 @@ function renderLoginForm(){
       <button onclick="quickLogin()" class="submit-btn">🗳️ 登入並投票</button>
     </div>`;
 }
-function quickLogin(){
+async function quickLogin(){
   const sid=document.getElementById('pSid').value.trim();
   const name=document.getElementById('pName').value.trim();
   if(!sid||!name){alert('請填入學號與姓名');return}
+  const cloudUser = await loadUserFromCloud(sid);
   const db=getDB();
   if(!db.users[sid]){
-    db.users[sid]={
+    db.users[sid]=cloudUser||{
       sid,name,createdAt:new Date().toISOString(),
       progress:{
         level1:{completed:false,score:0,completedAt:null,equipment:null},
@@ -251,7 +297,7 @@ function quickLogin(){
       equipmentOrder:[],bossDefeated:false,bossDefeatedAt:null
     };
     saveDB(db);
-  }
+  } else if(cloudUser){ db.users[sid]=cloudUser; saveDB(db); }
   localStorage.setItem(SESSION_KEY,sid);
   init();
 }
@@ -294,6 +340,7 @@ function submitVote(){
   const db=getDB();
   if(!db.voteStats) db.voteStats={zone1:0,zone2:0,zone3:0,zone4:0};
   db.voteStats[selectedVote]=(db.voteStats[selectedVote]||0)+1;
+  incrementVoteInCloud(selectedVote);
   
   // Assign armor
   const owned=user.equipmentOrder||[];

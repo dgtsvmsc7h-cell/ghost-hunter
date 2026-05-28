@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Ghost Hunter — 勇者地圖</title>
 <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Share+Tech+Mono&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
 :root{
   --bg:#030106;--card:rgba(10,2,20,0.9);--border:rgba(0,210,255,0.3);
@@ -288,6 +290,29 @@ body::before{
 <script>
 const DB_KEY='ghost_hunter_db_v1';
 const SESSION_KEY='ghost_hunter_session';
+
+// ── Firebase 設定（請替換為你的專案資訊）──
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDAMI3neAeRNrfVdG1NenlI6osL1qN6vyM",
+  authDomain: "ghost-hunter-c8ec6.firebaseapp.com",
+  projectId: "ghost-hunter-c8ec6",
+  storageBucket: "ghost-hunter-c8ec6.firebasestorage.app",
+  messagingSenderId: "822859188160",
+  appId: "1:822859188160:web:80eff0b443c7939224aa25"
+};
+let fbStore = null;
+(function initFirebase(){
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    fbStore = firebase.firestore();
+  }catch(e){ console.warn('Firebase 未初始化，使用本機儲存', e); }
+})();
+async function syncUserToCloud(user){
+  if(!fbStore) return;
+  try{ await fbStore.collection('users').doc(user.sid).set(user); }
+  catch(e){ console.warn('雲端寫入失敗', e); }
+}
+
 function getDB(){
   try{return JSON.parse(localStorage.getItem(DB_KEY)||'{"users":{},"voteStats":{"zone1":0,"zone2":0,"zone3":0,"zone4":0}}')}
   catch{return{users:{},voteStats:{zone1:0,zone2:0,zone3:0,zone4:0}}}
@@ -297,7 +322,7 @@ function getCurrentUser(){
   const sid=localStorage.getItem(SESSION_KEY)||''; if(!sid)return null;
   return getDB().users[sid]||null;
 }
-function saveUser(user){const db=getDB();db.users[user.sid]=user;saveDB(db)}
+function saveUser(user){const db=getDB();db.users[user.sid]=user;saveDB(db);syncUserToCloud(user);}
 
 // ─── Equipment info ───
 const EQ_INFO={

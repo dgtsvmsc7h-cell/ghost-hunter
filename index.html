@@ -6,6 +6,8 @@
 <title>Ghost Hunter: Midnight Signal</title>
 <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Bangers&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
 :root {
   --bg: #080010;
@@ -470,6 +472,40 @@ body::after{
 <script>
 const DB_KEY = 'ghost_hunter_db_v1';
 const SESSION_KEY = 'ghost_hunter_session';
+
+// ── Firebase 設定（請替換為你的專案資訊）──
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDAMI3neAeRNrfVdG1NenlI6osL1qN6vyM",
+  authDomain: "ghost-hunter-c8ec6.firebaseapp.com",
+  projectId: "ghost-hunter-c8ec6",
+  storageBucket: "ghost-hunter-c8ec6.firebasestorage.app",
+  messagingSenderId: "822859188160",
+  appId: "1:822859188160:web:80eff0b443c7939224aa25"
+};
+let fbStore = null;
+(function initFirebase(){
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    fbStore = firebase.firestore();
+  }catch(e){ console.warn('Firebase 未初始化，使用本機儲存', e); }
+})();
+async function syncUserToCloud(user){
+  if(!fbStore) return;
+  try{ await fbStore.collection('users').doc(user.sid).set(user); }
+  catch(e){ console.warn('雲端寫入失敗', e); }
+}
+async function loadUserFromCloud(sid){
+  if(!fbStore) return null;
+  try{
+    const snap = await fbStore.collection('users').doc(sid).get();
+    if(snap.exists){
+      const data = snap.data();
+      const db = getDB(); db.users[sid] = data; saveDB(db);
+      return data;
+    }
+  }catch(e){ console.warn('雲端讀取失敗', e); }
+  return null;
+}
 const EQUIPMENT_LIST = ['sword','shield','grail','armor'];
 const EQUIP_INFO = {
   sword:  {icon:'⚔️', name:'聖劍'},
@@ -499,6 +535,7 @@ function getCurrentUser(){
 }
 function saveUser(user){
   const db=getDB(); db.users[user.sid]=user; saveDB(db);
+  syncUserToCloud(user);
 }
 function createUser(sid,name){
   return {
@@ -514,16 +551,19 @@ function createUser(sid,name){
 }
 
 // ── Login ──
-function handleLogin(){
+async function handleLogin(){
   const sid=document.getElementById('inputSid').value.trim();
   const name=document.getElementById('inputName').value.trim();
   if(!sid){showToast('請輸入學號');return}
   if(!name){showToast('請輸入姓名');return}
+  showToast('⏳ 連線中…');
+  const cloudUser = await loadUserFromCloud(sid);
   const db=getDB();
   if(!db.users[sid]){
-    db.users[sid]=createUser(sid,name); saveDB(db);
-    showToast('🎃 帳號建立成功！');
+    db.users[sid] = cloudUser || createUser(sid,name); saveDB(db);
+    showToast(cloudUser ? '☁️ 歡迎回來，'+cloudUser.name+'（雲端進度已同步）' : '🎃 帳號建立成功！');
   } else {
+    if(cloudUser){ db.users[sid]=cloudUser; saveDB(db); }
     showToast('👻 歡迎回來，'+db.users[sid].name);
   }
   setSession(sid);

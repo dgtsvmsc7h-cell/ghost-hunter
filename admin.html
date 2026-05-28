@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ghost Hunter — 管理員後台</title>
 <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Share+Tech+Mono&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
 :root{
   --bg:#020810;--card:rgba(4,16,32,0.95);--border:rgba(0,210,255,0.25);
@@ -285,7 +287,7 @@ tbody td{padding:10px 14px;font-size:13px;color:var(--text);white-space:nowrap}
       </div>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:11px;color:var(--subtext);margin-bottom:40px">
-      此後台僅限管理員使用。所有資料儲存於本機 localStorage，重新整理後仍保留。
+      此後台僅限管理員使用。資料優先從 Firebase Firestore 雲端讀取；若無網路則回退至本機 localStorage。
     </div>
   </div>
 </div>
@@ -302,6 +304,23 @@ tbody td{padding:10px 14px;font-size:13px;color:var(--text);white-space:nowrap}
 <script>
 const DB_KEY='ghost_hunter_db_v1';
 const ADMIN_PASS='halloween2026';
+
+// ── Firebase 設定（請替換為你的專案資訊）──
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDAMI3neAeRNrfVdG1NenlI6osL1qN6vyM",
+  authDomain: "ghost-hunter-c8ec6.firebaseapp.com",
+  projectId: "ghost-hunter-c8ec6",
+  storageBucket: "ghost-hunter-c8ec6.firebasestorage.app",
+  messagingSenderId: "822859188160",
+  appId: "1:822859188160:web:80eff0b443c7939224aa25"
+};
+let fbStore = null;
+(function initFirebase(){
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    fbStore = firebase.firestore();
+  }catch(e){ console.warn('Firebase 未初始化，使用本機儲存', e); }
+})();
 const EQUIP_INFO={sword:{icon:'⚔️',name:'聖劍'},shield:{icon:'🛡️',name:'聖盾'},grail:{icon:'🏆',name:'聖杯'},armor:{icon:'🦺',name:'盔甲'}};
 const VOTE_LABELS={zone1:'🪦 Origin.exe 展區',zone2:'👻 Ghost Database 展區',zone3:'🎃 Pumpkin Code 展區',zone4:'📸 Ghost Mode ON 展區'};
 const VOTE_COLORS={zone1:'#00bcd4',zone2:'#ff0066',zone3:'#ff6600',zone4:'#ff5500'};
@@ -334,13 +353,29 @@ function doLogout(){
 }
 document.getElementById('adminPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
 
-function loadData(){
+async function loadData(){
+  if(fbStore){
+    try{
+      const [usersSnap,statsSnap]=await Promise.all([
+        fbStore.collection('users').get(),
+        fbStore.collection('voteStats').doc('stats').get()
+      ]);
+      allUsers=usersSnap.docs.map(d=>d.data());
+      const votes=statsSnap.exists?statsSnap.data():{zone1:0,zone2:0,zone3:0,zone4:0};
+      renderStats(allUsers,votes);
+      renderVoteChart(votes);
+      renderTable();
+      document.getElementById('lastRefresh').textContent='更新：'+new Date().toLocaleTimeString('zh-TW')+' ☁️ Firestore';
+      return;
+    }catch(e){ console.warn('Firestore 讀取失敗，使用本地資料',e); }
+  }
+  // fallback：localStorage
   const db=getDB();
   allUsers=Object.values(db.users||{});
   renderStats(allUsers,db.voteStats||{});
   renderVoteChart(db.voteStats||{});
   renderTable();
-  document.getElementById('lastRefresh').textContent='更新：'+new Date().toLocaleTimeString('zh-TW');
+  document.getElementById('lastRefresh').textContent='更新：'+new Date().toLocaleTimeString('zh-TW')+' （本機）';
 }
 
 function renderStats(users,votes){
