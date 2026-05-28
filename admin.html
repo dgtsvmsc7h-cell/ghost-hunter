@@ -339,7 +339,7 @@ function doLogin(){
   const pass=document.getElementById('adminPass').value;
   if(pass===ADMIN_PASS){
     document.getElementById('loginScreen').style.display='none';
-    document.getElementById('adminDash').style.display='';
+    document.getElementById('adminDash').style.display='block';
     loadData();
   } else {
     document.getElementById('loginErr').textContent='❌ 密碼錯誤，請再試一次';
@@ -456,7 +456,7 @@ function renderTable(){
       <td>${badge(p.level4?.completed)}</td>
       <td style="text-align:center;font-family:'Bangers',cursive;font-size:18px;color:var(--gold)">${(u.equipmentOrder||[]).length}/4</td>
       <td>${u.bossDefeated?`<span class="badge boss">💀 已擊敗</span>`:`<span class="badge todo">⏳ 未挑戰</span>`}</td>
-      <td>${allDone?`<span class="badge done">✅ 全通</span>`:`<span class="badge red">${[1,2,3,4].filter(lv=>!p['level'+lv].completed).length} 關未過</span>`}</td>
+      <td>${allDone?`<span class="badge done">✅ 全通</span>`:`<span class="badge red">${[1,2,3,4].filter(lv=>!p?.['level'+lv]?.completed).length} 關未過</span>`}</td>
       <td style="color:var(--subtext);font-size:12px">${createdAt}</td>
     </tr>`;
   }).join('');
