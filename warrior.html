@@ -792,6 +792,17 @@ function setStory(msg,gold=false){
   el.className='story-box'+(gold?' gold':'');
 }
 
+function scrollMapToWarrior(svgX){
+  const wrapper=document.querySelector('.map-wrapper');
+  const svg=document.getElementById('campusSvg');
+  if(!wrapper||!svg) return;
+  const scale=(svg.clientWidth||700)/1000;
+  const pixelX=svgX*scale;
+  const wrapperW=wrapper.clientWidth;
+  // Keep warrior horizontally centred in the visible area
+  wrapper.scrollLeft=Math.max(0,pixelX-wrapperW/2);
+}
+
 async function walkWarriorTo(target,fromPos){
   const dist=Math.hypot(target.x-fromPos.x,target.y-fromPos.y);
   if(dist<6) return;
@@ -807,9 +818,11 @@ async function walkWarriorTo(target,fromPos){
       const y=baseY+bounce*(1-t);
       const wg=document.getElementById('warriorGroup');
       if(wg) wg.setAttribute('transform',`translate(${x},${y})`);
+      scrollMapToWarrior(x);
       if(t<1) requestAnimationFrame(frame);
       else{
         if(wg) wg.setAttribute('transform',`translate(${target.x},${target.y})`);
+        scrollMapToWarrior(target.x);
         resolve();
       }
     }
