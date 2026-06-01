@@ -342,6 +342,7 @@ function submitVote(){
   const db=getDB();
   if(!db.voteStats) db.voteStats={zone1:0,zone2:0,zone3:0,zone4:0};
   db.voteStats[selectedVote]=(db.voteStats[selectedVote]||0)+1;
+  saveDB(db);
   incrementVoteInCloud(selectedVote);
   
   // Assign armor
