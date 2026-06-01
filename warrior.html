@@ -219,6 +219,32 @@ body::before{
 /* Confetti */
 .cpiece{position:fixed;top:-10px;width:8px;height:14px;z-index:999;pointer-events:none;animation:cfall linear forwards}
 @keyframes cfall{to{transform:translateY(110vh) rotate(720deg);opacity:0}}
+
+/* Building info overlay */
+@keyframes slideup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.info-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);
+  z-index:400;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.info-overlay.open{display:flex;animation:slideup 0.3s ease}
+.info-box{
+  background:#110020;border:1px solid rgba(255,100,0,0.4);border-radius:20px 20px 0 0;
+  padding:28px 20px 40px;width:100%;max-width:480px;
+}
+.info-box .ib-icon{font-size:54px;text-align:center;display:block;margin-bottom:12px}
+.info-box h3{font-family:'Bangers',cursive;font-size:28px;letter-spacing:1px;color:var(--orange2);margin-bottom:8px;text-align:center}
+.info-box .ib-tag{text-align:center;margin-bottom:14px}
+.info-box .ib-tag span{
+  display:inline-block;background:rgba(255,122,0,0.15);border:1px solid var(--orange);
+  border-radius:99px;padding:3px 12px;font-size:12px;color:var(--orange);letter-spacing:1px;
+}
+.info-box p{font-size:15px;color:var(--text);line-height:1.7;margin-bottom:14px}
+.info-close{
+  width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);
+  border-radius:10px;padding:14px;font-size:15px;font-weight:700;
+  color:var(--text);cursor:pointer;font-family:'Nunito',sans-serif;
+}
 </style>
 </head>
 <body>
@@ -244,6 +270,17 @@ body::before{
       <div class="boss-battle" id="bossSprite">😈</div>
     </div>
     <div style="font-family:'Share Tech Mono',monospace;font-size:14px;color:var(--red);letter-spacing:2px;animation:bossFlash 0.5s infinite alternate;text-align:center" id="battleMsg">激烈戰鬥中…</div>
+  </div>
+</div>
+
+<!-- Building info overlay -->
+<div class="info-overlay" id="infoOverlay" onclick="closeBuildingInfo()">
+  <div class="info-box" onclick="event.stopPropagation()">
+    <span class="ib-icon" id="infoIcon">🪦</span>
+    <h3 id="infoTitle">STAGE 01</h3>
+    <div class="ib-tag"><span id="infoLoc">地點</span></div>
+    <p id="infoDesc">關卡說明</p>
+    <button class="info-close" onclick="closeBuildingInfo()">關閉</button>
   </div>
 </div>
 
@@ -324,6 +361,25 @@ function getCurrentUser(){
   return getDB().users[sid]||null;
 }
 function saveUser(user){const db=getDB();db.users[user.sid]=user;saveDB(db);syncUserToCloud(user);}
+
+// ─── Stage info ───
+const STAGE_INFO=[
+  {num:1,icon:'🪦',title:'萬聖節的起源',loc:'第一醫學大樓',desc:'5 道萬聖節起源選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
+  {num:2,icon:'👻',title:'世界各國鬼怪文化',loc:'管理大樓（本活動起點）',desc:'5 道世界鬼怪文化選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
+  {num:3,icon:'🎃',title:'南瓜燈的秘密',loc:'圖書館',desc:'5 道關於傑克燈與南瓜的選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
+  {num:4,icon:'🗳️',title:'打卡牆與投票',loc:'活動中心三樓',desc:'投票選出你最喜歡的展區！每位勇者只能投票一次，完成後獲得第四件裝備「盔甲」！'},
+];
+function showBuildingInfo(num){
+  const s=STAGE_INFO[num-1]; if(!s) return;
+  document.getElementById('infoIcon').textContent=s.icon;
+  document.getElementById('infoTitle').textContent=`STAGE 0${s.num}｜${s.title}`;
+  document.getElementById('infoLoc').textContent='📍 '+s.loc;
+  document.getElementById('infoDesc').textContent=s.desc;
+  document.getElementById('infoOverlay').classList.add('open');
+}
+function closeBuildingInfo(){
+  document.getElementById('infoOverlay').classList.remove('open');
+}
 
 // ─── Equipment info ───
 const EQ_INFO={
@@ -447,7 +503,7 @@ function buildSvg(user,warriorPos,opts){
 <!-- ── Quest buildings ── -->
 
 <!-- 管理大樓 (Level 2 + START + BOSS) -->
-<g>
+<g onclick="showBuildingInfo(2)" style="cursor:pointer">
   <rect x="300" y="20" width="290" height="145" rx="6" fill="url(#gf4)" stroke="#ff0066" stroke-width="${done[2]?'2.5':'1.8'}" opacity="${done[2]?'1':'0.9'}"/>
   <line x1="300" y1="90" x2="590" y2="90" stroke="#ff0066" stroke-width="0.6" opacity="0.35"/>
   <line x1="445" y1="20" x2="445" y2="165" stroke="#ff0066" stroke-width="0.5" opacity="0.3"/>
@@ -464,7 +520,7 @@ function buildSvg(user,warriorPos,opts){
 </g>
 
 <!-- 第一醫學大樓 (Level 1) -->
-<g>
+<g onclick="showBuildingInfo(1)" style="cursor:pointer">
   <polygon points="490,200 710,200 710,310 620,310 620,345 490,345" fill="url(#gf2)" stroke="#00e1ff" stroke-width="${done[1]?'2.5':'1.8'}" opacity="${done[1]?'1':'0.9'}"/>
   <line x1="490" y1="255" x2="710" y2="255" stroke="#00e1ff" stroke-width="0.5" opacity="0.35"/>
   <text x="595" y="234" text-anchor="middle" fill="#00e1ff" font-size="13" font-family="'Noto Sans TC',sans-serif" font-weight="bold">第一醫學大樓</text>
@@ -477,7 +533,7 @@ function buildSvg(user,warriorPos,opts){
 </g>
 
 <!-- 圖書館 (Level 3) -->
-<g>
+<g onclick="showBuildingInfo(3)" style="cursor:pointer">
   <rect x="680" y="40" width="120" height="100" rx="10" fill="url(#gflib)" stroke="#9d00ff" stroke-width="${done[3]?'2.5':'1.8'}" opacity="${done[3]?'1':'0.9'}"/>
   <text x="740" y="78" text-anchor="middle" fill="#c060ff" font-size="13" font-family="'Noto Sans TC',sans-serif" font-weight="bold">圖書館</text>
   <text x="740" y="93" text-anchor="middle" fill="#9d00ff" font-size="9" font-family="'Share Tech Mono',monospace">LIBRARY · Lv.3</text>
@@ -489,7 +545,7 @@ function buildSvg(user,warriorPos,opts){
 </g>
 
 <!-- 活動中心 (Level 4, was 工學大樓) -->
-<g>
+<g onclick="showBuildingInfo(4)" style="cursor:pointer">
   <rect x="850" y="60" width="135" height="200" rx="6" fill="url(#gf1)" stroke="#ff5500" stroke-width="${done[4]?'2.5':'1.8'}" opacity="${done[4]?'1':'0.9'}"/>
   <line x1="850" y1="120" x2="985" y2="120" stroke="#ff5500" stroke-width="0.5" opacity="0.35"/>
   <line x1="917" y1="60" x2="917" y2="260" stroke="#ff5500" stroke-width="0.5" opacity="0.35"/>
