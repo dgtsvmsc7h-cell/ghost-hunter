@@ -252,7 +252,6 @@ tbody td{padding:10px 14px;font-size:13px;color:var(--text);white-space:nowrap}
     <div class="tabs">
       <div class="tab active" onclick="switchTab('all',this)">全部玩家</div>
       <div class="tab" onclick="switchTab('done',this)">已全通</div>
-      <div class="tab" onclick="switchTab('boss',this)">已擊敗 BOSS</div>
       <div class="tab" onclick="switchTab('incomplete',this)">進行中</div>
     </div>
     <div class="table-wrap">
@@ -275,7 +274,6 @@ tbody td{padding:10px 14px;font-size:13px;color:var(--text);white-space:nowrap}
               <th>Lv.3</th>
               <th>Lv.4</th>
               <th>裝備數</th>
-              <th>BOSS</th>
               <th>全通</th>
               <th>建立時間</th>
             </tr>
@@ -381,12 +379,10 @@ async function loadData(){
 function renderStats(users,votes){
   const total=users.length;
   const allDone=users.filter(u=>[1,2,3,4].every(lv=>u.progress?.['level'+lv]?.completed)).length;
-  const bossed=users.filter(u=>u.bossDefeated).length;
   const totalVotes=Object.values(votes).reduce((a,b)=>a+b,0);
   document.getElementById('statsRow').innerHTML=`
     <div class="stat-card"><div class="sc-val">${total}</div><div class="sc-label">🧑 總帳號數</div></div>
     <div class="stat-card"><div class="sc-val" style="color:var(--green)">${allDone}</div><div class="sc-label">✅ 四關全通</div></div>
-    <div class="stat-card"><div class="sc-val" style="color:var(--gold)">${bossed}</div><div class="sc-label">💀 擊敗 BOSS</div></div>
     <div class="stat-card"><div class="sc-val" style="color:var(--purple)">${totalVotes}</div><div class="sc-label">🗳️ 投票總數</div></div>
   `;
 }
@@ -412,7 +408,7 @@ function switchTab(mode,el){
   filterMode=mode;
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   el.classList.add('active');
-  const titles={all:'全部玩家',done:'已四關全通',boss:'已擊敗 BOSS',incomplete:'進行中'};
+  const titles={all:'全部玩家',done:'已四關全通',incomplete:'進行中'};
   document.getElementById('tableTitle').textContent=titles[mode]||'玩家';
   renderTable();
 }
@@ -428,7 +424,6 @@ function renderTable(){
   let users=[...allUsers];
   // Filter
   if(filterMode==='done') users=users.filter(u=>[1,2,3,4].every(lv=>u.progress?.['level'+lv]?.completed));
-  if(filterMode==='boss') users=users.filter(u=>u.bossDefeated);
   if(filterMode==='incomplete') users=users.filter(u=>![1,2,3,4].every(lv=>u.progress?.['level'+lv]?.completed));
   // Search
   if(q) users=users.filter(u=>(u.sid+'').toLowerCase().includes(q)||u.name.toLowerCase().includes(q));
@@ -440,7 +435,7 @@ function renderTable(){
     if(va<vb) return -sortDir; if(va>vb) return sortDir; return 0;
   });
   if(users.length===0){
-    document.getElementById('userTbody').innerHTML=`<tr><td colspan="10"><div class="no-data">暫無符合資料</div></td></tr>`;
+    document.getElementById('userTbody').innerHTML=`<tr><td colspan="9"><div class="no-data">暫無符合資料</div></td></tr>`;
     return;
   }
   document.getElementById('userTbody').innerHTML=users.map(u=>{
@@ -455,7 +450,6 @@ function renderTable(){
       <td>${badge(p.level3?.completed)}</td>
       <td>${badge(p.level4?.completed)}</td>
       <td style="text-align:center;font-family:'Bangers',cursive;font-size:18px;color:var(--gold)">${(u.equipmentOrder||[]).length}/4</td>
-      <td>${u.bossDefeated?`<span class="badge boss">💀 已擊敗</span>`:`<span class="badge todo">⏳ 未挑戰</span>`}</td>
       <td>${allDone?`<span class="badge done">✅ 全通</span>`:`<span class="badge red">${[1,2,3,4].filter(lv=>!p?.['level'+lv]?.completed).length} 關未過</span>`}</td>
       <td style="color:var(--subtext);font-size:12px">${createdAt}</td>
     </tr>`;
