@@ -349,8 +349,7 @@ function submitVote(){
   const now=new Date().toISOString();
   user.progress.level4={completed:true,vote:selectedVote,completedAt:now,equipment:newEq};
   user.equipmentOrder=[...owned,newEq];
-  db.users[user.sid]=user;
-  saveDB(db);
+  saveUser(user);
   
   // Confetti
   launchConfetti();
