@@ -195,8 +195,9 @@ body::after{
   border-style:solid;border-color:var(--gold);background:rgba(255,215,0,0.08);
   opacity:1;box-shadow:0 0 16px rgba(255,215,0,0.2);
 }
-.equip-item .ei-icon{font-size:26px}
-.equip-item .ei-name{font-size:11px;font-weight:700;text-align:center;color:var(--cream)}
+.equip-item .ei-icon{font-size:26px;filter:brightness(0);opacity:0.45;transition:filter 0.3s,opacity 0.3s}
+.equip-item.owned .ei-icon{filter:none;opacity:1}
+.equip-item .ei-name{font-size:11px;font-weight:700;text-align:center;color:rgba(255,255,255,0.3)}
 .equip-item.owned .ei-name{color:var(--gold)}
 
 /* Boss status */
@@ -610,7 +611,7 @@ function renderDash(){
     const has=user.equipmentOrder.includes(e);
     return`<div class="equip-item ${has?'owned':''}">
       <span class="ei-icon">${eq2[e].icon}</span>
-      <span class="ei-name">${has?eq2[e].name:'???'}</span>
+      <span class="ei-name">${has?eq2[e].name:'？？？'}</span>
     </div>`;
   }).join('');
 

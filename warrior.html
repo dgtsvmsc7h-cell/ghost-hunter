@@ -87,8 +87,9 @@ body::before{
   border-style:solid;border-color:var(--gold);background:rgba(255,215,0,0.07);
   box-shadow:0 0 14px rgba(255,215,0,0.2);
 }
-.eq-slot .eq-icon{font-size:20px;display:block;margin-bottom:2px}
-.eq-slot .eq-name{font-size:10px;color:var(--subtext);font-weight:700}
+.eq-slot .eq-icon{font-size:20px;display:block;margin-bottom:2px;filter:brightness(0);opacity:0.4;transition:filter 0.3s,opacity 0.3s}
+.eq-slot.owned .eq-icon{filter:none;opacity:1}
+.eq-slot .eq-name{font-size:10px;color:rgba(255,255,255,0.25);font-weight:700}
 .eq-slot.owned .eq-name{color:var(--gold)}
 
 /* Actions */
@@ -914,8 +915,8 @@ function renderEquipBar(equip){
     const has=equip.includes(e);
     const info=EQ_INFO[e];
     return`<div class="eq-slot ${has?'owned':''}">
-      <span class="eq-icon">${has?info.icon:'❓'}</span>
-      <span class="eq-name">${has?info.name:'???'}</span>
+      <span class="eq-icon">${info.icon}</span>
+      <span class="eq-name">${has?info.name:'？？？'}</span>
     </div>`;
   }).join('');
 }
