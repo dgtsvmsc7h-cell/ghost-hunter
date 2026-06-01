@@ -355,14 +355,13 @@ function submitVote(){
   launchConfetti();
   
   // Redirect to warrior with reward
-  setTimeout(()=>{
-    window.location.href=`warrior.html?reward=${newEq}&level=4&score=voted`;
-  }, 1800);
-  
-  showVictory(user,newEq);
+  const redirectUrl=`warrior.html?reward=${newEq}&level=4&score=voted`;
+  setTimeout(()=>{ window.location.href=redirectUrl; }, 1800);
+
+  showVictory(user,newEq,redirectUrl);
 }
 
-function showVictory(user,eq){
+function showVictory(user,eq,redirectUrl){
   const eqInfo={sword:{icon:'⚔️',name:'聖劍'},shield:{icon:'🛡️',name:'聖盾'},grail:{icon:'🏆',name:'聖杯'},armor:{icon:'🛡️',name:'盔甲'}};
   const info=eqInfo[eq]||{icon:'🛡️',name:'盔甲'};
   document.getElementById('pageContent').innerHTML=`
@@ -374,7 +373,9 @@ function showVictory(user,eq){
         <span class="ve-icon">${info.icon}</span>
         <span class="ve-name">${info.name}</span>
       </div>
-      <div class="victory-msg">正在前往勇者地圖…<br>查看完整冒險進度！</div>
+      <div class="victory-msg" style="margin-bottom:18px">即將前往勇者地圖，查看你的完整通關紀錄…</div>
+      <a href="${redirectUrl}" class="action-btn" style="display:block;text-align:center;text-decoration:none">⚔️ 立即前往勇者地圖</a>
+      <a href="index.html" class="action-btn sec" style="display:block;text-align:center;text-decoration:none;margin-top:10px">🏠 回首頁</a>
     </div>`;
 }
 
@@ -386,7 +387,8 @@ function renderAlreadyVoted(user){
       <div style="font-size:60px;text-align:center;display:block;margin-bottom:14px">✅</div>
       <div style="font-family:'Bangers',cursive;font-size:28px;color:var(--green);text-align:center;letter-spacing:1px;margin-bottom:8px">已完成投票</div>
       <p style="font-size:14px;color:var(--subtext);text-align:center;line-height:1.6;margin-bottom:18px">
-        你投給了：${voted.icon} ${voted.name}
+        你投給了：${voted.icon} ${voted.name}<br>
+        <span style="font-size:12px;opacity:0.7">進度已儲存，可隨時回首頁查看通關紀錄。</span>
       </p>
       <a href="warrior.html" class="action-btn">⚔️ 查看勇者地圖</a>
       <a href="index.html" class="action-btn sec">🏠 回首頁</a>

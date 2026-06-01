@@ -499,11 +499,7 @@ async function loadUserFromCloud(sid){
   if(!fbStore) return null;
   try{
     const snap = await fbStore.collection('users').doc(sid).get();
-    if(snap.exists){
-      const data = snap.data();
-      const db = getDB(); db.users[sid] = data; saveDB(db);
-      return data;
-    }
+    if(snap.exists) return snap.data();
   }catch(e){ console.warn('雲端讀取失敗', e); }
   return null;
 }
@@ -565,7 +561,11 @@ async function handleLogin(){
     saveUser(newUser);
     showToast(cloudUser ? '☁️ 歡迎回來，'+cloudUser.name+'（雲端進度已同步）' : '🎃 帳號建立成功！');
   } else {
-    if(cloudUser){ db.users[sid]=cloudUser; saveDB(db); }
+    if(cloudUser){
+      const localEqLen=(db.users[sid]?.equipmentOrder||[]).length;
+      const cloudEqLen=(cloudUser.equipmentOrder||[]).length;
+      if(cloudEqLen>localEqLen){ db.users[sid]=cloudUser; saveDB(db); }
+    }
     showToast('👻 歡迎回來，'+db.users[sid].name);
   }
   setSession(sid);
