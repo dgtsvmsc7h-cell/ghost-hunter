@@ -562,9 +562,11 @@ async function handleLogin(){
     showToast(cloudUser ? '☁️ 歡迎回來，'+cloudUser.name+'（雲端進度已同步）' : '🎃 帳號建立成功！');
   } else {
     if(cloudUser){
-      const localEqLen=(db.users[sid]?.equipmentOrder||[]).length;
+      const local=db.users[sid];
       const cloudEqLen=(cloudUser.equipmentOrder||[]).length;
-      if(cloudEqLen>localEqLen){ db.users[sid]=cloudUser; saveDB(db); }
+      const localEqLen=(local?.equipmentOrder||[]).length;
+      const cloudAhead=cloudEqLen>localEqLen||(cloudUser.bossDefeated&&!local?.bossDefeated);
+      if(cloudAhead){ db.users[sid]=cloudUser; saveDB(db); }
     }
     showToast('👻 歡迎回來，'+db.users[sid].name);
   }
@@ -726,10 +728,20 @@ function showToast(msg,dur=2200){
 })();
 
 // ── Init ──
-(function(){
-  const user=getCurrentUser();
+(async function(){
+  const sid=getSession();
+  let user=getCurrentUser();
+  // Session exists but localStorage is empty → try Firestore recovery
+  if(sid&&!user){
+    const cloudUser=await loadUserFromCloud(sid);
+    if(cloudUser){
+      const db=getDB();
+      db.users[sid]=cloudUser;
+      saveDB(db);
+      user=cloudUser;
+    }
+  }
   if(user) renderDash();
-  // Enter on input
   ['inputSid','inputName'].forEach(id=>{
     document.getElementById(id).addEventListener('keydown',e=>{
       if(e.key==='Enter') handleLogin();
