@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ghost Mode：校園萬聖登入中</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #030106; /* 極致暗黑背景 */
+            --primary-yellow: #ffee00; /* 黃色霓虹 */
+            --accent-orange: #ff5500; /* 萬聖橘 */
+            --secondary-neon: #9d00ff; /* 魔幻紫 */
+            --cyber-red: #ff0055; /* 警告紅 */
+            --cyber-green: #33ff66; /* 駭客綠 */
+            --cyber-blue: #00d2ff; /* 雷達藍 */
+            --text-color: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Noto Sans TC', 'Share Tech Mono', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* 暗黑網格雷達背景 */
+        .radar-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1; 
+            pointer-events: none;
+            background-color: #030106;
+            background-image: 
+                linear-gradient(rgba(0, 102, 255, 0.22) 1.5px, transparent 1.5px),
+                linear-gradient(90deg, rgba(0, 102, 255, 0.22) 1.5px, transparent 1.5px),
+                radial-gradient(rgba(157, 0, 255, 0.35) 2px, transparent 0);
+            background-size: 50px 50px, 50px 50px, 25px 25px;
+        }
+
+        /* 頁面切換控制 */
+        .page {
+            display: none;
+            min-height: 100vh;
+            padding: 40px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ==================== 標題區塊與呼吸閃爍 ==================== */
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            padding: 40px 10px;
+            border: 2px dashed var(--secondary-neon);
+            background: rgba(13, 2, 20, 0.5);
+            position: relative;
+            backdrop-filter: blur(2px);
+        }
+
+        header::before {
+            content: "SYSTEM STATUS: GLITCHED";
+            position: absolute;
+            top: 5px;
+            left: 10px;
+            font-size: 12px;
+            color: var(--secondary-neon);
+            font-family: 'Share Tech Mono', sans-serif;
+        }
+
+        /* 黃色一閃一閃發光標題 */
+        .main-title {
+            font-size: 2.8rem;
+            font-weight: 700;
+            color: var(--primary-yellow);
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            animation: yellowGlowBlink 2.5s infinite alternate ease-in-out;
+        }
+
+        @keyframes yellowGlowBlink {
+            0% {
+                text-shadow: 0 0 4px rgba(255, 238, 0, 0.5), 
+                             0 0 10px rgba(255, 238, 0, 0.4), 
+                             0 0 20px rgba(255, 187, 0, 0.2);
+                opacity: 0.92;
+            }
+            50% {
+                text-shadow: 0 0 10px rgba(255, 238, 0, 0.9), 
+                             0 0 25px rgba(255, 238, 0, 0.8), 
+                             0 0 45px rgba(255, 187, 0, 0.6),
+                             0 0 70px rgba(255, 102, 0, 0.4);
+                opacity: 1;
+            }
+            100% {
+                text-shadow: 0 0 3px rgba(255, 238, 0, 0.3), 
+                             0 0 6px rgba(255, 238, 0, 0.2);
+                opacity: 0.85;
+            }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: var(--accent-orange);
+            text-shadow: 0 0 5px var(--accent-orange);
+        }
+
+        /* 置中且整體放大的系統警告區塊 */
+        .system-alert {
+            background: rgba(255, 0, 85, 0.05);
+            border: 2px solid var(--cyber-red);
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.2);
+            padding: 30px;
+            margin-bottom: 40px;
+            border-radius: 8px;
+            line-height: 1.8;
+            backdrop-filter: blur(2px);
+            text-align: center;
+        }
+
+        .alert-title {
+            display: block;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--cyber-red);
+            text-shadow: 0 0 8px var(--cyber-red);
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .alert-text {
+            font-size: 1.15rem;
+            color: #ffffff;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .alert-text mark {
+            background: transparent;
+            color: var(--cyber-green);
+            text-shadow: 0 0 5px var(--cyber-green);
+            font-weight: bold;
+        }
+
+        /* ==================== 展區介紹卡片與視覺意象 ==================== */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 50px;
+        }
+
+        .card {
+            background: rgba(13, 2, 20, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            backdrop-filter: blur(2px);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary-yellow);
+            box-shadow: 0 5px 15px rgba(255, 238, 0, 0.2);
+        }
+
+        .card h3 {
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+
+        .visual-box {
+            height: 80px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px dashed rgba(255,255,255,0.2);
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin-top: auto;
+        }
+
+        .icon-lg { font-size: 2rem; }
+
+        .mini-photo {
+            width: 48px;
+            height: 48px;
+            background: #222;
+            border: 1px solid #fff;
+            transform: rotate(-3deg);
+        }
+        .mini-photo:nth-child(2) {
+            transform: rotate(4deg);
+            background: #333;
+        }
+
+        /* 步驟說明區 */
+        .guide-section {
+            background: rgba(157, 0, 255, 0.03);
+            border: 1px solid var(--secondary-neon);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 50px;
+            text-align: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .guide-section h2 { margin-bottom: 20px; }
+
+        .steps {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .step { flex: 1; min-width: 200px; padding: 10px; }
+
+        .step-num {
+            font-family: 'Share Tech Mono', sans-serif;
+            font-size: 2rem;
+            color: var(--primary-yellow);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* 按鈕樣式 */
+        .btn-container { text-align: center; margin-top: 30px; }
+
+        .start-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 2px solid #ffffff;
+            font-size: 1.4rem;
+            padding: 14px 40px;
+            cursor: pointer;
+            font-weight: bold;
+            letter-spacing: 3px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        .start-btn:hover {
+            background: #ffffff;
+            color: #000;
+            box-shadow: 0 0 25px #ffffff;
+            transform: scale(1.05);
+        }
+
+        /* ==================== PAGE 2: 實景虛擬雷達地圖頁面 ==================== */
+        .map-header { text-align: center; margin-bottom: 30px; }
+
+        /* 實景地圖雷達外殼 */
+        .map-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            border: 2px solid var(--cyber-blue);
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.3);
+            border-radius: 12px;
+            background: #090514;
+            overflow: hidden;
+        }
+
+        /* 地圖本體定位容器 */
+        .map-container {
+            position: relative;
+            width: 100%;
+        }
+
+        /* SVG 校園地圖樣式 */
+        .campus-svg {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* 建築物 SVG 群組 hover 效果 */
+        .svg-building {
+            cursor: pointer;
+            transition: all 0.25s ease;
+        }
+        .svg-building:hover .building-fill {
+            fill-opacity: 0.55;
+        }
+        .svg-building:hover .building-border {
+            stroke-width: 2.5;
+            filter: url(#glow-hover);
+        }
+        .svg-building .building-label {
+            pointer-events: none;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        /* 手機板版面微調 */
+        @media (max-width: 768px) {
+            .map-wrapper { border-radius: 8px; }
+        }
+
+        .back-btn {
+            background: transparent;
+            color: #aaa;
+            border: 1px solid #555;
+            padding: 8px 16px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+        }
+        .back-btn:hover { color: #fff; border-color: #fff; background: rgba(255,255,255,0.05); }
+
+        /* ==================== 彈出小測驗視窗 (Modal) ==================== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal.active { display: flex; }
+
+        .modal-content {
+            background: #0f0a1c;
+            border: 2px solid var(--primary-yellow);
+            border-radius: 12px;
+            max-width: 500px;
+            width: 100%;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 0 30px rgba(255, 238, 0, 0.3);
+            animation: modalPop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px; right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #888;
+        }
+        .close-modal:hover { color: #fff; }
+
+        .quiz-question { font-size: 1.2rem; margin-bottom: 20px; font-weight: bold; line-height: 1.4; }
+        .quiz-options { display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px; }
+
+        .option-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.15);
+            color: #fff;
+            padding: 12px;
+            text-align: left;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+        .option-btn:hover { background: rgba(255, 238, 0, 0.1); border-color: var(--primary-yellow); }
+
+        .quiz-result { margin-top: 15px; padding: 15px; border-radius: 6px; display: none; text-align: center; font-weight: bold; }
+
+        .line-stamp-link {
+            display: inline-block;
+            background: #06C755;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 25px;
+            margin-top: 15px;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(6, 199, 85, 0.4);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="radar-bg"></div>
+
+    <div id="homePage" class="page active">
+        <header>
+            <h1 class="main-title">Ghost Mode：校園萬聖登入中</h1>
+            <p class="subtitle">完成闖關任務，解除萬聖模式</p>
+        </header>
+
+        <section class="system-alert">
+            <span class="alert-title">【系統警告】</span>
+            <div class="alert-text">
+                偵測到神祕惡意碼全面入侵校園，系統已自動強制切換為 <mark>「Ghost Mode（萬聖模式）」</mark>！
+                四大未知虛擬展區已在校園各據點同步實體化。各位玩家，請立刻前往以下四大展區探索未知代碼、回答防禦測驗。只有集齊 4 枚電子印章，才能成功解鎖系統、解除萬聖模式！
+                <br><br>
+                <strong>你，準備好登入了嗎？</strong>
+            </div>
+        </section>
+
+        <div class="grid-container">
+            <!-- 區塊一：萬聖節起源 -->
+            <div class="card">
+                <div>
+                    <h3 style="color: var(--accent-orange);">🏛️ 區塊一｜Origin.exe</h3>
+                    <p><strong>【萬聖節的起源】</strong><br>萬聖節才不是只有要糖果！深入追溯這場古老的薩溫節（Samhain）慶典，看看凱爾特人是如何在冬日序幕升起營火、戴上面具驅趕遊魂。解開歷史的底層代碼，重回萬聖節的最初起點。</p>
+                </div>
+                <!-- SVG：凱爾特篝火儀式場景 -->
+                <div class="visual-box" style="padding:0;overflow:hidden;">
+                  <svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+                    <!-- 夜空 -->
+                    <rect width="300" height="80" fill="#0a0010"/>
+                    <!-- 星點 -->
+                    <circle cx="20" cy="8" r="1" fill="#fff" opacity="0.7"/>
+                    <circle cx="60" cy="5" r="0.8" fill="#fff" opacity="0.5"/>
+                    <circle cx="100" cy="10" r="1" fill="#fff" opacity="0.6"/>
+                    <circle cx="150" cy="4" r="1.2" fill="#fff" opacity="0.8"/>
+                    <circle cx="200" cy="9" r="0.8" fill="#fff" opacity="0.5"/>
+                    <circle cx="240" cy="6" r="1" fill="#fff" opacity="0.7"/>
+                    <circle cx="280" cy="11" r="0.9" fill="#fff" opacity="0.6"/>
+                    <circle cx="40" cy="18" r="0.7" fill="#fff" opacity="0.4"/>
+                    <circle cx="130" cy="15" r="0.8" fill="#fff" opacity="0.5"/>
+                    <circle cx="260" cy="18" r="0.7" fill="#fff" opacity="0.4"/>
+                    <!-- 地面 -->
+                    <rect x="0" y="62" width="300" height="18" fill="#1a0a00"/>
+                    <!-- 凱爾特結符文石（左） -->
+                    <rect x="18" y="44" width="20" height="28" rx="2" fill="#2a1a00" stroke="#ff5500" stroke-width="1" opacity="0.8"/>
+                    <text x="28" y="62" text-anchor="middle" fill="#ff5500" font-size="10" opacity="0.7">᚛</text>
+                    <!-- 凱爾特結符文石（右） -->
+                    <rect x="262" y="44" width="20" height="28" rx="2" fill="#2a1a00" stroke="#ff5500" stroke-width="1" opacity="0.8"/>
+                    <text x="272" y="62" text-anchor="middle" fill="#ff5500" font-size="10" opacity="0.7">᚜</text>
+                    <!-- 篝火柴堆 -->
+                    <polygon points="140,62 150,62 152,68 138,68" fill="#3a1500"/>
+                    <polygon points="144,62 156,62 158,68 142,68" fill="#4a1800"/>
+                    <polygon points="148,62 160,62 162,68 146,68" fill="#3a1500"/>
+                    <!-- 火焰層（橘/黃/白） -->
+                    <ellipse cx="150" cy="54" rx="14" ry="10" fill="#ff5500" opacity="0.9">
+                      <animate attributeName="ry" values="10;13;9;12;10" dur="0.8s" repeatCount="indefinite"/>
+                    </ellipse>
+                    <ellipse cx="150" cy="50" rx="9" ry="12" fill="#ff8800" opacity="0.85">
+                      <animate attributeName="ry" values="12;15;11;14;12" dur="0.7s" repeatCount="indefinite"/>
+                      <animate attributeName="cx" values="150;148;152;149;150" dur="0.9s" repeatCount="indefinite"/>
+                    </ellipse>
+                    <ellipse cx="150" cy="46" rx="5" ry="9" fill="#ffcc00" opacity="0.9">
+                      <animate attributeName="ry" values="9;12;8;11;9" dur="0.6s" repeatCount="indefinite"/>
+                      <animate attributeName="cx" values="150;152;148;151;150" dur="0.8s" repeatCount="indefinite"/>
+                    </ellipse>
+                    <ellipse cx="150" cy="43" rx="2.5" ry="5" fill="#fff" opacity="0.7">
+                      <animate attributeName="ry" values="5;7;4;6;5" dur="0.5s" repeatCount="indefinite"/>
+                    </ellipse>
+                    <!-- 火花粒子 -->
+                    <circle cx="143" cy="38" r="1.2" fill="#ffcc00" opacity="0.8">
+                      <animate attributeName="cy" values="38;28;38" dur="1.2s" repeatCount="indefinite"/>
+                      <animate attributeName="opacity" values="0.8;0;0.8" dur="1.2s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="158" cy="35" r="1" fill="#ff8800" opacity="0.8">
+                      <animate attributeName="cy" values="35;22;35" dur="1.5s" repeatCount="indefinite"/>
+                      <animate attributeName="opacity" values="0.8;0;0.8" dur="1.5s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="146" cy="32" r="0.8" fill="#ffee00" opacity="0.7">
+                      <animate attributeName="cy" values="32;18;32" dur="1s" repeatCount="indefinite"/>
+                      <animate attributeName="opacity" values="0.7;0;0.7" dur="1s" repeatCount="indefinite"/>
+                    </circle>
+                    <!-- 面具人剪影（左） -->
+                    <ellipse cx="90" cy="42" rx="8" ry="10" fill="#0d0005"/>
+                    <polygon points="86,52 94,52 92,68 88,68" fill="#0d0005"/>
+                    <!-- 面具紋路 -->
+                    <line x1="86" y1="40" x2="94" y2="40" stroke="#ff5500" stroke-width="0.8" opacity="0.6"/>
+                    <circle cx="88" cy="38" r="1.5" fill="#ff5500" opacity="0.5"/>
+                    <circle cx="93" cy="38" r="1.5" fill="#ff5500" opacity="0.5"/>
+                    <!-- 面具人剪影（右） -->
+                    <ellipse cx="210" cy="42" rx="8" ry="10" fill="#0d0005"/>
+                    <polygon points="206,52 214,52 212,68 208,68" fill="#0d0005"/>
+                    <line x1="206" y1="40" x2="214" y2="40" stroke="#ff5500" stroke-width="0.8" opacity="0.6"/>
+                    <circle cx="207" cy="38" r="1.5" fill="#ff5500" opacity="0.5"/>
+                    <circle cx="213" cy="38" r="1.5" fill="#ff5500" opacity="0.5"/>
+                    <!-- 橘色光暈 -->
+                    <radialGradient id="fireGlow" cx="50%" cy="80%" r="50%">
+                      <stop offset="0%" stop-color="#ff5500" stop-opacity="0.3"/>
+                      <stop offset="100%" stop-color="#ff5500" stop-opacity="0"/>
+                    </radialGradient>
+                    <ellipse cx="150" cy="62" rx="60" ry="20" fill="url(#fireGlow)"/>
+                    <!-- 底部標記 -->
+                    <text x="150" y="77" text-anchor="middle" fill="#ff5500" font-size="7" font-family="'Share Tech Mono',monospace" opacity="0.7">SAMHAIN_FESTIVAL.EXE</text>
+                  </svg>
+                </div>
+            </div>
+
+            <!-- 區塊二：世界各國鬼怪文化 -->
+            <div class="card">
+                <div>
+                    <h3 style="color: #00e1ff;">🌍 區塊二｜Ghost Database</h3>
+                    <p><strong>【世界各國鬼怪文化】</strong><br>系統已連線至全球百鬼資料庫！從南美洲熱鬧斑斕的墨西哥亡靈節，到各國令人屏息的傳說妖魔。這裡紀錄了人類對未知世界的恐懼與敬畏，點開檔案，你敢直視這些跨國鬼怪的雙眼嗎？</p>
+                </div>
+                <!-- SVG：世界地圖輪廓 + 各地鬼怪訊號點 -->
+                <div class="visual-box" style="padding:0;overflow:hidden;">
+                  <svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+                    <rect width="300" height="80" fill="#001520"/>
+                    <!-- 網格 -->
+                    <g stroke="#00e1ff" stroke-width="0.4" opacity="0.15">
+                      <line x1="0" y1="20" x2="300" y2="20"/><line x1="0" y1="40" x2="300" y2="40"/>
+                      <line x1="0" y1="60" x2="300" y2="60"/>
+                      <line x1="60" y1="0" x2="60" y2="80"/><line x1="120" y1="0" x2="120" y2="80"/>
+                      <line x1="180" y1="0" x2="180" y2="80"/><line x1="240" y1="0" x2="240" y2="80"/>
+                    </g>
+                    <!-- 簡化世界輪廓（地塊） -->
+                    <!-- 北美 -->
+                    <path d="M20,18 L55,15 L60,25 L50,38 L30,40 L18,32 Z" fill="#00e1ff" opacity="0.12" stroke="#00e1ff" stroke-width="0.8"/>
+                    <!-- 南美 -->
+                    <path d="M38,44 L55,42 L58,60 L45,68 L32,62 Z" fill="#00e1ff" opacity="0.12" stroke="#00e1ff" stroke-width="0.8"/>
+                    <!-- 歐洲 -->
+                    <path d="M112,14 L135,12 L138,28 L118,30 Z" fill="#00e1ff" opacity="0.12" stroke="#00e1ff" stroke-width="0.8"/>
+                    <!-- 非洲 -->
+                    <path d="M118,34 L140,32 L142,62 L125,66 L112,55 Z" fill="#00e1ff" opacity="0.12" stroke="#00e1ff" stroke-width="0.8"/>
+                    <!-- 亞洲 -->
+                    <path d="M150,10 L220,8 L225,35 L200,42 L155,38 L148,22 Z" fill="#00e1ff" opacity="0.12" stroke="#00e1ff" stroke-width="0.8"/>
+                    <!-- 東南亞/台灣 -->
+                    <path d="M210,40 L235,38 L238,58 L215,60 Z" fill="#00e1ff" opacity="0.12" stroke="#00e1ff" stroke-width="0.8"/>
+                    <!-- 澳洲 -->
+                    <path d="M220,50 L260,48 L262,68 L225,70 Z" fill="#00e1ff" opacity="0.12" stroke="#00e1ff" stroke-width="0.8"/>
+
+                    <!-- 信號點：墨西哥亡靈節 -->
+                    <circle cx="40" cy="36" r="4" fill="none" stroke="#ff5500" stroke-width="1.2">
+                      <animate attributeName="r" values="4;7;4" dur="2s" repeatCount="indefinite"/>
+                      <animate attributeName="opacity" values="1;0.2;1" dur="2s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="40" cy="36" r="2" fill="#ff5500"/>
+                    <text x="40" y="48" text-anchor="middle" fill="#ff5500" font-size="6" font-family="'Share Tech Mono',monospace">MX</text>
+
+                    <!-- 信號點：日本百鬼夜行 -->
+                    <circle cx="222" cy="25" r="4" fill="none" stroke="#9d00ff" stroke-width="1.2">
+                      <animate attributeName="r" values="4;7;4" dur="2.4s" repeatCount="indefinite"/>
+                      <animate attributeName="opacity" values="1;0.2;1" dur="2.4s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="222" cy="25" r="2" fill="#9d00ff"/>
+                    <text x="222" y="37" text-anchor="middle" fill="#9d00ff" font-size="6" font-family="'Share Tech Mono',monospace">JP</text>
+
+                    <!-- 信號點：愛爾蘭凱爾特 -->
+                    <circle cx="118" cy="18" r="4" fill="none" stroke="#33ff66" stroke-width="1.2">
+                      <animate attributeName="r" values="4;7;4" dur="1.8s" repeatCount="indefinite"/>
+                      <animate attributeName="opacity" values="1;0.2;1" dur="1.8s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="118" cy="18" r="2" fill="#33ff66"/>
+                    <text x="118" y="30" text-anchor="middle" fill="#33ff66" font-size="6" font-family="'Share Tech Mono',monospace">IE</text>
+
+                    <!-- 信號點：中國鬼月 -->
+                    <circle cx="200" cy="28" r="4" fill="none" stroke="#ffee00" stroke-width="1.2">
+                      <animate attributeName="r" values="4;7;4" dur="2.8s" repeatCount="indefinite"/>
+                      <animate attributeName="opacity" values="1;0.2;1" dur="2.8s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="200" cy="28" r="2" fill="#ffee00"/>
+                    <text x="200" y="40" text-anchor="middle" fill="#ffee00" font-size="6" font-family="'Share Tech Mono',monospace">CN</text>
+
+                    <!-- 信號點：埃及亡靈節 -->
+                    <circle cx="138" cy="42" r="4" fill="none" stroke="#00e1ff" stroke-width="1.2">
+                      <animate attributeName="r" values="4;7;4" dur="3s" repeatCount="indefinite"/>
+                      <animate attributeName="opacity" values="1;0.2;1" dur="3s" repeatCount="indefinite"/>
+                    </circle>
+                    <circle cx="138" cy="42" r="2" fill="#00e1ff"/>
+                    <text x="138" y="54" text-anchor="middle" fill="#00e1ff" font-size="6" font-family="'Share Tech Mono',monospace">EG</text>
+
+                    <!-- 連線 -->
+                    <line x1="40" y1="36" x2="118" y2="18" stroke="#00e1ff" stroke-width="0.6" stroke-dasharray="3,3" opacity="0.4"/>
+                    <line x1="118" y1="18" x2="138" y2="42" stroke="#00e1ff" stroke-width="0.6" stroke-dasharray="3,3" opacity="0.4"/>
+                    <line x1="138" y1="42" x2="200" y2="28" stroke="#00e1ff" stroke-width="0.6" stroke-dasharray="3,3" opacity="0.4"/>
+                    <line x1="200" y1="28" x2="222" y2="25" stroke="#00e1ff" stroke-width="0.6" stroke-dasharray="3,3" opacity="0.4"/>
+
+                    <!-- 底部標記 -->
+                    <text x="150" y="77" text-anchor="middle" fill="#00e1ff" font-size="7" font-family="'Share Tech Mono',monospace" opacity="0.7">GLOBAL_GHOST_DATABASE :: 5 NODES ONLINE</text>
+                  </svg>
+                </div>
+            </div>
+
+            <!-- 區塊三：南瓜燈 -->
+            <div class="card">
+                <div>
+                    <h3 style="color: var(--primary-yellow);">🕯️ 區塊三｜Pumpkin Code</h3>
+                    <p><strong>【南瓜燈的秘密】</strong><br>萬聖節最強大的防禦裝置——「傑克南瓜燈」（Jack-o'-the-lantern）。你知道最早的南瓜燈其實是「大頭菜」做的嗎？解鎖這串古老的南瓜代碼，揭開愛爾蘭吝嗇傑克與魔鬼鬥智的傳奇故事。</p>
+                </div>
+                <!-- SVG：南瓜燈特寫 + 程式碼解密感 -->
+                <div class="visual-box" style="padding:0;overflow:hidden;">
+                  <svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+                    <rect width="300" height="80" fill="#0d0800"/>
+                    <!-- 背景十六進位代碼（裝飾） -->
+                    <text x="8" y="14" fill="#ffee00" font-size="7" font-family="'Share Tech Mono',monospace" opacity="0.18">3A FF 0D 4C 8E 21 B7 93 F0 55 2A 6D 1E C8</text>
+                    <text x="8" y="24" fill="#ffee00" font-size="7" font-family="'Share Tech Mono',monospace" opacity="0.12">7B 00 E3 91 5F 3C A4 68 2D 0A 77 B2 4F 19</text>
+                    <text x="8" y="70" fill="#ffee00" font-size="7" font-family="'Share Tech Mono',monospace" opacity="0.18">C1 84 3F 56 AA 0E 72 D9 1B 4A 8C 25 F6 39</text>
+                    <text x="8" y="78" fill="#ffee00" font-size="7" font-family="'Share Tech Mono',monospace" opacity="0.12">60 17 9D E7 43 BB 06 5E 2F A8 34 71 EC 0C</text>
+
+                    <!-- 蠟燭（左） -->
+                    <rect x="52" y="46" width="10" height="24" rx="2" fill="#e8d090"/>
+                    <ellipse cx="57" cy="44" rx="5" ry="2" fill="#c8b070"/>
+                    <!-- 燭芯 + 火焰 -->
+                    <line x1="57" y1="44" x2="57" y2="38" stroke="#333" stroke-width="1"/>
+                    <ellipse cx="57" cy="36" rx="3" ry="5" fill="#ff8800" opacity="0.9">
+                      <animate attributeName="ry" values="5;7;4;6;5" dur="0.7s" repeatCount="indefinite"/>
+                    </ellipse>
+                    <ellipse cx="57" cy="34" rx="1.5" ry="3" fill="#ffee00" opacity="0.9">
+                      <animate attributeName="ry" values="3;5;2;4;3" dur="0.6s" repeatCount="indefinite"/>
+                    </ellipse>
+
+                    <!-- 南瓜燈主體 -->
+                    <!-- 多個橢圓拼成南瓜分段感 -->
+                    <ellipse cx="150" cy="52" rx="38" ry="26" fill="#cc5500" stroke="#ff8800" stroke-width="1.2"/>
+                    <ellipse cx="134" cy="52" rx="12" ry="26" fill="#bb4400" opacity="0.5"/>
+                    <ellipse cx="166" cy="52" rx="12" ry="26" fill="#bb4400" opacity="0.5"/>
+                    <ellipse cx="150" cy="52" rx="6" ry="26" fill="#aa3300" opacity="0.3"/>
+                    <!-- 南瓜蒂 -->
+                    <rect x="146" y="24" width="8" height="10" rx="3" fill="#2a5e00" stroke="#3a8000" stroke-width="1"/>
+                    <!-- 臉：眼睛（三角） -->
+                    <polygon points="132,46 140,38 148,46" fill="#ffee00" opacity="0.9">
+                      <animate attributeName="opacity" values="0.9;0.3;0.9" dur="1.5s" repeatCount="indefinite"/>
+                    </polygon>
+                    <polygon points="152,46 160,38 168,46" fill="#ffee00" opacity="0.9">
+                      <animate attributeName="opacity" values="0.9;0.3;0.9" dur="1.5s" repeatCount="indefinite"/>
+                    </polygon>
+                    <!-- 臉：嘴巴（鋸齒） -->
+                    <path d="M128,58 L134,55 L138,61 L143,55 L148,61 L153,55 L158,61 L163,55 L168,55 L168,63 L128,63 Z" fill="#ffee00" opacity="0.85">
+                      <animate attributeName="opacity" values="0.85;0.3;0.85" dur="1.5s" repeatCount="indefinite"/>
+                    </path>
+                    <!-- 內部光暈 -->
+                    <radialGradient id="pumpkinGlow" cx="50%" cy="60%" r="50%">
+                      <stop offset="0%" stop-color="#ffee00" stop-opacity="0.35"/>
+                      <stop offset="100%" stop-color="#ff5500" stop-opacity="0"/>
+                    </radialGradient>
+                    <ellipse cx="150" cy="52" rx="38" ry="26" fill="url(#pumpkinGlow)"/>
+
+                    <!-- 蠟燭（右） -->
+                    <rect x="238" y="50" width="10" height="20" rx="2" fill="#e8d090"/>
+                    <ellipse cx="243" cy="48" rx="5" ry="2" fill="#c8b070"/>
+                    <line x1="243" y1="48" x2="243" y2="42" stroke="#333" stroke-width="1"/>
+                    <ellipse cx="243" cy="40" rx="3" ry="5" fill="#ff8800" opacity="0.9">
+                      <animate attributeName="ry" values="5;7;4;6;5" dur="0.9s" repeatCount="indefinite"/>
+                    </ellipse>
+                    <ellipse cx="243" cy="38" rx="1.5" ry="3" fill="#ffee00" opacity="0.9">
+                      <animate attributeName="ry" values="3;5;2;4;3" dur="0.8s" repeatCount="indefinite"/>
+                    </ellipse>
+
+                    <!-- 底部標記 -->
+                    <text x="150" y="78" text-anchor="middle" fill="#ffee00" font-size="7" font-family="'Share Tech Mono',monospace" opacity="0.7">JACK_LANTERN.DECODE :: TURNIP_ORIGIN_UNLOCKED</text>
+                  </svg>
+                </div>
+            </div>
+
+            <!-- 區塊四：打卡牆投票區 -->
+            <div class="card">
+                <div>
+                    <h3 style="color: #ff0066;">👁️ 區塊四｜Ghost Mode ON</h3>
+                    <p><strong>【打卡牆、投票區】</strong><br>歡迎來到現實與虛擬的交錯點！這裡有最魔幻的實體打卡牆，拍下你的登入身影、上傳分享，並為你心目中最酷炫的萬聖裝扮投下關鍵一票。當「Ghost Mode」全面啟動，你就是校園裡最亮眼的焦點！</p>
+                </div>
+                <!-- SVG：打卡牆 + 投票介面感 -->
+                <div class="visual-box" style="padding:0;overflow:hidden;">
+                  <svg viewBox="0 0 300 80" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;">
+                    <rect width="300" height="80" fill="#100010"/>
+                    <!-- 打卡牆背景格 -->
+                    <rect x="8" y="8" width="52" height="42" rx="3" fill="#1a001a" stroke="#ff0066" stroke-width="1" opacity="0.8"/>
+                    <rect x="8" y="8" width="52" height="42" rx="3" fill="#ff0066" opacity="0.06"/>
+                    <!-- 相框 1：幽靈剪影 -->
+                    <ellipse cx="34" cy="24" rx="10" ry="12" fill="#330020" stroke="#ff0066" stroke-width="0.8"/>
+                    <path d="M24,36 Q26,44 34,44 Q42,44 44,36 L44,30 Q40,34 34,32 Q28,34 24,30 Z" fill="#330020" stroke="#ff0066" stroke-width="0.8"/>
+                    <circle cx="30" cy="22" r="2.5" fill="#ff0066" opacity="0.8"/>
+                    <circle cx="38" cy="22" r="2.5" fill="#ff0066" opacity="0.8"/>
+                    <text x="34" y="56" text-anchor="middle" fill="#ff0066" font-size="6" font-family="'Share Tech Mono',monospace" opacity="0.7">GHOST_01</text>
+
+                    <!-- 打卡牆背景格2 -->
+                    <rect x="68" y="8" width="52" height="42" rx="3" fill="#1a001a" stroke="#9d00ff" stroke-width="1" opacity="0.8"/>
+                    <rect x="68" y="8" width="52" height="42" rx="3" fill="#9d00ff" opacity="0.06"/>
+                    <!-- 相框 2：南瓜頭人 -->
+                    <ellipse cx="94" cy="20" rx="9" ry="10" fill="#cc5500" stroke="#ff8800" stroke-width="0.8"/>
+                    <polygon points="88,16 92,10 96,16" fill="#ff8800" opacity="0.8"/>
+                    <polygon points="98,16 100,10 103,16" fill="#ff8800" opacity="0.8"/>
+                    <circle cx="90" cy="19" r="2" fill="#ffee00" opacity="0.8"/>
+                    <circle cx="98" cy="19" r="2" fill="#ffee00" opacity="0.8"/>
+                    <path d="M88,24 L94,22 L100,24" stroke="#ffee00" stroke-width="1" fill="none" opacity="0.8"/>
+                    <!-- 身體 -->
+                    <rect x="88" y="30" width="12" height="14" rx="2" fill="#330060" stroke="#9d00ff" stroke-width="0.8"/>
+                    <text x="94" y="56" text-anchor="middle" fill="#9d00ff" font-size="6" font-family="'Share Tech Mono',monospace" opacity="0.7">PUMPKIN_02</text>
+
+                    <!-- 打卡牆背景格3 -->
+                    <rect x="128" y="8" width="52" height="42" rx="3" fill="#1a001a" stroke="#ffee00" stroke-width="1" opacity="0.8"/>
+                    <rect x="128" y="8" width="52" height="42" rx="3" fill="#ffee00" opacity="0.04"/>
+                    <!-- 相框 3：女巫 -->
+                    <!-- 帽子 -->
+                    <polygon points="154,10 148,26 160,26" fill="#1a0040" stroke="#ffee00" stroke-width="0.8"/>
+                    <rect x="144" y="26" width="20" height="4" rx="1" fill="#2a0060" stroke="#ffee00" stroke-width="0.8"/>
+                    <!-- 臉 -->
+                    <ellipse cx="154" cy="34" rx="8" ry="8" fill="#c8a060" stroke="#ffee00" stroke-width="0.8"/>
+                    <circle cx="151" cy="32" r="1.5" fill="#330000"/>
+                    <circle cx="157" cy="32" r="1.5" fill="#330000"/>
+                    <path d="M150,37 Q154,40 158,37" stroke="#330000" stroke-width="1" fill="none"/>
+                    <!-- 翹鼻子 -->
+                    <ellipse cx="154" cy="35" rx="2" ry="1.5" fill="#b08040"/>
+                    <text x="154" y="56" text-anchor="middle" fill="#ffee00" font-size="6" font-family="'Share Tech Mono',monospace" opacity="0.7">WITCH_03</text>
+
+                    <!-- 投票區（右側） -->
+                    <rect x="192" y="8" width="100" height="64" rx="4" fill="#0a0015" stroke="#ff0066" stroke-width="1" opacity="0.9"/>
+                    <text x="242" y="22" text-anchor="middle" fill="#ff0066" font-size="8" font-family="'Share Tech Mono',monospace">VOTE_SYSTEM</text>
+                    <!-- 票選條 -->
+                    <rect x="200" y="28" width="84" height="8" rx="2" fill="#1a0010"/>
+                    <rect x="200" y="28" width="58" height="8" rx="2" fill="#ff0066" opacity="0.7"/>
+                    <text x="200" y="35" fill="#fff" font-size="6" font-family="'Share Tech Mono',monospace" opacity="0.9" dx="2">GHOST  69%</text>
+
+                    <rect x="200" y="40" width="84" height="8" rx="2" fill="#1a0010"/>
+                    <rect x="200" y="40" width="42" height="8" rx="2" fill="#9d00ff" opacity="0.7"/>
+                    <text x="200" y="47" fill="#fff" font-size="6" font-family="'Share Tech Mono',monospace" opacity="0.9" dx="2">PUMPKIN 50%</text>
+
+                    <rect x="200" y="52" width="84" height="8" rx="2" fill="#1a0010"/>
+                    <rect x="200" y="52" width="30" height="8" rx="2" fill="#ffee00" opacity="0.7"/>
+                    <text x="200" y="59" fill="#fff" font-size="6" font-family="'Share Tech Mono',monospace" opacity="0.9" dx="2">WITCH  36%</text>
+
+                    <!-- 閃爍游標 -->
+                    <rect x="270" y="28" width="2" height="8" fill="#ff0066">
+                      <animate attributeName="opacity" values="1;0;1" dur="1s" repeatCount="indefinite"/>
+                    </rect>
+
+                    <!-- 底部標記 -->
+                    <text x="150" y="78" text-anchor="middle" fill="#ff0066" font-size="7" font-family="'Share Tech Mono',monospace" opacity="0.7">GHOST_MODE_ON :: SCANNING_COSTUMES...</text>
+                  </svg>
+                </div>
+            </div>
+        </div>
+
+        <section class="guide-section">
+            <h2>🔮 闖關集章指南 (Quest Guide)</h2>
+            <div class="steps">
+                <div class="step">
+                    <span class="step-num">步驟 1</span>
+                    <p>啟動任務：點擊下方<strong>【ENTER：登入虛擬雷達地圖】</strong>按鈕。</p>
+                </div>
+                <div class="step">
+                    <span class="step-num">步驟 2</span>
+                    <p>實地解謎：前往校園內實體四大展區，尋找線索。</p>
+                </div>
+                <div class="step">
+                    <span class="step-num">步驟 3</span>
+                    <p>連線集章：回答線上小測驗，<strong>全對</strong>即可獲得該區專屬 LINE 集章網址！</p>
+                </div>
+            </div>
+            <p style="margin-top: 25px; color: var(--primary-yellow); font-size: 0.95rem;">💡 <strong>任務獎勵：</strong>集滿 4 枚電子章（由藝文中心 LINE 官方帳號發放），即可至藝文中心兌換萬聖節限定神秘好禮！</p>
+        </section>
+
+        <div class="btn-container">
+            <button class="start-btn" onclick="switchPage('mapPage')">ENTER：登入虛擬雷達地圖</button>
+        </div>
+    </div>
+
+
+    <div id="mapPage" class="page">
+        <button class="back-btn" onclick="switchPage('homePage')">⬅ 返回活動首頁</button>
+        
+        <div class="map-header">
+            <h2 style="color: var(--primary-yellow); font-size: 2rem;">校園實景虛擬雷達地圖</h2>
+            <p style="color: #aaa; margin-top: 5px;">校園地圖已鎖定四大核心建築物，點選建築即可啟動展區小測驗</p>
+        </div>
+
+        <div class="map-wrapper">
+            <div class="map-container">
+              <!-- ===== SVG 校園雷達地圖 ===== -->
+              <svg class="campus-svg" viewBox="0 0 1000 440" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <!-- 全域發光濾鏡 -->
+                  <filter id="glow-blue" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="4" result="blur"/>
+                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                  </filter>
+                  <filter id="glow-hover" x="-40%" y="-40%" width="180%" height="180%">
+                    <feGaussianBlur stdDeviation="8" result="blur"/>
+                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                  </filter>
+                  <filter id="glow-yellow" x="-30%" y="-30%" width="160%" height="160%">
+                    <feGaussianBlur stdDeviation="5" result="blur"/>
+                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                  </filter>
+                  <!-- 雷達掃描漸層 -->
+                  <radialGradient id="radarGrad" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stop-color="#00d2ff" stop-opacity="0.07"/>
+                    <stop offset="100%" stop-color="#030106" stop-opacity="0"/>
+                  </radialGradient>
+                  <!-- 建築填色 -->
+                  <linearGradient id="bldFill1" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#ff5500" stop-opacity="0.18"/>
+                    <stop offset="100%" stop-color="#ff5500" stop-opacity="0.07"/>
+                  </linearGradient>
+                  <linearGradient id="bldFill2" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#00e1ff" stop-opacity="0.18"/>
+                    <stop offset="100%" stop-color="#00e1ff" stop-opacity="0.07"/>
+                  </linearGradient>
+                  <linearGradient id="bldFill3" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#ffee00" stop-opacity="0.18"/>
+                    <stop offset="100%" stop-color="#ffee00" stop-opacity="0.07"/>
+                  </linearGradient>
+                  <linearGradient id="bldFill4" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#ff0066" stop-opacity="0.18"/>
+                    <stop offset="100%" stop-color="#ff0066" stop-opacity="0.07"/>
+                  </linearGradient>
+                  <linearGradient id="libFill" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#9d00ff" stop-opacity="0.25"/>
+                    <stop offset="100%" stop-color="#9d00ff" stop-opacity="0.10"/>
+                  </linearGradient>
+                  <linearGradient id="musFill" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stop-color="#9d00ff" stop-opacity="0.20"/>
+                    <stop offset="100%" stop-color="#9d00ff" stop-opacity="0.08"/>
+                  </linearGradient>
+                  <!-- 脈衝動畫 -->
+                  <style>
+                    @keyframes radarSpin {
+                      from { transform: rotate(0deg); }
+                      to { transform: rotate(360deg); }
+                    }
+                    @keyframes bldPulse1 {
+                      0%,100% { stroke-opacity:0.8; } 50% { stroke-opacity:1; filter:url(#glow-hover); }
+                    }
+                    @keyframes bldPulse2 {
+                      0%,100% { stroke-opacity:0.7; } 50% { stroke-opacity:1; filter:url(#glow-hover); }
+                    }
+                    @keyframes dotBlink {
+                      0%,100% { opacity:0.4; } 50% { opacity:1; }
+                    }
+                    @keyframes scanLine {
+                      0% { transform: translateY(0); opacity: 0.5; }
+                      50% { opacity: 0.2; }
+                      100% { transform: translateY(430px); opacity: 0; }
+                    }
+                    .b1-border { animation: bldPulse1 2.8s infinite ease-in-out; }
+                    .b2-border { animation: bldPulse2 3.2s infinite ease-in-out; }
+                    .b3-border { animation: bldPulse1 2.5s infinite ease-in-out 0.4s; }
+                    .b4-border { animation: bldPulse2 3.5s infinite ease-in-out 0.8s; }
+                    .svg-building:hover rect, .svg-building:hover polygon, .svg-building:hover ellipse {
+                      fill-opacity: 0.4 !important;
+                    }
+                  </style>
+                </defs>
+
+                <!-- ── 背景：暗色地面 ── -->
+                <rect width="1000" height="440" fill="#030106"/>
+
+                <!-- 雷達網格 -->
+                <g opacity="0.18" stroke="#0066ff" stroke-width="1">
+                  <!-- 橫線 -->
+                  <line x1="0" y1="43" x2="1000" y2="43"/>
+                  <line x1="0" y1="86" x2="1000" y2="86"/>
+                  <line x1="0" y1="129" x2="1000" y2="129"/>
+                  <line x1="0" y1="172" x2="1000" y2="172"/>
+                  <line x1="0" y1="215" x2="1000" y2="215"/>
+                  <line x1="0" y1="258" x2="1000" y2="258"/>
+                  <line x1="0" y1="301" x2="1000" y2="301"/>
+                  <line x1="0" y1="344" x2="1000" y2="344"/>
+                  <line x1="0" y1="387" x2="1000" y2="387"/>
+                  <!-- 直線 -->
+                  <line x1="100" y1="0" x2="100" y2="430"/>
+                  <line x1="200" y1="0" x2="200" y2="430"/>
+                  <line x1="300" y1="0" x2="300" y2="430"/>
+                  <line x1="400" y1="0" x2="400" y2="430"/>
+                  <line x1="500" y1="0" x2="500" y2="430"/>
+                  <line x1="600" y1="0" x2="600" y2="430"/>
+                  <line x1="700" y1="0" x2="700" y2="430"/>
+                  <line x1="800" y1="0" x2="800" y2="430"/>
+                  <line x1="900" y1="0" x2="900" y2="430"/>
+                </g>
+                <!-- 紫色小點交叉 -->
+                <g fill="#9d00ff" opacity="0.3">
+                  <circle cx="50" cy="43" r="1.5"/><circle cx="150" cy="43" r="1.5"/><circle cx="250" cy="43" r="1.5"/>
+                  <circle cx="350" cy="43" r="1.5"/><circle cx="450" cy="43" r="1.5"/><circle cx="550" cy="43" r="1.5"/>
+                  <circle cx="650" cy="43" r="1.5"/><circle cx="750" cy="43" r="1.5"/><circle cx="850" cy="43" r="1.5"/>
+                  <circle cx="950" cy="43" r="1.5"/><circle cx="50" cy="129" r="1.5"/><circle cx="150" cy="129" r="1.5"/>
+                  <circle cx="250" cy="129" r="1.5"/><circle cx="350" cy="129" r="1.5"/><circle cx="450" cy="129" r="1.5"/>
+                  <circle cx="550" cy="129" r="1.5"/><circle cx="650" cy="129" r="1.5"/><circle cx="750" cy="129" r="1.5"/>
+                  <circle cx="850" cy="129" r="1.5"/><circle cx="950" cy="129" r="1.5"/>
+                  <circle cx="50" cy="215" r="1.5"/><circle cx="150" cy="215" r="1.5"/><circle cx="250" cy="215" r="1.5"/>
+                  <circle cx="350" cy="215" r="1.5"/><circle cx="450" cy="215" r="1.5"/><circle cx="550" cy="215" r="1.5"/>
+                  <circle cx="650" cy="215" r="1.5"/><circle cx="750" cy="215" r="1.5"/><circle cx="850" cy="215" r="1.5"/>
+                  <circle cx="950" cy="215" r="1.5"/>
+                  <circle cx="50" cy="301" r="1.5"/><circle cx="150" cy="301" r="1.5"/><circle cx="250" cy="301" r="1.5"/>
+                  <circle cx="350" cy="301" r="1.5"/><circle cx="450" cy="301" r="1.5"/><circle cx="550" cy="301" r="1.5"/>
+                  <circle cx="650" cy="301" r="1.5"/><circle cx="750" cy="301" r="1.5"/><circle cx="850" cy="301" r="1.5"/>
+                  <circle cx="950" cy="301" r="1.5"/>
+                  <circle cx="50" cy="387" r="1.5"/><circle cx="150" cy="387" r="1.5"/><circle cx="250" cy="387" r="1.5"/>
+                  <circle cx="350" cy="387" r="1.5"/><circle cx="450" cy="387" r="1.5"/><circle cx="550" cy="387" r="1.5"/>
+                  <circle cx="650" cy="387" r="1.5"/><circle cx="750" cy="387" r="1.5"/><circle cx="850" cy="387" r="1.5"/>
+                  <circle cx="950" cy="387" r="1.5"/>
+                </g>
+
+                <!-- 雷達掃描線（動畫） -->
+                <line x1="0" y1="0" x2="1000" y2="0" stroke="#00d2ff" stroke-width="2" opacity="0.25">
+                  <animateTransform attributeName="transform" type="translate" from="0,0" to="0,440" dur="5s" repeatCount="indefinite"/>
+                  <animate attributeName="opacity" values="0.4;0.1;0" dur="5s" repeatCount="indefinite"/>
+                </line>
+
+                <!-- 十字瞄準線 -->
+                <line x1="0" y1="220" x2="1000" y2="220" stroke="#00d2ff" stroke-width="1" opacity="0.35"/>
+                <line x1="500" y1="0" x2="500" y2="440" stroke="#00d2ff" stroke-width="1" opacity="0.35"/>
+
+                <!-- ══════════════════════════════════
+                     道路 / 通道（淡藍線條）
+                ══════════════════════════════════ -->
+                <g stroke="#00d2ff" stroke-width="1.5" opacity="0.25" fill="none">
+                  <!-- 主幹道（橫向） -->
+                  <line x1="0" y1="320" x2="1000" y2="320"/>
+                  <!-- 上方通道 -->
+                  <line x1="170" y1="20" x2="170" y2="320"/>
+                  <!-- 中間縱向 -->
+                  <line x1="580" y1="20" x2="580" y2="320"/>
+                  <!-- 右側縱向 -->
+                  <line x1="840" y1="20" x2="840" y2="320"/>
+                  <!-- 停車場/下方 -->
+                  <line x1="0" y1="390" x2="1000" y2="390"/>
+                </g>
+
+                <!-- ══════════════════════════════════
+                     非互動建築（圖書館、文物館）
+                ══════════════════════════════════ -->
+                <!-- 圖書館（圓角矩形，紫色） -->
+                <g opacity="0.85">
+                  <rect x="680" y="40" width="120" height="100" rx="12"
+                        fill="url(#libFill)" stroke="#9d00ff" stroke-width="1.5" opacity="0.9"/>
+                  <text x="740" y="83" text-anchor="middle" fill="#c060ff" font-size="13" font-family="'Noto Sans TC',sans-serif" font-weight="bold">圖書館</text>
+                  <text x="740" y="100" text-anchor="middle" fill="#9d00ff" font-size="10" font-family="'Share Tech Mono',monospace">LIBRARY</text>
+                </g>
+
+                <!-- 文物館（橢圓，紫色）— 移到左下角，遠離二醫 -->
+                <g opacity="0.85">
+                  <ellipse cx="60" cy="390" rx="55" ry="32"
+                           fill="url(#musFill)" stroke="#9d00ff" stroke-width="1.5"/>
+                  <text x="60" y="386" text-anchor="middle" fill="#c060ff" font-size="12" font-family="'Noto Sans TC',sans-serif" font-weight="bold">文物館</text>
+                  <text x="60" y="402" text-anchor="middle" fill="#9d00ff" font-size="9" font-family="'Share Tech Mono',monospace">MUSEUM</text>
+                </g>
+
+                <!-- ══════════════════════════════════
+                     互動建築 1：工學大樓（橘色，右側）
+                ══════════════════════════════════ -->
+                <g class="svg-building" onclick="openQuiz(1)" role="button" aria-label="工學大樓">
+                  <rect class="building-fill" x="850" y="60" width="135" height="200" rx="6"
+                        fill="url(#bldFill1)" fill-opacity="0.85"/>
+                  <rect class="building-border b1-border" x="850" y="60" width="135" height="200" rx="6"
+                        fill="none" stroke="#ff5500" stroke-width="1.8"/>
+                  <!-- 內部細節線 -->
+                  <line x1="850" y1="120" x2="985" y2="120" stroke="#ff5500" stroke-width="0.6" opacity="0.4"/>
+                  <line x1="850" y1="180" x2="985" y2="180" stroke="#ff5500" stroke-width="0.6" opacity="0.4"/>
+                  <line x1="917" y1="60" x2="917" y2="260" stroke="#ff5500" stroke-width="0.6" opacity="0.4"/>
+                  <!-- 標籤 -->
+                  <text x="917" y="142" text-anchor="middle" fill="#ff5500" font-size="14" font-family="'Noto Sans TC',sans-serif" font-weight="bold" filter="url(#glow-blue)">工學大樓</text>
+                  <text x="917" y="160" text-anchor="middle" fill="#ff7733" font-size="9.5" font-family="'Share Tech Mono',monospace">ENGINEERING</text>
+                  <!-- 互動徽章 -->
+                  <rect x="875" y="185" width="84" height="28" rx="4" fill="rgba(255,85,0,0.2)" stroke="#ff5500" stroke-width="1.2"/>
+                  <text x="917" y="204" text-anchor="middle" fill="#ff5500" font-size="11" font-family="'Share Tech Mono',monospace">💾 Origin.exe</text>
+                  <!-- 角落裝飾 -->
+                  <rect x="850" y="60" width="10" height="10" fill="#ff5500" opacity="0.8"/>
+                  <rect x="975" y="60" width="10" height="10" fill="#ff5500" opacity="0.8"/>
+                  <rect x="850" y="250" width="10" height="10" fill="#ff5500" opacity="0.8"/>
+                  <rect x="975" y="250" width="10" height="10" fill="#ff5500" opacity="0.8"/>
+                  <!-- 點擊提示 -->
+                  <circle cx="917" cy="112" r="6" fill="#ff5500" opacity="0.6">
+                    <animate attributeName="r" values="6;9;6" dur="2s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.6;0.2;0.6" dur="2s" repeatCount="indefinite"/>
+                  </circle>
+                  <circle cx="917" cy="112" r="3" fill="#ff5500"/>
+                </g>
+
+                <!-- ══════════════════════════════════
+                     互動建築 2：第一醫學大樓（青藍，中右下）
+                ══════════════════════════════════ -->
+                <g class="svg-building" onclick="openQuiz(2)" role="button" aria-label="第一醫學大樓">
+                  <!-- 主體 + 附翼 -->
+                  <polygon class="building-fill" points="490,200 710,200 710,310 620,310 620,345 490,345"
+                           fill="url(#bldFill2)" fill-opacity="0.85"/>
+                  <polygon class="building-border b2-border" points="490,200 710,200 710,310 620,310 620,345 490,345"
+                           fill="none" stroke="#00e1ff" stroke-width="1.8"/>
+                  <!-- 內部細節線 -->
+                  <line x1="490" y1="255" x2="710" y2="255" stroke="#00e1ff" stroke-width="0.6" opacity="0.4"/>
+                  <line x1="600" y1="200" x2="600" y2="310" stroke="#00e1ff" stroke-width="0.6" opacity="0.4"/>
+                  <text x="600" y="241" text-anchor="middle" fill="#00e1ff" font-size="13" font-family="'Noto Sans TC',sans-serif" font-weight="bold" filter="url(#glow-blue)">第一醫學大樓</text>
+                  <text x="600" y="258" text-anchor="middle" fill="#33ccff" font-size="9" font-family="'Share Tech Mono',monospace">1ST MED SCI BLDG</text>
+                  <rect x="533" y="275" width="134" height="28" rx="4" fill="rgba(0,225,255,0.15)" stroke="#00e1ff" stroke-width="1.2"/>
+                  <text x="600" y="294" text-anchor="middle" fill="#00e1ff" font-size="11" font-family="'Share Tech Mono',monospace">👻 Ghost DB</text>
+                  <!-- 角落裝飾 -->
+                  <rect x="490" y="200" width="10" height="10" fill="#00e1ff" opacity="0.7"/>
+                  <rect x="700" y="200" width="10" height="10" fill="#00e1ff" opacity="0.7"/>
+                  <rect x="490" y="335" width="10" height="10" fill="#00e1ff" opacity="0.7"/>
+                  <!-- 脈衝點 -->
+                  <circle cx="600" cy="220" r="5" fill="#00e1ff" opacity="0.5">
+                    <animate attributeName="r" values="5;8;5" dur="2.5s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.5;0.15;0.5" dur="2.5s" repeatCount="indefinite"/>
+                  </circle>
+                  <circle cx="600" cy="220" r="2.5" fill="#00e1ff"/>
+                </g>
+
+                <!-- ══════════════════════════════════
+                     互動建築 3：第二醫學大樓（黃色，左側）
+                ══════════════════════════════════ -->
+                <g class="svg-building" onclick="openQuiz(3)" role="button" aria-label="第二醫學大樓">
+                  <!-- 主體 + 突出段 -->
+                  <polygon class="building-fill" points="20,160 190,160 190,250 240,250 240,345 20,345"
+                           fill="url(#bldFill3)" fill-opacity="0.85"/>
+                  <polygon class="building-border b3-border" points="20,160 190,160 190,250 240,250 240,345 20,345"
+                           fill="none" stroke="#ffee00" stroke-width="1.8"/>
+                  <line x1="20" y1="250" x2="240" y2="250" stroke="#ffee00" stroke-width="0.6" opacity="0.4"/>
+                  <line x1="130" y1="160" x2="130" y2="345" stroke="#ffee00" stroke-width="0.6" opacity="0.4"/>
+                  <text x="118" y="210" text-anchor="middle" fill="#ffee00" font-size="12" font-family="'Noto Sans TC',sans-serif" font-weight="bold" filter="url(#glow-yellow)">第二醫學大樓</text>
+                  <text x="118" y="226" text-anchor="middle" fill="#ffe033" font-size="9" font-family="'Share Tech Mono',monospace">2ND MED SCI</text>
+                  <rect x="40" y="278" width="150" height="28" rx="4" fill="rgba(255,238,0,0.12)" stroke="#ffee00" stroke-width="1.2"/>
+                  <text x="115" y="297" text-anchor="middle" fill="#ffee00" font-size="11" font-family="'Share Tech Mono',monospace">🎃 Pumpkin Code</text>
+                  <!-- 角落 -->
+                  <rect x="20" y="160" width="10" height="10" fill="#ffee00" opacity="0.7"/>
+                  <rect x="180" y="160" width="10" height="10" fill="#ffee00" opacity="0.7"/>
+                  <rect x="20" y="335" width="10" height="10" fill="#ffee00" opacity="0.7"/>
+                  <rect x="230" y="335" width="10" height="10" fill="#ffee00" opacity="0.7"/>
+                  <!-- 脈衝 -->
+                  <circle cx="118" cy="180" r="5" fill="#ffee00" opacity="0.5">
+                    <animate attributeName="r" values="5;8;5" dur="2.2s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.5;0.15;0.5" dur="2.2s" repeatCount="indefinite"/>
+                  </circle>
+                  <circle cx="118" cy="180" r="2.5" fill="#ffee00"/>
+                </g>
+
+                <!-- ══════════════════════════════════
+                     互動建築 4：管理大樓（紅粉，上中）
+                ══════════════════════════════════ -->
+                <g class="svg-building" onclick="openQuiz(4)" role="button" aria-label="管理大樓">
+                  <rect class="building-fill" x="300" y="20" width="290" height="145" rx="6"
+                        fill="url(#bldFill4)" fill-opacity="0.85"/>
+                  <rect class="building-border b4-border" x="300" y="20" width="290" height="145" rx="6"
+                        fill="none" stroke="#ff0066" stroke-width="1.8"/>
+                  <line x1="300" y1="90" x2="590" y2="90" stroke="#ff0066" stroke-width="0.6" opacity="0.4"/>
+                  <line x1="445" y1="20" x2="445" y2="165" stroke="#ff0066" stroke-width="0.6" opacity="0.4"/>
+                  <text x="445" y="69" text-anchor="middle" fill="#ff0066" font-size="15" font-family="'Noto Sans TC',sans-serif" font-weight="bold" filter="url(#glow-blue)">管理大樓</text>
+                  <text x="445" y="87" text-anchor="middle" fill="#ff3388" font-size="10" font-family="'Share Tech Mono',monospace">MANAGEMENT BLDG</text>
+                  <rect x="350" y="107" width="190" height="28" rx="4" fill="rgba(255,0,102,0.15)" stroke="#ff0066" stroke-width="1.2"/>
+                  <text x="445" y="126" text-anchor="middle" fill="#ff0066" font-size="11" font-family="'Share Tech Mono',monospace">📸 Ghost Mode ON</text>
+                  <!-- 角落 -->
+                  <rect x="300" y="20" width="10" height="10" fill="#ff0066" opacity="0.7"/>
+                  <rect x="580" y="20" width="10" height="10" fill="#ff0066" opacity="0.7"/>
+                  <rect x="300" y="155" width="10" height="10" fill="#ff0066" opacity="0.7"/>
+                  <rect x="580" y="155" width="10" height="10" fill="#ff0066" opacity="0.7"/>
+                  <!-- 脈衝 -->
+                  <circle cx="445" cy="48" r="5" fill="#ff0066" opacity="0.5">
+                    <animate attributeName="r" values="5;8;5" dur="3s" repeatCount="indefinite"/>
+                    <animate attributeName="opacity" values="0.5;0.15;0.5" dur="3s" repeatCount="indefinite"/>
+                  </circle>
+                  <circle cx="445" cy="48" r="2.5" fill="#ff0066"/>
+                </g>
+
+                <!-- ══════════════════════════════════
+                     圖例與指南針
+                ══════════════════════════════════ -->
+                <!-- 圖例框 -->
+                <g opacity="0.85">
+                  <rect x="10" y="10" width="150" height="100" rx="4" fill="rgba(3,1,6,0.8)" stroke="#0066ff" stroke-width="1" opacity="0.6"/>
+                  <text x="85" y="28" text-anchor="middle" fill="#00d2ff" font-size="10" font-family="'Share Tech Mono',monospace">CAMPUS LEGEND</text>
+                  <rect x="18" y="36" width="10" height="10" rx="2" fill="rgba(255,85,0,0.3)" stroke="#ff5500" stroke-width="1"/>
+                  <text x="34" y="46" fill="#ff5500" font-size="9.5" font-family="'Noto Sans TC',sans-serif">工學大樓</text>
+                  <rect x="18" y="54" width="10" height="10" rx="2" fill="rgba(0,225,255,0.2)" stroke="#00e1ff" stroke-width="1"/>
+                  <text x="34" y="64" fill="#00e1ff" font-size="9.5" font-family="'Noto Sans TC',sans-serif">第一醫學大樓</text>
+                  <rect x="18" y="72" width="10" height="10" rx="2" fill="rgba(255,238,0,0.2)" stroke="#ffee00" stroke-width="1"/>
+                  <text x="34" y="82" fill="#ffee00" font-size="9.5" font-family="'Noto Sans TC',sans-serif">第二醫學大樓</text>
+                  <rect x="18" y="90" width="10" height="10" rx="2" fill="rgba(255,0,102,0.2)" stroke="#ff0066" stroke-width="1"/>
+                  <text x="34" y="100" fill="#ff0066" font-size="9.5" font-family="'Noto Sans TC',sans-serif">管理大樓</text>
+                </g>
+
+                <!-- 指南針（右上角） -->
+                <g transform="translate(950,25)" opacity="0.7">
+                  <circle r="18" fill="rgba(0,210,255,0.05)" stroke="#00d2ff" stroke-width="1"/>
+                  <polygon points="0,-14 4,0 0,4 -4,0" fill="#ff0066"/>
+                  <polygon points="0,14 4,0 0,-4 -4,0" fill="#00d2ff"/>
+                  <text y="-16" text-anchor="middle" fill="#ff0066" font-size="9" font-family="'Share Tech Mono',monospace">N</text>
+                </g>
+
+                <!-- 底部狀態欄 -->
+                <rect x="0" y="420" width="1000" height="20" fill="rgba(0,210,255,0.04)" stroke="#00d2ff" stroke-width="0.5" opacity="0.5"/>
+                <text x="16" y="434" fill="#00d2ff" font-size="9" font-family="'Share Tech Mono',monospace" opacity="0.7">SYS: GHOST_MODE_ACTIVE ██ CAMPUS_RADAR_LOCK ██ 4 TARGETS ACQUIRED</text>
+                <text x="984" y="434" text-anchor="end" fill="#00d2ff" font-size="9" font-family="'Share Tech Mono',monospace" opacity="0.7">TAP TARGET TO ENTER</text>
+              </svg>
+              <!-- ===== SVG 結束 ===== -->
+            </div>
+        </div>
+    </div>
+
+
+    <div id="quizModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeQuiz()">&times;</span>
+            <h3 id="modalZoneTitle" style="margin-bottom: 15px; color: var(--primary-yellow);">ZONE_QUIZ</h3>
+            <div id="quizQuestion" class="quiz-question">問題加載中...</div>
+            <div id="quizOptions" class="quiz-options"></div>
+            <div id="quizResult" class="quiz-result"></div>
+        </div>
+    </div>
+
+    <script>
+        function switchPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        const quizData = {
+            1: {
+                title: "💾 工學大樓 ➔ Origin.exe 【萬聖節的起源】",
+                question: "萬盛節起源於兩千多年前，凱爾特人驅趕遊魂、迎接冬天的什麼古老慶典？",
+                options: ["復活節", "薩溫節 (Samhain)", "感恩節", "元旦"],
+                correct: 1,
+                lineUrl: "https://line.me/R/ti/p/@your_art_center_id_1"
+            },
+            2: {
+                title: "👻 第一醫學大樓 ➔ Ghost Database 【世界各國鬼怪文化】",
+                question: "充滿斑斕色彩與歡樂思念氛圍的「亡靈節」是源自於以下哪一個國家？",
+                options: ["日本", "義大利", "墨西哥", "埃及"],
+                correct: 2,
+                lineUrl: "https://line.me/R/ti/p/@your_art_center_id_2"
+            },
+            3: {
+                title: "🎃 第二醫學大樓 ➔ Pumpkin Code 【南瓜燈的秘密】",
+                question: "歷史上最早的傑克南瓜燈，其實一開始是用什麼植物蔬菜雕刻而成的？",
+                options: ["大頭菜/蕪菁", "胡蘿蔔", "地瓜", "白蘿蔔"],
+                correct: 0,
+                lineUrl: "https://line.me/R/ti/p/@your_art_center_id_3"
+            },
+            4: {
+                title: "📸 管理大樓 ➔ Ghost Mode ON 【打卡牆、投票區】",
+                question: "您是否已經前往現場實體打卡牆合照分享，或是為萬聖節活動裝扮投下了一票呢？",
+                options: ["是的，已完成解鎖！", "尚未，我現在就去。"],
+                correct: 0,
+                lineUrl: "https://line.me/R/ti/p/@your_art_center_id_4"
+            }
+        };
+
+        let currentZone = null;
+
+        function openQuiz(zoneId) {
+            currentZone = zoneId;
+            const data = quizData[zoneId];
+            
+            document.getElementById('modalZoneTitle').innerText = data.title;
+            document.getElementById('quizQuestion').innerText = data.question;
+            
+            const resultDiv = document.getElementById('quizResult');
+            resultDiv.style.display = 'none';
+
+            const optionsDiv = document.getElementById('quizOptions');
+            optionsDiv.innerHTML = '';
+            
+            data.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-btn';
+                button.innerText = option;
+                button.onclick = () => checkAnswer(index);
+                optionsDiv.appendChild(button);
+            });
+
+            document.getElementById('quizModal').classList.add('active');
+        }
+
+        function closeQuiz() {
+            document.getElementById('quizModal').classList.remove('active');
+        }
+
+        function checkAnswer(selectedIndex) {
+            const data = quizData[currentZone];
+            const resultDiv = document.getElementById('quizResult');
+            resultDiv.style.display = 'block';
+
+            if (selectedIndex === data.correct) {
+                resultDiv.style.background = 'rgba(6, 199, 85, 0.15)';
+                resultDiv.style.color = '#06C755';
+                resultDiv.style.border = '1px solid #06C755';
+                resultDiv.innerHTML = `
+                    <p>🎉 答對了！解鎖成功！</p>
+                    <a href="${data.lineUrl}" target="_blank" class="line-stamp-link">➔ 點我開啟 LINE 領取該區電子章</a>
+                `;
+            } else {
+                resultDiv.style.background = 'rgba(255, 85, 0, 0.15)';
+                resultDiv.style.color = 'var(--accent-orange)';
+                resultDiv.style.border = '1px solid var(--accent-orange)';
+                resultDiv.innerHTML = `<p>❌ 系統錯誤！答案不正確，請重新挑戰！</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
