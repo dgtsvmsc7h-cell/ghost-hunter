@@ -132,11 +132,13 @@ body::before{
   font-family:'Bangers',cursive;font-size:32px;letter-spacing:2px;color:var(--gold);
   margin-bottom:18px;text-shadow:0 0 20px rgba(255,215,0,0.6);
 }
-.reward-box .rb-icon{
-  font-size:86px;display:block;margin-bottom:14px;
+.reward-box .rb-chest-img{
+  width:120px;height:120px;object-fit:contain;
+  display:block;margin:0 auto 14px;
+  filter:drop-shadow(0 0 18px rgba(255,215,0,0.8)) drop-shadow(0 0 36px rgba(255,165,0,0.5));
   animation:iconFloat 2s ease-in-out infinite;
 }
-@keyframes iconFloat{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-10px) rotate(5deg)}}
+@keyframes iconFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}}
 .reward-box .rb-name{
   font-family:'Bangers',cursive;font-size:28px;color:var(--cream);
   letter-spacing:2px;margin-bottom:8px;
@@ -255,7 +257,7 @@ body::before{
   <div class="reward-box">
     <div class="rb-badge">// 寶箱開啟 //</div>
     <div class="rb-title">🎁 獲得裝備！</div>
-    <span class="rb-icon" id="rbIcon">⚔️</span>
+    <img class="rb-chest-img" src="chest_open.webp" alt="寶箱"/>
     <div class="rb-name" id="rbName">聖劍</div>
     <div class="rb-desc" id="rbDesc">傳說武器</div>
     <button class="rb-btn" onclick="closeReward()">⚡ 收下裝備！</button>
@@ -615,17 +617,13 @@ ${!bossDefeated?buildBoss(370,190):`
 }
 
 function buildChest(cx,cy,open){
-  const glow=open?`<circle cx="0" cy="${-cy+cy}" r="30" fill="url(#chestGlow)" transform="translate(0,-8)"/>`:''
   return `<g transform="translate(${cx},${cy})">
-    ${open?`<circle r="30" fill="url(#chestGlow)"/>`:''}
     <ellipse cx="0" cy="16" rx="16" ry="3" fill="#000" opacity="0.5"/>
     ${open?`
-      <rect x="-15" y="0" width="30" height="16" fill="#8b4513" stroke="#4a1810" stroke-width="1.2" rx="2"/>
-      <path d="M-15 0 Q-15 -12 0 -12 Q 15 -12 15 0 L 15 -7 Q 15 -19 0 -19 Q -15 -19 -15 -7 Z" fill="#5a2d08" stroke="#4a1810" stroke-width="1.2" transform="translate(0,-3) rotate(-18)"/>
-      <ellipse cx="0" cy="1" rx="11" ry="3" fill="#ffd700" opacity="0.7"><animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite"/></ellipse>
-      <text x="-13" y="-14" font-size="9" fill="#ffd700">✦</text>
-      <text x="10" y="-17" font-size="8" fill="#ffd700">✦</text>
-      <text x="-1" y="-22" font-size="10" fill="#ffd700">✨</text>
+      <circle r="34" fill="url(#chestGlow)" opacity="0.7"><animate attributeName="r" values="30;38;30" dur="1.8s" repeatCount="indefinite"/></circle>
+      <image href="chest_open.webp" x="-28" y="-44" width="56" height="56" preserveAspectRatio="xMidYMid meet"/>
+      <text x="-13" y="-38" font-size="8" fill="#ffd700" opacity="0.9">✦</text>
+      <text x="11" y="-42" font-size="7" fill="#ffd700" opacity="0.9">✦</text>
     `:`
       <rect x="-15" y="0" width="30" height="16" fill="#4a3520" stroke="#2a1810" stroke-width="1.2" rx="2" opacity="0.7"/>
       <path d="M-15 0 Q-15-10 0-10 Q 15-10 15 0 Z" fill="#3a2510" stroke="#2a1810" stroke-width="1.2" opacity="0.7"/>
@@ -962,7 +960,6 @@ async function animateBossFight(user,currentPos,currentState){
 function showRewardPopup(eqKey){
   return new Promise(resolve=>{
     const info=EQ_INFO[eqKey]||{icon:'?',name:'?',desc:'?'};
-    document.getElementById('rbIcon').textContent=info.icon;
     document.getElementById('rbName').textContent=info.name;
     document.getElementById('rbDesc').textContent=info.desc;
     document.getElementById('rewardOverlay').classList.add('open');
