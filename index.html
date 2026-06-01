@@ -437,7 +437,7 @@ body::after{
 
     <!-- Equipment -->
     <div class="section-card">
-      <div class="section-title">🗡️ 裝備背包</div>
+      <div class="section-title" id="equipTitle">🗡️ 裝備背包</div>
       <div class="equip-rack" id="equipRack">
         <!-- Rendered by JS -->
       </div>
@@ -607,6 +607,8 @@ function renderDash(){
   // Equipment
   const allEq=['sword','shield','grail','armor'];
   const eq2={sword:{icon:'⚔️',name:'聖劍'},shield:{icon:'🛡️',name:'聖盾'},grail:{icon:'🏆',name:'聖杯'},armor:{icon:'🛡️',name:'盔甲'}};
+  const eqCount=(user.equipmentOrder||[]).length;
+  document.getElementById('equipTitle').textContent=`🗡️ 裝備背包（${eqCount}/4）`;
   document.getElementById('equipRack').innerHTML=allEq.map(e=>{
     const has=user.equipmentOrder.includes(e);
     return`<div class="equip-item ${has?'owned':''}">
