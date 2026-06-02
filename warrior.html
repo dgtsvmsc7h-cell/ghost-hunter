@@ -795,15 +795,20 @@ function setStory(msg,gold=false){
   el.className='story-box'+(gold?' gold':'');
 }
 
-function scrollMapToWarrior(svgX){
+function scrollMapToWarrior(svgX,svgY){
   const wrapper=document.querySelector('.map-wrapper');
   const svg=document.getElementById('campusSvg');
   if(!wrapper||!svg) return;
-  const scale=(svg.clientWidth||700)/1000;
-  const pixelX=svgX*scale;
+  const svgW=svg.clientWidth||700;
+  const svgH=svg.clientHeight||440;
+  const scaleX=svgW/1000;
+  const scaleY=svgH/440;
+  const pixelX=svgX*scaleX;
+  const pixelY=svgY*scaleY;
   const wrapperW=wrapper.clientWidth;
-  // Keep warrior horizontally centred in the visible area
+  const wrapperH=wrapper.clientHeight;
   wrapper.scrollLeft=Math.max(0,pixelX-wrapperW/2);
+  wrapper.scrollTop=Math.max(0,pixelY-wrapperH/2);
 }
 
 async function walkWarriorTo(target,fromPos){
@@ -821,11 +826,11 @@ async function walkWarriorTo(target,fromPos){
       const y=baseY+bounce*(1-t);
       const wg=document.getElementById('warriorGroup');
       if(wg) wg.setAttribute('transform',`translate(${x},${y})`);
-      scrollMapToWarrior(x);
+      scrollMapToWarrior(x,y);
       if(t<1) requestAnimationFrame(frame);
       else{
         if(wg) wg.setAttribute('transform',`translate(${target.x},${target.y})`);
-        scrollMapToWarrior(target.x);
+        scrollMapToWarrior(target.x,target.y);
         resolve();
       }
     }
