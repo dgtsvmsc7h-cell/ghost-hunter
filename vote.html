@@ -257,11 +257,67 @@ const VOTE_OPTIONS=[
 
 let selectedVote=null;
 
+const LEVEL_INFO={
+  1:{icon:'🪦',name:'萬聖節的起源',loc:'第一醫學大樓'},
+  2:{icon:'👻',name:'世界鬼怪文化',loc:'管理大樓'},
+  3:{icon:'🎃',name:'南瓜燈的秘密',loc:'圖書館'},
+};
+
 function init(){
   const user=getCurrentUser();
   if(!user){renderLoginForm(); return}
   if(user.progress.level4.completed){renderAlreadyVoted(user); return}
+  const incomplete=[1,2,3].filter(lv=>!user.progress['level'+lv].completed);
+  if(incomplete.length>0){renderLockedForm(user,incomplete); return}
   renderVoteForm(user);
+}
+
+function renderLockedForm(user,incomplete){
+  const rows=incomplete.map(lv=>{
+    const info=LEVEL_INFO[lv];
+    return`<div style="display:flex;align-items:center;gap:12px;
+      background:rgba(255,120,0,0.07);border:1px solid rgba(255,120,0,0.3);
+      border-radius:10px;padding:11px 14px;margin-bottom:8px">
+      <span style="font-size:22px">${info.icon}</span>
+      <div>
+        <div style="font-size:13px;font-weight:700;color:var(--cream)">STAGE 0${lv}｜${info.name}</div>
+        <div style="font-size:11px;color:var(--subtext);margin-top:2px">📍 ${info.loc}</div>
+      </div>
+      <span style="margin-left:auto;font-size:11px;font-weight:700;
+        color:var(--orange);letter-spacing:1px">未完成</span>
+    </div>`;
+  }).join('');
+
+  const lockedOpts=VOTE_OPTIONS.map(o=>`
+    <button class="vote-opt" disabled style="opacity:0.35;cursor:not-allowed;filter:grayscale(0.6)">
+      <span class="vo-icon">${o.icon}</span>
+      <div class="vo-text">
+        <div class="vo-name">${o.name}</div>
+        <div class="vo-loc">📍 ${o.loc}</div>
+      </div>
+      <span style="font-size:16px;opacity:0.5">🔒</span>
+    </button>`).join('');
+
+  document.getElementById('pageContent').innerHTML=`
+    <div class="section-card" style="border-color:rgba(255,80,0,0.5)">
+      <div style="font-size:11px;letter-spacing:3px;color:var(--subtext);margin-bottom:14px;text-align:center">
+        勇者 ${user.name}（${user.sid}）
+      </div>
+      <div style="text-align:center;font-size:48px;margin-bottom:10px">🔒</div>
+      <div style="font-family:'Bangers',cursive;font-size:26px;letter-spacing:2px;
+        color:var(--orange2);text-align:center;margin-bottom:6px">第四關尚未解鎖</div>
+      <div style="font-size:14px;color:var(--text);text-align:center;line-height:1.7;margin-bottom:18px">
+        請先至其他關卡取得裝備，<br>再來挑戰第四關!!
+      </div>
+      <div style="margin-bottom:18px">${rows}</div>
+      <div style="font-size:12px;color:var(--subtext);text-align:center;margin-bottom:14px;letter-spacing:1px">
+        — 投票功能已鎖定，完成以上關卡後再回來 —
+      </div>
+      <div class="vote-options" style="pointer-events:none">${lockedOpts}</div>
+    </div>
+    <a href="index.html" style="display:block;text-align:center;margin-top:14px;
+      font-family:'Bangers',cursive;font-size:20px;letter-spacing:2px;
+      color:var(--orange2);text-decoration:none">← 回首頁繼續闖關</a>`;
 }
 
 function renderLoginForm(){
