@@ -413,7 +413,7 @@ const EQ_INFO={
 // Scale 0.45 → warrior ≈24px tall, head at center-12, feet at center+12
 const WARRIOR_POS={
   start:  {x:555,y:150},  // 管理大樓 bottom-right of building, past badge
-  boss:   {x:340,y:45},   // 管理大樓 top-left, above title text
+  boss:   {x:917,y:100},  // 活動中心 upper area, below top edge, above text labels
   level1: {x:680,y:215},  // 第一醫學 right section, between top and title y=241
   level2: {x:555,y:150},  // 管理大樓 (same as start; level 2 IS at mgmt)
   level3: {x:755,y:55},   // 圖書館 top area, above title y=83
@@ -436,21 +436,21 @@ function getWaypoints(fromId, toId){
     'start-level1':[[555,182],[660,182]],
     'start-level3':[[640,150],[755,148]],
     'start-level4':[[640,145],[810,145]],
-    'start-boss':[],  // within same building
+    'start-boss':[[640,145],[810,145]],  // 管理大樓 → 活動中心
     // level2 === same position as start
     'level2-level1':[[555,182],[660,182]],
     'level2-level3':[[640,150],[755,148]],
     'level2-level4':[[640,145],[810,145]],
-    'level2-boss':[],
+    'level2-boss':[[640,145],[810,145]],  // 管理大樓 → 活動中心
     // level1↔others
     'level1-level3':[[660,182],[755,182],[755,148]],
     'level1-level4':[[660,182],[810,150]],
-    'level1-boss':[[660,182],[555,182],[445,100]],
+    'level1-boss':[[660,182],[810,145]],  // 第一醫學 → 活動中心
     // level3↔others
     'level3-level4':[[808,55]],
-    'level3-boss':[[638,55],[555,80],[445,80]],
-    // level4↔boss
-    'level4-boss':[[850,80],[640,80],[445,80]],
+    'level3-boss':[[808,55]],             // 圖書館 → 活動中心（同側直行）
+    // level4↔boss (同建築內)
+    'level4-boss':[],
   };
   const key=`${fromId}-${toId}`;
   const rkey=`${toId}-${fromId}`;
@@ -578,9 +578,9 @@ ${pathStr?`<path d="${pathStr}" fill="none" stroke="#22ff77" stroke-width="2.5" 
   <text x="0" y="14" text-anchor="middle" fill="#22ff77" font-size="8" font-family="'Share Tech Mono',monospace">START</text>
 </g>
 
-<!-- BOSS marker at mgmt -->
-${!bossDefeated?buildBoss(370,190):`
-<g transform="translate(370,190)">
+<!-- BOSS marker at 活動中心 -->
+${!bossDefeated?buildBoss(917,100):`
+<g transform="translate(917,100)">
   <circle r="16" fill="url(#bossAura)" opacity="0.4"/>
   <text x="0" y="-2" text-anchor="middle" font-size="18">💀</text>
   <text x="0" y="14" text-anchor="middle" fill="#22ff77" font-size="8" font-family="'Share Tech Mono',monospace">DEFEATED</text>
@@ -854,7 +854,7 @@ async function animateNewCompletion(user,newLevel,newEqKey){
   document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,fromPos);
   renderEquipBar(tmpUser.equipmentOrder);
 
-  const LOC_NAMES={start:'管理大樓（起點）',level1:'第一醫學大樓',level2:'管理大樓',level3:'圖書館',level4:'活動中心',boss:'管理大樓（BOSS 區）'};
+  const LOC_NAMES={start:'管理大樓（起點）',level1:'第一醫學大樓',level2:'管理大樓',level3:'圖書館',level4:'活動中心',boss:'活動中心'};
   setStory('勇者出發前往 '+(LOC_NAMES[newLocId]||'目的地')+'…');
   await delay(600);
 
