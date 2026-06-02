@@ -403,17 +403,17 @@ const EQ_INFO={
 // ─── Map building definitions ───
 // viewBox: 0 0 1000 440
 // Buildings from original SVG (preserved exactly):
-//   管理大樓: rect x=300 y=20 w=290 h=145 → Level 2, START, BOSS
+//   管理大樓: rect x=300 y=20 w=290 h=145 → Level 2, START
 //   第一醫學大樓: polygon 490,200 710,200 710,310 620,310 620,345 490,345 → Level 1
 //   圖書館: rect x=680 y=40 w=120 h=100 → Level 3
-//   活動中心 (was 工學): rect x=850 y=60 w=135 h=200 → Level 4
+//   活動中心 (was 工學): rect x=850 y=60 w=135 h=200 → Level 4, BOSS
 //   第二醫學大樓: polygon 20,160 190,160 190,250 240,250 240,345 20,345 → decoration
 
 // Warrior standing positions INSIDE buildings (avoiding text labels):
 // Scale 0.45 → warrior ≈24px tall, head at center-12, feet at center+12
 const WARRIOR_POS={
   start:  {x:555,y:150},  // 管理大樓 bottom-right of building, past badge
-  boss:   {x:917,y:100},  // 活動中心 upper area, below top edge, above text labels
+  boss:   {x:960,y:100},  // 活動中心 right half, beside BOSS marker at (860,95)
   level1: {x:680,y:215},  // 第一醫學 right section, between top and title y=241
   level2: {x:555,y:150},  // 管理大樓 (same as start; level 2 IS at mgmt)
   level3: {x:755,y:55},   // 圖書館 top area, above title y=83
@@ -436,21 +436,21 @@ function getWaypoints(fromId, toId){
     'start-level1':[[555,182],[660,182]],
     'start-level3':[[640,150],[755,148]],
     'start-level4':[[640,145],[810,145]],
-    'start-boss':[[640,145],[810,145]],  // 管理大樓 → 活動中心
+    'start-boss':[[640,145],[810,145],[850,100]],  // 管理大樓 → 走廊 → 活動中心左壁直行
     // level2 === same position as start
     'level2-level1':[[555,182],[660,182]],
     'level2-level3':[[640,150],[755,148]],
     'level2-level4':[[640,145],[810,145]],
-    'level2-boss':[[640,145],[810,145]],  // 管理大樓 → 活動中心
+    'level2-boss':[[640,145],[810,145],[850,100]],  // 管理大樓 → 走廊 → 活動中心左壁直行
     // level1↔others
     'level1-level3':[[660,182],[755,182],[755,148]],
     'level1-level4':[[660,182],[810,150]],
-    'level1-boss':[[660,182],[810,145]],  // 第一醫學 → 活動中心
+    'level1-boss':[[660,182],[810,145],[850,100]],  // 第一醫學 → 走廊 → 活動中心左壁直行
     // level3↔others
     'level3-level4':[[808,55]],
-    'level3-boss':[[808,55]],             // 圖書館 → 活動中心（同側直行）
-    // level4↔boss (同建築內)
-    'level4-boss':[],
+    'level3-boss':[[808,55],[850,100]],  // 圖書館 → 建築間隙 → 活動中心左壁直行
+    // level4↔boss (同建築內，先下行增加移動感再到 boss)
+    'level4-boss':[[917,220]],
   };
   const key=`${fromId}-${toId}`;
   const rkey=`${toId}-${fromId}`;
@@ -578,9 +578,9 @@ ${pathStr?`<path d="${pathStr}" fill="none" stroke="#22ff77" stroke-width="2.5" 
   <text x="0" y="14" text-anchor="middle" fill="#22ff77" font-size="8" font-family="'Share Tech Mono',monospace">START</text>
 </g>
 
-<!-- BOSS marker at 活動中心 -->
-${!bossDefeated?buildBoss(917,100):`
-<g transform="translate(917,100)">
+<!-- BOSS marker at 活動中心 (left half), warrior stops at right half (960,100) -->
+${!bossDefeated?buildBoss(860,95):`
+<g transform="translate(860,95)">
   <circle r="16" fill="url(#bossAura)" opacity="0.4"/>
   <text x="0" y="-2" text-anchor="middle" font-size="18">💀</text>
   <text x="0" y="14" text-anchor="middle" fill="#22ff77" font-size="8" font-family="'Share Tech Mono',monospace">DEFEATED</text>
@@ -649,7 +649,6 @@ function buildBoss(cx,cy){
     <path d="M-9-11 L-13-19 L-7-13 Z" fill="#1a0808" stroke="#ff0055" stroke-width="0.7"/>
     <path d="M 9-11 L 13-19 L  7-13 Z" fill="#1a0808" stroke="#ff0055" stroke-width="0.7"/>
     <path d="M-6 4 L-4 9 L-2 4 L 0 9 L 2 4 L 4 9 L 6 4" stroke="#fff" stroke-width="1.3" fill="none"/>
-    <text x="0" y="30" text-anchor="middle" font-family="Bangers" font-size="11" fill="#ff0055">BOSS</text>
   </g>`;
 }
 
@@ -908,7 +907,7 @@ async function animateBossFight(user,currentPos,currentState){
   const bossPos=WARRIOR_POS.boss;
   const lastLocId=levelToLocId(getCompletionOrder(user.progress).slice(-1)[0]||'start');
   
-  setStory('⚔️ 勇者朝管理大樓 BOSS 區進發！');
+  setStory('⚔️ 勇者朝活動中心進發！');
   await delay(500);
   
   // Walk to boss
