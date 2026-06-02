@@ -527,7 +527,7 @@ function buildSvg(user,warriorPos,opts){
   <rect x="300" y="20" width="8" height="8" fill="#ff0066" opacity="0.7"/><rect x="582" y="20" width="8" height="8" fill="#ff0066" opacity="0.7"/>
   <rect x="300" y="157" width="8" height="8" fill="#ff0066" opacity="0.7"/><rect x="582" y="157" width="8" height="8" fill="#ff0066" opacity="0.7"/>
   ${done[2]?'<circle cx="445" cy="48" r="5" fill="#ff0066" opacity="0.4"><animate attributeName="opacity" values="0.4;0.1;0.4" dur="2s" repeatCount="indefinite"/></circle>':''}
-  ${done[2]?buildChest(385,190,true):''}
+  ${done[2]?buildChest(385,190,true):buildChest(385,190,false)}
 </g>
 
 <!-- 第一醫學大樓 (Level 1) -->
@@ -540,7 +540,7 @@ function buildSvg(user,warriorPos,opts){
   <text x="595" y="286" text-anchor="middle" fill="#00e1ff" font-size="10" font-family="'Share Tech Mono',monospace">🪦 ORIGIN.EXE</text>
   <rect x="490" y="200" width="8" height="8" fill="#00e1ff" opacity="0.7"/><rect x="702" y="200" width="8" height="8" fill="#00e1ff" opacity="0.7"/>
   <rect x="490" y="337" width="8" height="8" fill="#00e1ff" opacity="0.7"/>
-  ${done[1]?buildChest(595,370,true):''}
+  ${done[1]?buildChest(595,370,true):buildChest(595,370,false)}
 </g>
 
 <!-- 圖書館 (Level 3) -->
@@ -552,7 +552,7 @@ function buildSvg(user,warriorPos,opts){
   <text x="740" y="120" text-anchor="middle" fill="#c060ff" font-size="10" font-family="'Share Tech Mono',monospace">🎃 PUMPKIN CODE</text>
   <rect x="680" y="40" width="8" height="8" fill="#9d00ff" opacity="0.7"/><rect x="792" y="40" width="8" height="8" fill="#9d00ff" opacity="0.7"/>
   <rect x="680" y="132" width="8" height="8" fill="#9d00ff" opacity="0.7"/><rect x="792" y="132" width="8" height="8" fill="#9d00ff" opacity="0.7"/>
-  ${done[3]?buildChest(740,168,true):''}
+  ${done[3]?buildChest(740,168,true):buildChest(740,168,false)}
 </g>
 
 <!-- 活動中心 (Level 4, was 工學大樓) -->
@@ -566,7 +566,7 @@ function buildSvg(user,warriorPos,opts){
   <text x="917" y="198" text-anchor="middle" fill="#ff5500" font-size="10" font-family="'Share Tech Mono',monospace">🗳️ VOTE STAGE</text>
   <rect x="850" y="60" width="8" height="8" fill="#ff5500" opacity="0.7"/><rect x="977" y="60" width="8" height="8" fill="#ff5500" opacity="0.7"/>
   <rect x="850" y="252" width="8" height="8" fill="#ff5500" opacity="0.7"/><rect x="977" y="252" width="8" height="8" fill="#ff5500" opacity="0.7"/>
-  ${done[4]?buildChest(917,270,true):''}
+  ${done[4]?buildChest(917,270,true):buildChest(917,270,false)}
 </g>
 
 <!-- Path trace (dashed green line showing warrior's journey) -->
@@ -633,9 +633,7 @@ function buildChest(cx,cy,open){
       <text x="-13" y="-38" font-size="8" fill="#ffd700" opacity="0.9">✦</text>
       <text x="11" y="-42" font-size="7" fill="#ffd700" opacity="0.9">✦</text>
     `:`
-      <rect x="-15" y="0" width="30" height="16" fill="#4a3520" stroke="#2a1810" stroke-width="1.2" rx="2" opacity="0.7"/>
-      <path d="M-15 0 Q-15-10 0-10 Q 15-10 15 0 Z" fill="#3a2510" stroke="#2a1810" stroke-width="1.2" opacity="0.7"/>
-      <rect x="-2" y="-4" width="4" height="8" fill="#888" opacity="0.7"/>
+      <image href="chest_closed.png" x="-28" y="-44" width="56" height="56" preserveAspectRatio="xMidYMid meet"/>
     `}
   </g>`;
 }
