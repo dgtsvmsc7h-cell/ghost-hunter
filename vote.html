@@ -266,8 +266,8 @@ const LEVEL_INFO={
 function init(){
   const user=getCurrentUser();
   if(!user){renderLoginForm(); return}
-  if(user.progress.level4.completed){renderAlreadyVoted(user); return}
-  const incomplete=[1,2,3].filter(lv=>!user.progress['level'+lv].completed);
+  if(user.progress?.level4?.completed){renderAlreadyVoted(user); return}
+  const incomplete=[1,2,3].filter(lv=>!user.progress?.['level'+lv]?.completed);
   if(incomplete.length>0){renderLockedForm(user,incomplete); return}
   renderVoteForm(user);
 }
@@ -439,7 +439,7 @@ function showVictory(user,eq,redirectUrl){
 }
 
 function renderAlreadyVoted(user){
-  const p=user.progress.level4;
+  const p=user.progress?.level4;
   const voted=VOTE_OPTIONS.find(o=>o.key===p.vote)||{icon:'🗳️',name:'已投票'};
   document.getElementById('pageContent').innerHTML=`
     <div class="voted-card">
