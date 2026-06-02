@@ -88,6 +88,8 @@ body{
   text-align:left;width:100%;font-family:'Nunito',sans-serif;
 }
 .vote-opt:active{transform:scale(0.98)}
+.vote-opt[disabled]:active,
+.vote-opt.locked:active{transform:none;pointer-events:none}
 .vote-opt.selected{border-color:var(--gold);background:rgba(255,215,0,0.1);box-shadow:0 0 20px rgba(255,215,0,0.2)}
 .vote-opt .vo-icon{font-size:30px;flex-shrink:0}
 .vote-opt .vo-text{flex:1}
@@ -404,7 +406,8 @@ function submitVote(){
   // Assign armor
   const owned=user.equipmentOrder||[];
   const available=['sword','shield','grail','armor'].filter(e=>!owned.includes(e));
-  const newEq=available.includes('armor')?'armor':available[Math.floor(Math.random()*available.length)]||'armor';
+  const newEq=available.includes('armor')?'armor':(available.length>0?available[Math.floor(Math.random()*available.length)]:null);
+  if(!newEq) return;
   const now=new Date().toISOString();
   user.progress.level4={completed:true,vote:selectedVote,completedAt:now,equipment:newEq};
   user.equipmentOrder=[...owned,newEq];
