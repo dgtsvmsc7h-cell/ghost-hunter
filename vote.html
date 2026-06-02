@@ -396,18 +396,18 @@ function submitVote(){
   if(!confirm('確定投給這個展區嗎？投票後不可修改。')) return;
   const user=getCurrentUser(); if(!user) return;
   
+  // Assign armor (calculated first to guard before any writes)
+  const owned=user.equipmentOrder||[];
+  const available=['sword','shield','grail','armor'].filter(e=>!owned.includes(e));
+  const newEq=available.includes('armor')?'armor':(available.length>0?available[Math.floor(Math.random()*available.length)]:null);
+  if(!newEq) return;
+
   // Save vote
   const db=getDB();
   if(!db.voteStats) db.voteStats={zone1:0,zone2:0,zone3:0,zone4:0};
   db.voteStats[selectedVote]=(db.voteStats[selectedVote]||0)+1;
   saveDB(db);
   incrementVoteInCloud(selectedVote);
-  
-  // Assign armor
-  const owned=user.equipmentOrder||[];
-  const available=['sword','shield','grail','armor'].filter(e=>!owned.includes(e));
-  const newEq=available.includes('armor')?'armor':(available.length>0?available[Math.floor(Math.random()*available.length)]:null);
-  if(!newEq) return;
   const now=new Date().toISOString();
   user.progress.level4={completed:true,vote:selectedVote,completedAt:now,equipment:newEq};
   user.equipmentOrder=[...owned,newEq];
