@@ -497,8 +497,7 @@ function showDetail(sid){
 function closeDrawer(){document.getElementById('detailDrawer').classList.remove('open')}
 
 function exportCSV(){
-  const db=getDB();
-  const users=Object.values(db.users||{});
+  const users=allUsers.length>0?allUsers:Object.values(getDB().users||{});
   const headers=['學號','姓名','建立時間','Lv1完成','Lv1分數','Lv2完成','Lv2分數','Lv3完成','Lv3分數','Lv4完成','投票選項','裝備取得順序','BOSS擊敗','BOSS擊敗時間','四關全通'];
   const rows=users.map(u=>{
     const p=u.progress||{};

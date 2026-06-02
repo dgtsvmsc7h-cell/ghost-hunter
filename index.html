@@ -698,11 +698,11 @@ function navigateFromQr(text){
       window.location.href=text; return;
     }
     const lv=url.searchParams.get('level');
-    if(lv) {window.location.href=`quiz.html?level=${lv}`;return}
+    if(lv){window.location.href=lv==='4'?'vote.html':`quiz.html?level=${lv}`;return}
   }catch{}
   // Check plain text
   const m=text.match(/level[=:]?\s*(\d)/i);
-  if(m){window.location.href=`quiz.html?level=${m[1]}`;return}
+  if(m){window.location.href=m[1]==='4'?'vote.html':`quiz.html?level=${m[1]}`;return}
   if(/vote/i.test(text)){window.location.href='vote.html';return}
   showToast('無法識別的 QR Code');
 }

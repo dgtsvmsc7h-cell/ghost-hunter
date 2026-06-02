@@ -856,7 +856,8 @@ async function animateNewCompletion(user,newLevel,newEqKey){
   document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,fromPos);
   renderEquipBar(tmpUser.equipmentOrder);
 
-  setStory('勇者出發前往 '+WARRIOR_POS[newLocId===newLocId?newLocId:'start']+'…');
+  const LOC_NAMES={start:'管理大樓（起點）',level1:'第一醫學大樓',level2:'管理大樓',level3:'圖書館',level4:'活動中心',boss:'管理大樓（BOSS 區）'};
+  setStory('勇者出發前往 '+(LOC_NAMES[newLocId]||'目的地')+'…');
   await delay(600);
 
   // Walk through waypoints
@@ -1024,16 +1025,16 @@ function launchConfetti(){
   const reward=urlParams.get('reward');
   const level=parseInt(urlParams.get('level'));
 
-  // Static view (no redirect params): sync from Firestore for cross-device consistency
-  if(!reward && !level && sid){
+  // Always sync from Firestore first (covers both static view and reward/animation flow)
+  // This prevents duplicate boss fights when bossDefeated was already saved on another device
+  if(sid){
     const cloudUser=await loadUserFromCloud(sid);
     if(cloudUser){
       const db=getDB();
       const local=db.users[sid];
       const cloudEqLen=(cloudUser.equipmentOrder||[]).length;
       const localEqLen=(local?.equipmentOrder||[]).length;
-      // Use cloud data if local is absent or cloud has strictly more progress
-      if(!local || cloudEqLen>localEqLen){
+      if(!local||cloudEqLen>localEqLen||(cloudUser.bossDefeated&&!local?.bossDefeated)){
         db.users[sid]=cloudUser;
         saveDB(db);
       }
@@ -1055,6 +1056,7 @@ function launchConfetti(){
 
   if(reward&&level){
     // Just completed a level — animate, then clean URL to prevent re-trigger on reload
+    // user.bossDefeated already reflects latest Firestore state after sync above
     setTimeout(async()=>{
       await animateNewCompletion(user,level,reward);
       history.replaceState(null,'',location.pathname);

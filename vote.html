@@ -282,7 +282,7 @@ async function quickLogin(){
   const cloudUser = await loadUserFromCloud(sid);
   const db=getDB();
   if(!db.users[sid]){
-    db.users[sid]=cloudUser||{
+    const newUser=cloudUser||{
       sid,name,createdAt:new Date().toISOString(),
       progress:{
         level1:{completed:false,score:0,completedAt:null,equipment:null},
@@ -292,7 +292,7 @@ async function quickLogin(){
       },
       equipmentOrder:[],bossDefeated:false,bossDefeatedAt:null
     };
-    saveDB(db);
+    saveUser(newUser);
   } else if(cloudUser){
     const local=db.users[sid];
     const cloudEqLen=(cloudUser.equipmentOrder||[]).length;
