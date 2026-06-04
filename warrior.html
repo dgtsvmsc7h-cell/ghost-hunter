@@ -815,7 +815,7 @@ function scrollMapToWarrior(svgX,svgY){
 async function walkWarriorTo(target,fromPos){
   const dist=Math.hypot(target.x-fromPos.x,target.y-fromPos.y);
   if(dist<6) return;
-  const dur=Math.min(1200,Math.max(600,dist*4));
+  const dur=Math.min(2400,Math.max(1200,dist*8));
   return new Promise(resolve=>{
     const start=performance.now();
     const sx=fromPos.x,sy=fromPos.y;
