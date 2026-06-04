@@ -858,6 +858,7 @@ async function animateNewCompletion(user,newLevel,newEqKey){
   tmpUser.equipmentOrder=user.equipmentOrder.filter(e=>e!==newEqKey);
   document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,fromPos);
   renderEquipBar(tmpUser.equipmentOrder);
+  scrollMapToWarrior(fromPos.x,fromPos.y);
 
   const LOC_NAMES={start:'管理大樓（起點）',level1:'第一醫學大樓',level2:'管理大樓',level3:'圖書館',level4:'活動中心',boss:'活動中心'};
   setStory('勇者出發前往 '+(LOC_NAMES[newLocId]||'目的地')+'…');
@@ -878,6 +879,7 @@ async function animateNewCompletion(user,newLevel,newEqKey){
     document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,currentPos);
     const wg=document.getElementById('warriorGroup');
     if(wg) wg.setAttribute('transform',`translate(${currentPos.x},${currentPos.y})`);
+    scrollMapToWarrior(currentPos.x,currentPos.y);
   }
 
   setStory('✨ 到達目的地！寶箱發出金光…');
@@ -886,6 +888,7 @@ async function animateNewCompletion(user,newLevel,newEqKey){
   // Reveal chest
   tmpUser.progress['level'+newLevel].completed=true;
   document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,currentPos);
+  scrollMapToWarrior(currentPos.x,currentPos.y);
   await delay(600);
 
   // Show reward popup
@@ -895,6 +898,7 @@ async function animateNewCompletion(user,newLevel,newEqKey){
   tmpUser.equipmentOrder=[...tmpUser.equipmentOrder,newEqKey];
   renderEquipBar(tmpUser.equipmentOrder);
   document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,currentPos);
+  scrollMapToWarrior(currentPos.x,currentPos.y);
 
   // Check for boss fight
   const allDone=[1,2,3,4].every(lv=>tmpUser.progress['level'+lv].completed);
@@ -928,6 +932,7 @@ async function animateBossFight(user,currentPos,currentState){
     document.getElementById('campusSvg').innerHTML=buildSvg(currentState,currentPosWalk);
     const wg=document.getElementById('warriorGroup');
     if(wg) wg.setAttribute('transform',`translate(${currentPosWalk.x},${currentPosWalk.y})`);
+    scrollMapToWarrior(currentPosWalk.x,currentPosWalk.y);
   }
 
   setStory('💥 最終決戰開始！');
@@ -957,6 +962,7 @@ async function animateBossFight(user,currentPos,currentState){
   
   // Final map
   document.getElementById('campusSvg').innerHTML=buildSvg(user,bossPos,{bossDefeated:true});
+  scrollMapToWarrior(bossPos.x,bossPos.y);
   setStory('🏆 VICTORY! 魔王已被擊敗！',true);
   
   launchConfetti();
@@ -1069,6 +1075,7 @@ function launchConfetti(){
     const wpos=getCurrentWarriorPos(user);
     document.getElementById('campusSvg').innerHTML=buildSvg(user,wpos);
     renderEquipBar(user.equipmentOrder||[]);
+    requestAnimationFrame(()=>scrollMapToWarrior(wpos.x,wpos.y));
     const order=getCompletionOrder(user.progress);
     if(user.bossDefeated){
       setStory('🏆 VICTORY! 魔王已被擊敗！前往管院 8 樓領取禮物！',true);
