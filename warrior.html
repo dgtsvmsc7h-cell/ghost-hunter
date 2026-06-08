@@ -55,6 +55,7 @@ body::before{
   border-color:rgba(0,210,255,0.3);
   box-shadow:0 4px 24px rgba(0,0,0,0.6),0 0 30px rgba(0,210,255,0.2),0 0 60px rgba(0,210,255,0.08);
   background:rgba(3,1,6,0.95);
+  scroll-behavior:smooth;
 }
 .campus-svg{
   display:block;
@@ -474,10 +475,8 @@ function buildSvg(user,warriorPos,opts){
   const done={1:p.level1.completed,2:p.level2.completed,3:p.level3.completed,4:p.level4.completed};
   const bossDefeated=opts.bossDefeated||user.bossDefeated;
 
-  // Path trace (dashed line showing visited route)
-  const visited=getVisitedPath(user);
-  const pathStr=visited.length>1?
-    'M '+visited.map(pt=>`${pt.x} ${pt.y}`).join(' L '):null;
+  const walkPath=(opts&&opts.walkPath)||[];
+  const walkPolyPts=walkPath.length>=2?walkPath.map(p=>`${p.x},${p.y}`).join(' '):'';
 
   return `
 <defs>
@@ -570,8 +569,8 @@ function buildSvg(user,warriorPos,opts){
   ${done[4]?buildChest(917,270,true):buildChest(917,270,false)}
 </g>
 
-<!-- Path trace (dashed green line showing warrior's journey) -->
-${pathStr?`<path d="${pathStr}" fill="none" stroke="#22ff77" stroke-width="2.5" stroke-dasharray="7 5" opacity="0.65" stroke-linecap="round"><animate attributeName="stroke-dashoffset" from="0" to="-12" dur="0.8s" repeatCount="indefinite"/></path>`:''}
+<!-- Walk path (white dashed line for current stage movement) -->
+<polyline id="walkPolyline" points="${walkPolyPts}" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2.2" stroke-dasharray="8 5" stroke-linecap="round"/>
 
 <!-- START marker at mgmt  -->
 <g transform="translate(310,185)">
@@ -796,7 +795,13 @@ function setStory(msg,gold=false){
   el.className='story-box'+(gold?' gold':'');
 }
 
-function scrollMapToWarrior(svgX,svgY){
+function updateWalkPolyline(pts){
+  const el=document.getElementById('walkPolyline');
+  if(!el) return;
+  el.setAttribute('points',pts&&pts.length>=2?pts.map(p=>`${p.x},${p.y}`).join(' '):'');
+}
+
+function scrollMapToWarrior(svgX,svgY,smooth=false){
   const wrapper=document.querySelector('.map-wrapper');
   const svg=document.getElementById('campusSvg');
   if(!wrapper||!svg) return;
@@ -808,8 +813,14 @@ function scrollMapToWarrior(svgX,svgY){
   const pixelY=svgY*scaleY;
   const wrapperW=wrapper.clientWidth;
   const wrapperH=wrapper.clientHeight;
-  wrapper.scrollLeft=Math.max(0,pixelX-wrapperW/2);
-  wrapper.scrollTop=Math.max(0,pixelY-wrapperH/2);
+  const left=Math.max(0,pixelX-wrapperW/2);
+  const top=Math.max(0,pixelY-wrapperH/2);
+  if(smooth){
+    wrapper.scrollTo({left,top,behavior:'smooth'});
+  } else {
+    wrapper.scrollLeft=left;
+    wrapper.scrollTop=top;
+  }
 }
 
 async function walkWarriorTo(target,fromPos){
@@ -858,36 +869,40 @@ async function animateNewCompletion(user,newLevel,newEqKey){
   tmpUser.equipmentOrder=user.equipmentOrder.filter(e=>e!==newEqKey);
   document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,fromPos);
   renderEquipBar(tmpUser.equipmentOrder);
-  scrollMapToWarrior(fromPos.x,fromPos.y);
-
   const LOC_NAMES={start:'管理大樓（起點）',level1:'第一醫學大樓',level2:'管理大樓',level3:'圖書館',level4:'活動中心',boss:'活動中心'};
   setStory('勇者出發前往 '+(LOC_NAMES[newLocId]||'目的地')+'…');
-  await delay(600);
+
+  // 先將視窗捲動到勇者起始位置，等捲動完成後再開始移動
+  scrollMapToWarrior(fromPos.x,fromPos.y,true);
+  await delay(800);
 
   // Walk through waypoints
   let currentPos={...fromPos};
   const waypoints=[...getWaypoints(fromLocId,newLocId),targetPos];
-  
+  const walkPts=[{x:fromPos.x,y:fromPos.y}];
+
   for(const wp of waypoints){
     const dist=Math.hypot(wp.x-currentPos.x,wp.y-currentPos.y);
     if(dist>5){
-      setStory('勇者移動中…路徑繞過建築！');
+      setStory('勇者移動中…');
       await walkWarriorTo(wp,currentPos);
     }
     currentPos={...wp};
-    // Redraw to update path
-    document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,currentPos);
+    walkPts.push({x:currentPos.x,y:currentPos.y});
     const wg=document.getElementById('warriorGroup');
     if(wg) wg.setAttribute('transform',`translate(${currentPos.x},${currentPos.y})`);
+    updateWalkPolyline(walkPts);
     scrollMapToWarrior(currentPos.x,currentPos.y);
   }
+  // 動畫結束後一次重建 SVG（含白色路徑）
+  document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,currentPos,{walkPath:walkPts});
 
   setStory('✨ 到達目的地！寶箱發出金光…');
   await delay(700);
 
   // Reveal chest
   tmpUser.progress['level'+newLevel].completed=true;
-  document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,currentPos);
+  document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,currentPos,{walkPath:walkPts});
   scrollMapToWarrior(currentPos.x,currentPos.y);
   await delay(600);
 
@@ -897,7 +912,7 @@ async function animateNewCompletion(user,newLevel,newEqKey){
   // Update equipment
   tmpUser.equipmentOrder=[...tmpUser.equipmentOrder,newEqKey];
   renderEquipBar(tmpUser.equipmentOrder);
-  document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,currentPos);
+  document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,currentPos,{walkPath:walkPts});
   scrollMapToWarrior(currentPos.x,currentPos.y);
 
   // Check for boss fight
@@ -917,23 +932,28 @@ async function animateBossFight(user,currentPos,currentState){
   const bossPos=WARRIOR_POS.boss;
   const lastLocId=levelToLocId(getCompletionOrder(user.progress).slice(-1)[0]||'start');
   
+  updateWalkPolyline([]);
   setStory('⚔️ 勇者朝活動中心進發！');
   await delay(500);
   
   // Walk to boss
   const waypoints=[...getWaypoints(lastLocId,'boss'),bossPos];
   let currentPosWalk={...currentPos};
+  const bossPts=[{x:currentPos.x,y:currentPos.y}];
   for(const wp of waypoints){
     const dist=Math.hypot(wp.x-currentPosWalk.x,wp.y-currentPosWalk.y);
     if(dist>5){
       await walkWarriorTo(wp,currentPosWalk);
     }
     currentPosWalk={...wp};
-    document.getElementById('campusSvg').innerHTML=buildSvg(currentState,currentPosWalk);
+    bossPts.push({x:currentPosWalk.x,y:currentPosWalk.y});
     const wg=document.getElementById('warriorGroup');
     if(wg) wg.setAttribute('transform',`translate(${currentPosWalk.x},${currentPosWalk.y})`);
+    updateWalkPolyline(bossPts);
     scrollMapToWarrior(currentPosWalk.x,currentPosWalk.y);
   }
+  // 動畫結束後一次重建 SVG（含白色路徑）
+  document.getElementById('campusSvg').innerHTML=buildSvg(currentState,currentPosWalk,{walkPath:bossPts});
 
   setStory('💥 最終決戰開始！');
   await delay(400);
@@ -961,7 +981,7 @@ async function animateBossFight(user,currentPos,currentState){
   saveUser(user);
   
   // Final map
-  document.getElementById('campusSvg').innerHTML=buildSvg(user,bossPos,{bossDefeated:true});
+  document.getElementById('campusSvg').innerHTML=buildSvg(user,bossPos,{bossDefeated:true,walkPath:bossPts});
   scrollMapToWarrior(bossPos.x,bossPos.y);
   setStory('🏆 VICTORY! 魔王已被擊敗！',true);
   
