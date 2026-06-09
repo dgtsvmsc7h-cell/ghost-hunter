@@ -570,7 +570,7 @@ function buildSvg(user,warriorPos,opts){
 </g>
 
 <!-- Walk path (white dashed line for current stage movement) -->
-<polyline id="walkPolyline" points="${walkPolyPts}" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2.2" stroke-dasharray="8 5" stroke-linecap="round"/>
+<polyline id="walkPolyline" points="${walkPolyPts}" fill="none" stroke="white" stroke-width="2" stroke-dasharray="6 4" stroke-linecap="round"/>
 
 <!-- START marker at mgmt  -->
 <g transform="translate(310,185)">
@@ -796,7 +796,8 @@ function setStory(msg,gold=false){
 }
 
 function updateWalkPolyline(pts){
-  const el=document.getElementById('walkPolyline');
+  const svg=document.getElementById('campusSvg');
+  const el=svg&&svg.querySelector('#walkPolyline');
   if(!el) return;
   el.setAttribute('points',pts&&pts.length>=2?pts.map(p=>`${p.x},${p.y}`).join(' '):'');
 }
@@ -824,6 +825,9 @@ function scrollMapToWarrior(svgX,svgY,smooth=false){
 }
 
 async function walkWarriorTo(target,fromPos){
+  const svg=document.getElementById('campusSvg');
+  const wg=svg&&svg.querySelector('#warriorGroup');
+  if(!wg) return;
   const dist=Math.hypot(target.x-fromPos.x,target.y-fromPos.y);
   if(dist<6) return;
   const dur=Math.min(2400,Math.max(1200,dist*8));
@@ -836,12 +840,11 @@ async function walkWarriorTo(target,fromPos){
       const baseY=sy+(target.y-sy)*t;
       const bounce=Math.sin(t*Math.PI*8)*2.5;
       const y=baseY+bounce*(1-t);
-      const wg=document.getElementById('warriorGroup');
-      if(wg) wg.setAttribute('transform',`translate(${x},${y})`);
+      wg.setAttribute('transform',`translate(${x},${y})`);
       scrollMapToWarrior(x,y);
       if(t<1) requestAnimationFrame(frame);
       else{
-        if(wg) wg.setAttribute('transform',`translate(${target.x},${target.y})`);
+        wg.setAttribute('transform',`translate(${target.x},${target.y})`);
         scrollMapToWarrior(target.x,target.y);
         resolve();
       }
@@ -889,7 +892,8 @@ async function animateNewCompletion(user,newLevel,newEqKey){
     }
     currentPos={...wp};
     walkPts.push({x:currentPos.x,y:currentPos.y});
-    const wg=document.getElementById('warriorGroup');
+    const svgEl=document.getElementById('campusSvg');
+    const wg=svgEl&&svgEl.querySelector('#warriorGroup');
     if(wg) wg.setAttribute('transform',`translate(${currentPos.x},${currentPos.y})`);
     updateWalkPolyline(walkPts);
     scrollMapToWarrior(currentPos.x,currentPos.y);
@@ -930,12 +934,14 @@ async function animateNewCompletion(user,newLevel,newEqKey){
 
 async function animateBossFight(user,currentPos,currentState){
   const bossPos=WARRIOR_POS.boss;
-  const lastLocId=levelToLocId(getCompletionOrder(user.progress).slice(-1)[0]||'start');
-  
+  const lastLocId=levelToLocId(getCompletionOrder(currentState.progress).slice(-1)[0]||'start');
+
+  // 動畫前先渲染一次 SVG，確保 warriorGroup 在 DOM 中
+  document.getElementById('campusSvg').innerHTML=buildSvg(currentState,currentPos,{walkPath:[]});
   updateWalkPolyline([]);
   setStory('⚔️ 勇者朝活動中心進發！');
   await delay(500);
-  
+
   // Walk to boss
   const waypoints=[...getWaypoints(lastLocId,'boss'),bossPos];
   let currentPosWalk={...currentPos};
@@ -947,7 +953,8 @@ async function animateBossFight(user,currentPos,currentState){
     }
     currentPosWalk={...wp};
     bossPts.push({x:currentPosWalk.x,y:currentPosWalk.y});
-    const wg=document.getElementById('warriorGroup');
+    const svgEl=document.getElementById('campusSvg');
+    const wg=svgEl&&svgEl.querySelector('#warriorGroup');
     if(wg) wg.setAttribute('transform',`translate(${currentPosWalk.x},${currentPosWalk.y})`);
     updateWalkPolyline(bossPts);
     scrollMapToWarrior(currentPosWalk.x,currentPosWalk.y);
