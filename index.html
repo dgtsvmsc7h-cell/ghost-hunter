@@ -619,7 +619,7 @@ function renderDash(){
 
   // Equipment
   const allEq=['sword','shield','grail','armor'];
-  const eq2={sword:{icon:'<img src="劍元素.png" style="width:32px;height:32px;object-fit:contain">',name:'聖劍'},shield:{icon:'🛡️',name:'聖盾'},grail:{icon:'🏆',name:'聖杯'},armor:{icon:'🛡️',name:'盔甲'}};
+  const eq2={sword:{icon:'<img src="劍元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖劍'},shield:{icon:'🛡️',name:'聖盾'},grail:{icon:'🏆',name:'聖杯'},armor:{icon:'🛡️',name:'盔甲'}};
   const eqCount=(user.equipmentOrder||[]).length;
   document.getElementById('equipTitle').textContent=`🗡️ 裝備背包（${eqCount}/4）`;
   document.getElementById('equipRack').innerHTML=allEq.map(e=>{
