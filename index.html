@@ -519,7 +519,7 @@ const EQUIP_INFO = {
   sword:  {icon:'<img src="劍元素.png" style="width:32px;height:32px;object-fit:contain">', name:'聖劍'},
   shield: {icon:'<img src="聖盾元素.png" style="width:48px;height:48px;object-fit:contain">', name:'聖盾'},
   grail:  {icon:'<img src="聖杯元素.png" style="width:48px;height:48px;object-fit:contain">', name:'聖杯'},
-  armor:  {icon:'🛡️', name:'盔甲'}
+  armor:  {icon:'<img src="盔甲元素.png" style="width:48px;height:48px;object-fit:contain">', name:'盔甲'}
 };
 const STAGE_INFO = [
   {num:1,icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',title:'萬聖節的起源',loc:'第一醫學大樓',desc:'5 道萬聖節起源選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
@@ -619,7 +619,7 @@ function renderDash(){
 
   // Equipment
   const allEq=['sword','shield','grail','armor'];
-  const eq2={sword:{icon:'<img src="劍元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖劍'},shield:{icon:'<img src="聖盾元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖盾'},grail:{icon:'<img src="聖杯元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖杯'},armor:{icon:'🛡️',name:'盔甲'}};
+  const eq2={sword:{icon:'<img src="劍元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖劍'},shield:{icon:'<img src="聖盾元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖盾'},grail:{icon:'<img src="聖杯元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖杯'},armor:{icon:'<img src="盔甲元素.png" style="width:48px;height:48px;object-fit:contain">',name:'盔甲'}};
   const eqCount=(user.equipmentOrder||[]).length;
   document.getElementById('equipTitle').textContent=`🗡️ 裝備背包（${eqCount}/4）`;
   document.getElementById('equipRack').innerHTML=allEq.map(e=>{
