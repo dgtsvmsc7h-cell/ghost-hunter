@@ -333,7 +333,7 @@ body::after{
 <!-- Stage info modal -->
 <div class="modal-overlay" id="stageModal" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
-    <span class="m-icon" id="modalIcon"><img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain"></span>
+    <span class="m-icon" id="modalIcon"><img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain"></span>
     <h3 id="modalTitle">Stage 1</h3>
     <div class="m-tag"><span id="modalLoc">第一醫學大樓</span></div>
     <p id="modalDesc">關卡說明</p>
@@ -369,7 +369,7 @@ body::after{
       <div class="section-title">🗺️ 四大關卡</div>
       <div class="stages-grid">
         <button class="stage-card" onclick="showStageInfo(1)">
-          <span class="s-icon"><img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain"></span>
+          <span class="s-icon"><img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain"></span>
           <span class="s-num">STAGE 01</span>
           <span class="s-name">萬聖節的起源</span>
           <span class="s-loc">📍 第一醫學大樓</span>
@@ -522,7 +522,7 @@ const EQUIP_INFO = {
   armor:  {icon:'🛡️', name:'盔甲'}
 };
 const STAGE_INFO = [
-  {num:1,icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',title:'萬聖節的起源',loc:'第一醫學大樓',desc:'5 道萬聖節起源選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
+  {num:1,icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',title:'萬聖節的起源',loc:'第一醫學大樓',desc:'5 道萬聖節起源選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
   {num:2,icon:'👻',title:'世界各國鬼怪文化',loc:'管理大樓（本活動起點）',desc:'5 道世界鬼怪文化選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
   {num:3,icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',title:'南瓜燈的秘密',loc:'圖書館',desc:'5 道關於傑克燈與南瓜的選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
   {num:4,icon:'🗳️',title:'打卡牆與投票',loc:'活動中心三樓',desc:'投票選出你最喜歡的展區！每位勇者只能投票一次，完成後獲得第四件裝備「盔甲」！'},
@@ -601,7 +601,7 @@ function renderDash(){
 
   // Progress stages
   const stages=[
-    {key:'level1',icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',name:'起源測驗',loc:'第一醫學'},
+    {key:'level1',icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',name:'起源測驗',loc:'第一醫學'},
     {key:'level2',icon:'👻',name:'鬼怪文化',loc:'管理大樓'},
     {key:'level3',icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',name:'南瓜秘密',loc:'圖書館'},
     {key:'level4',icon:'🗳️',name:'打卡投票',loc:'活動中心'},
