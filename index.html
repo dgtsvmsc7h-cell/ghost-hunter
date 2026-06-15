@@ -225,7 +225,7 @@ body::after{
   from{box-shadow:0 0 20px rgba(255,215,0,0.2)}
   to{box-shadow:0 0 40px rgba(255,215,0,0.5)}
 }
-.gift-card .gc-emoji{font-size:52px;display:block;margin-bottom:10px;
+.gift-card .gc-emoji{width:72px;height:72px;object-fit:contain;display:block;margin:0 auto 10px;
   animation:bounce 1.5s ease-in-out infinite}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .gift-card .gc-title{font-family:'Bangers',cursive;font-size:26px;letter-spacing:2px;color:var(--gold);margin-bottom:8px}
@@ -431,7 +431,7 @@ body::after{
 
     <!-- Gift card (only when all 4 + boss done) -->
     <div class="gift-card" id="giftCard" style="display:none;margin-bottom:16px">
-      <span class="gc-emoji">🎁</span>
+      <img src="已開啟寶箱.webp" class="gc-emoji" alt="">
       <div class="gc-title">🏆 全部過關！任務完成！</div>
       <div style="font-size:14px;color:var(--text);margin-bottom:6px">勇者，請前往領取禮物：</div>
       <div class="gc-loc">📍 管院 8 樓<br>人文科學觀摩室</div>
