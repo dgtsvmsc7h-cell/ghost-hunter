@@ -378,7 +378,7 @@ function saveUser(user){const db=getDB();db.users[user.sid]=user;saveDB(db);sync
 // ─── Stage info ───
 const STAGE_INFO=[
   {num:1,icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',title:'萬聖節的起源',loc:'第一醫學大樓',desc:'5 道萬聖節起源選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
-  {num:2,icon:'👻',title:'世界各國鬼怪文化',loc:'管理大樓（本活動起點）',desc:'5 道世界鬼怪文化選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
+  {num:2,icon:'<img src="關卡二元素.png" style="width:28px;height:28px;object-fit:contain">',title:'世界各國鬼怪文化',loc:'管理大樓（本活動起點）',desc:'5 道世界鬼怪文化選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
   {num:3,icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',title:'南瓜燈的秘密',loc:'圖書館',desc:'5 道關於傑克燈與南瓜的選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
   {num:4,icon:'🗳️',title:'打卡牆與投票',loc:'活動中心三樓',desc:'投票選出你最喜歡的展區！每位勇者只能投票一次，完成後獲得第四件裝備「盔甲」！'},
 ];
@@ -521,7 +521,7 @@ function buildSvg(user,warriorPos,opts){
   <text x="445" y="63" text-anchor="middle" fill="#ff0066" font-size="14" font-family="'Noto Sans TC',sans-serif" font-weight="bold">管理大樓</text>
   <text x="445" y="80" text-anchor="middle" fill="#ff3388" font-size="9" font-family="'Share Tech Mono',monospace">MANAGEMENT · START · BOSS</text>
   <rect x="345" y="100" width="200" height="26" rx="4" fill="rgba(255,0,102,0.12)" stroke="#ff0066" stroke-width="1"/>
-  <text x="445" y="118" text-anchor="middle" fill="#ff0066" font-size="10" font-family="'Share Tech Mono',monospace">👻 GHOST DB (Lv.2)</text>
+  <text x="445" y="118" text-anchor="middle" fill="#ff0066" font-size="10" font-family="'Share Tech Mono',monospace">GHOST DB (Lv.2)</text>
   <text x="445" y="150" text-anchor="middle" fill="rgba(255,150,150,0.6)" font-size="8" font-family="'Share Tech Mono',monospace">BOSS ZONE: LEFT · START ZONE: RIGHT</text>
   <!-- Corners -->
   <rect x="300" y="20" width="8" height="8" fill="#ff0066" opacity="0.7"/><rect x="582" y="20" width="8" height="8" fill="#ff0066" opacity="0.7"/>
