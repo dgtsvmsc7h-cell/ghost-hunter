@@ -380,7 +380,7 @@ const STAGE_INFO=[
   {num:1,icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',title:'萬聖節的起源',loc:'第一醫學大樓',desc:'5 道萬聖節起源選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
   {num:2,icon:'<img src="關卡二元素.png" style="width:28px;height:28px;object-fit:contain">',title:'世界各國鬼怪文化',loc:'管理大樓（本活動起點）',desc:'5 道世界鬼怪文化選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
   {num:3,icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',title:'南瓜燈的秘密',loc:'圖書館',desc:'5 道關於傑克燈與南瓜的選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
-  {num:4,icon:'🗳️',title:'打卡牆與投票',loc:'活動中心三樓',desc:'投票選出你最喜歡的展區！每位勇者只能投票一次，完成後獲得第四件裝備「盔甲」！'},
+  {num:4,icon:'<img src="關卡四元素.png" style="width:28px;height:28px;object-fit:contain">',title:'打卡牆與投票',loc:'活動中心三樓',desc:'投票選出你最喜歡的展區！每位勇者只能投票一次，完成後獲得第四件裝備「盔甲」！'},
 ];
 function showBuildingInfo(num){
   const s=STAGE_INFO[num-1]; if(!s) return;
@@ -563,7 +563,7 @@ function buildSvg(user,warriorPos,opts){
   <text x="917" y="145" text-anchor="middle" fill="#ff5500" font-size="13" font-family="'Noto Sans TC',sans-serif" font-weight="bold">活動中心</text>
   <text x="917" y="160" text-anchor="middle" fill="#ff7733" font-size="8.5" font-family="'Share Tech Mono',monospace">ACTIVITY CTR · Lv.4</text>
   <rect x="865" y="180" width="104" height="26" rx="4" fill="rgba(255,85,0,0.12)" stroke="#ff5500" stroke-width="1"/>
-  <text x="917" y="198" text-anchor="middle" fill="#ff5500" font-size="10" font-family="'Share Tech Mono',monospace">🗳️ VOTE STAGE</text>
+  <text x="917" y="198" text-anchor="middle" fill="#ff5500" font-size="10" font-family="'Share Tech Mono',monospace">VOTE STAGE</text>
   <rect x="850" y="60" width="8" height="8" fill="#ff5500" opacity="0.7"/><rect x="977" y="60" width="8" height="8" fill="#ff5500" opacity="0.7"/>
   <rect x="850" y="252" width="8" height="8" fill="#ff5500" opacity="0.7"/><rect x="977" y="252" width="8" height="8" fill="#ff5500" opacity="0.7"/>
   ${done[4]?buildChest(917,270,true):buildChest(917,270,false)}
