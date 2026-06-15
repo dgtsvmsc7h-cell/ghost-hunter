@@ -47,7 +47,13 @@ body::after{
 .page{max-width:480px;margin:0 auto;padding:16px 16px 100px;position:relative;z-index:1}
 
 /* ─── HEADER HERO ─── */
-.hero{text-align:center;padding:28px 8px 24px;position:relative}
+.hero-spacer{
+  height:72vh;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:flex-end;
+}
+@supports (height:72dvh){.hero-spacer{height:72dvh}}
+.hero{text-align:center;padding:0 8px 24px;position:relative;width:100%}
 
 .hero h1{
   font-family:'Bangers',cursive;font-size:clamp(38px,10vw,56px);
@@ -350,10 +356,12 @@ body::after{
 
   <!-- ── LOGIN VIEW ── -->
   <div id="loginView">
-    <div class="hero">
-      <h1>GHOST HUNTER</h1>
-      <h2>Midnight Signal</h2>
-      <p class="desc">深夜，校園響起神秘訊號。勇者，出擊！收集四件裝備，打倒魔王，守護校園平安。</p>
+    <div class="hero-spacer">
+      <div class="hero">
+        <h1>GHOST HUNTER</h1>
+        <h2>Midnight Signal</h2>
+        <p class="desc">深夜，校園響起神秘訊號。勇者，出擊！收集四件裝備，打倒魔王，守護校園平安。</p>
+      </div>
     </div>
 
     <!-- Stage Info -->
