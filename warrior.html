@@ -281,7 +281,7 @@ body::before{
 <!-- Building info overlay -->
 <div class="info-overlay" id="infoOverlay" onclick="closeBuildingInfo()">
   <div class="info-box" onclick="event.stopPropagation()">
-    <span class="ib-icon" id="infoIcon">🪦</span>
+    <span class="ib-icon" id="infoIcon"><img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain"></span>
     <h3 id="infoTitle">STAGE 01</h3>
     <div class="ib-tag"><span id="infoLoc">地點</span></div>
     <p id="infoDesc">關卡說明</p>
@@ -377,7 +377,7 @@ function saveUser(user){const db=getDB();db.users[user.sid]=user;saveDB(db);sync
 
 // ─── Stage info ───
 const STAGE_INFO=[
-  {num:1,icon:'🪦',title:'萬聖節的起源',loc:'第一醫學大樓',desc:'5 道萬聖節起源選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
+  {num:1,icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',title:'萬聖節的起源',loc:'第一醫學大樓',desc:'5 道萬聖節起源選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
   {num:2,icon:'👻',title:'世界各國鬼怪文化',loc:'管理大樓（本活動起點）',desc:'5 道世界鬼怪文化選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
   {num:3,icon:'🎃',title:'南瓜燈的秘密',loc:'圖書館',desc:'5 道關於傑克燈與南瓜的選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
   {num:4,icon:'🗳️',title:'打卡牆與投票',loc:'活動中心三樓',desc:'投票選出你最喜歡的展區！每位勇者只能投票一次，完成後獲得第四件裝備「盔甲」！'},
@@ -537,7 +537,7 @@ function buildSvg(user,warriorPos,opts){
   <text x="595" y="234" text-anchor="middle" fill="#00e1ff" font-size="13" font-family="'Noto Sans TC',sans-serif" font-weight="bold">第一醫學大樓</text>
   <text x="595" y="249" text-anchor="middle" fill="#33ccff" font-size="8.5" font-family="'Share Tech Mono',monospace">1ST MED SCI · Lv.1</text>
   <rect x="525" y="268" width="140" height="26" rx="4" fill="rgba(0,225,255,0.12)" stroke="#00e1ff" stroke-width="1"/>
-  <text x="595" y="286" text-anchor="middle" fill="#00e1ff" font-size="10" font-family="'Share Tech Mono',monospace">🪦 ORIGIN.EXE</text>
+  <text x="595" y="286" text-anchor="middle" fill="#00e1ff" font-size="10" font-family="'Share Tech Mono',monospace">ORIGIN.EXE</text>
   <rect x="490" y="200" width="8" height="8" fill="#00e1ff" opacity="0.7"/><rect x="702" y="200" width="8" height="8" fill="#00e1ff" opacity="0.7"/>
   <rect x="490" y="337" width="8" height="8" fill="#00e1ff" opacity="0.7"/>
   ${done[1]?buildChest(595,370,true):buildChest(595,370,false)}
