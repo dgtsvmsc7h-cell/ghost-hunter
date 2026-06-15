@@ -223,14 +223,26 @@ if(urlParams.get('level')==='1'){
 }
 
 if(urlParams.get('level')==='2'){
-  const bgDiv=document.createElement('div');
-  bgDiv.className='bg-img';
-  const bgImg=document.createElement('img');
-  bgImg.src='各國鬼怪文化.jpg';
-  bgImg.alt='';
-  bgImg.style.cssText='width:100%;height:100%;object-fit:cover;object-position:center;filter:brightness(0.5);';
-  bgDiv.appendChild(bgImg);
-  document.body.insertBefore(bgDiv,document.body.firstChild);
+  const bgTop=document.createElement('div');
+  bgTop.style.cssText='position:fixed;inset:0;z-index:0;';
+  const bgTopImg=document.createElement('img');
+  bgTopImg.src='各國鬼怪文化.jpg';
+  bgTopImg.alt='';
+  bgTopImg.style.cssText='width:100%;height:100%;object-fit:cover;object-position:center top;filter:brightness(0.45);';
+  bgTop.appendChild(bgTopImg);
+  document.body.insertBefore(bgTop,document.body.firstChild);
+
+  const bgBot=document.createElement('div');
+  bgBot.style.cssText='position:fixed;top:50%;left:0;right:0;bottom:0;z-index:0;';
+  const bgBotImg=document.createElement('img');
+  bgBotImg.src='各國鬼怪文化.jpg';
+  bgBotImg.alt='';
+  bgBotImg.style.cssText='width:100%;height:100%;object-fit:cover;object-position:right bottom;filter:brightness(0.65);';
+  const blendDiv=document.createElement('div');
+  blendDiv.style.cssText='position:absolute;top:0;left:0;right:0;height:80px;background:linear-gradient(to bottom,#080010,transparent);';
+  bgBot.appendChild(bgBotImg);
+  bgBot.appendChild(blendDiv);
+  document.body.insertBefore(bgBot,document.body.firstChild.nextSibling);
 }
 
 // ── Quiz data ──
