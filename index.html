@@ -36,25 +36,7 @@ html,body{
   object-fit:contain;object-position:center top;
   filter:brightness(0.72) saturate(1.1);
 }
-.skillbar-img-wrap{
-  margin-top:-2px;padding:0 0 20px;position:relative;
-  background:linear-gradient(to bottom,rgba(6,1,0,0.86) 0%,rgba(0,0,0,0) 22%);
-}
-.skillbar-img-wrap::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:18px;
-  background:linear-gradient(to bottom,rgba(6,1,0,0.9),transparent);
-  z-index:1;pointer-events:none;
-}
-.skillbar-img-wrap::after{
-  content:'';position:absolute;bottom:20px;left:0;right:0;height:22px;
-  background:linear-gradient(to top,rgba(0,0,0,0.7),transparent);
-  z-index:1;pointer-events:none;
-}
-.skillbar-img{
-  display:block;width:100%;height:auto;
-  mix-blend-mode:lighten;filter:brightness(1.08) contrast(1.05);
-  position:relative;z-index:0;
-}
+
 /* Scan-line overlay */
 body::after{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
@@ -66,19 +48,11 @@ body::after{
 
 /* ─── HEADER HERO ─── */
 .hero{text-align:center;padding:28px 8px 24px;position:relative}
-.hero-badge{
-  display:inline-block;background:rgba(255,122,0,0.15);
-  border:1px solid var(--orange);border-radius:99px;
-  padding:4px 14px;font-size:11px;letter-spacing:3px;
-  color:var(--orange);font-weight:700;margin-bottom:14px;
-  text-transform:uppercase;
-}
+
 .hero h1{
   font-family:'Bangers',cursive;font-size:clamp(38px,10vw,56px);
   line-height:1;letter-spacing:2px;margin-bottom:4px;
-  background:linear-gradient(135deg, #ff9c2b 0%, #ff4488 50%, #b84eff 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-  filter:drop-shadow(0 0 20px rgba(255,80,0,0.4));
+  color:var(--cream);
 }
 .hero h2{
   font-family:'Bangers',cursive;font-size:clamp(18px,5vw,26px);
@@ -377,7 +351,6 @@ body::after{
   <!-- ── LOGIN VIEW ── -->
   <div id="loginView">
     <div class="hero">
-      <div class="hero-badge">Halloween Event 2026</div>
       <h1>GHOST HUNTER</h1>
       <h2>Midnight Signal</h2>
       <p class="desc">深夜，校園響起神秘訊號。勇者，出擊！收集四件裝備，打倒魔王，守護校園平安。</p>
@@ -428,10 +401,7 @@ body::after{
       <button class="btn-primary" onclick="handleLogin()">🎮 開始冒險</button>
     </div>
 
-    <!-- Skillbar image -->
-    <div class="skillbar-img-wrap">
-      <img class="skillbar-img" src="遊戲介面/1781488503275_主頁介面.jpg" alt="skill bar">
-    </div>
+
   </div>
 
   <!-- ── DASHBOARD VIEW ── -->
