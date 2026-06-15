@@ -14,15 +14,17 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{
-  min-height:100vh;background:var(--bg);color:var(--text);
+  min-height:100vh;background:#000;color:var(--text);
   font-family:'Nunito',sans-serif;overflow-x:hidden;
 }
-body{
-  background-image:
-    radial-gradient(ellipse at 20% 10%, rgba(138,43,226,0.2) 0%,transparent 55%),
-    radial-gradient(ellipse at 80% 80%, rgba(255,122,0,0.15) 0%,transparent 55%);
+.bg-img{
+  position:fixed;inset:0;z-index:0;
 }
-.page{max-width:480px;margin:0 auto;padding:16px 16px 60px;min-height:100vh}
+.bg-img img{
+  width:100%;height:100%;object-fit:cover;object-position:center;
+  filter:brightness(0.5);
+}
+.page{max-width:480px;margin:0 auto;padding:16px 16px 60px;min-height:100vh;position:relative;z-index:1}
 
 /* Stage header */
 .stage-header{
@@ -197,6 +199,16 @@ function saveUser(user){const db=getDB();db.users[user.sid]=user;saveDB(db);sync
 
 const urlParams=new URLSearchParams(window.location.search);
 const level=parseInt(urlParams.get('level'))||1;
+
+if(urlParams.get('level')==='1'){
+  const bgDiv=document.createElement('div');
+  bgDiv.className='bg-img';
+  const bgImg=document.createElement('img');
+  bgImg.src='萬聖節起源背景圖.jpg';
+  bgImg.alt='';
+  bgDiv.appendChild(bgImg);
+  document.body.insertBefore(bgDiv,document.body.firstChild);
+}
 
 // ── Quiz data ──
 const QUIZZES={
