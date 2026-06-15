@@ -651,7 +651,7 @@ function renderDash(){
 // ── Stage info modal ──
 function showStageInfo(num){
   const s=STAGE_INFO[num-1];
-  document.getElementById('modalIcon').textContent=s.icon;
+  document.getElementById('modalIcon').innerHTML=s.icon;
   document.getElementById('modalTitle').textContent=`STAGE 0${s.num}｜${s.title}`;
   document.getElementById('modalLoc').textContent='📍 '+s.loc;
   document.getElementById('modalDesc').textContent=s.desc;

@@ -384,7 +384,7 @@ const STAGE_INFO=[
 ];
 function showBuildingInfo(num){
   const s=STAGE_INFO[num-1]; if(!s) return;
-  document.getElementById('infoIcon').textContent=s.icon;
+  document.getElementById('infoIcon').innerHTML=s.icon;
   document.getElementById('infoTitle').textContent=`STAGE 0${s.num}｜${s.title}`;
   document.getElementById('infoLoc').textContent='📍 '+s.loc;
   document.getElementById('infoDesc').textContent=s.desc;
