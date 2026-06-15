@@ -245,6 +245,17 @@ if(urlParams.get('level')==='2'){
   document.body.insertBefore(bgBot,document.body.firstChild.nextSibling);
 }
 
+if(urlParams.get('level')==='3'){
+  const bgDiv=document.createElement('div');
+  bgDiv.className='bg-img';
+  const bgImg=document.createElement('img');
+  bgImg.src='南瓜燈的秘密.jpg';
+  bgImg.alt='';
+  bgImg.style.cssText='width:100%;height:100%;object-fit:cover;object-position:center;filter:brightness(0.5);';
+  bgDiv.appendChild(bgImg);
+  document.body.insertBefore(bgDiv,document.body.firstChild);
+}
+
 // ── Quiz data ──
 const QUIZZES={
   1:{
