@@ -172,29 +172,6 @@ html,body{
 }
 .btn-secondary:active{background:rgba(255,255,255,0.06)}
 
-/* ─── SKILLBAR IMAGE ─── */
-.skillbar-img-wrap{
-  margin-top:-2px;
-  padding:0 0 20px;
-  position:relative;
-  background:linear-gradient(to bottom, rgba(6,1,0,0.86) 0%, rgba(0,0,0,0) 22%);
-}
-.skillbar-img-wrap::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:18px;
-  background:linear-gradient(to bottom, rgba(6,1,0,0.9), transparent);
-  z-index:1;pointer-events:none;
-}
-.skillbar-img-wrap::after{
-  content:'';position:absolute;bottom:20px;left:0;right:0;height:22px;
-  background:linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-  z-index:1;pointer-events:none;
-}
-.skillbar-img{
-  display:block;width:100%;height:auto;
-  mix-blend-mode:lighten;
-  filter:brightness(1.08) contrast(1.05);
-  position:relative;z-index:0;
-}
 
 /* ─── DASHBOARD ─── */
 .player-header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
@@ -417,11 +394,6 @@ html,body{
         <input type="text" id="inputName" placeholder="輸入姓名">
       </div>
       <button class="btn-primary" onclick="handleLogin()">🎮 開始冒險</button>
-    </div>
-
-    <!-- Skillbar image -->
-    <div class="skillbar-img-wrap">
-      <img class="skillbar-img" src="1781488503275_主頁介面.jpg" alt="skill bar">
     </div>
 
   </div><!-- end #loginView -->
