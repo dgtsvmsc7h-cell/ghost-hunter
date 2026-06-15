@@ -24,73 +24,55 @@
   --shadow: 0 8px 32px rgba(0,0,0,0.5);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-
 html,body{
-  width:100%;height:100%;overflow:hidden;background:#000;
-  color:var(--text);font-family:'Nunito',sans-serif;
+  min-height:100vh;background:var(--bg);color:var(--text);
+  font-family:'Nunito',sans-serif;overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse at 15% 20%, rgba(138,43,226,0.22) 0%,transparent 55%),
+    radial-gradient(ellipse at 85% 70%, rgba(255,122,0,0.18) 0%,transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(34,255,119,0.08) 0%,transparent 50%);
+}
+/* Scan-line overlay */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.04) 3px,rgba(0,0,0,0.04) 4px);
 }
 
-/* ─── BACKGROUND IMAGE ─── */
-.bg-img{
-  position:fixed;inset:0;z-index:0;background:#000;
+/* ─── LAYOUT ─── */
+.page{max-width:480px;margin:0 auto;padding:16px 16px 100px;position:relative;z-index:1}
+
+/* ─── HEADER HERO ─── */
+.hero{text-align:center;padding:28px 8px 24px;position:relative}
+.hero-badge{
+  display:inline-block;background:rgba(255,122,0,0.15);
+  border:1px solid var(--orange);border-radius:99px;
+  padding:4px 14px;font-size:11px;letter-spacing:3px;
+  color:var(--orange);font-weight:700;margin-bottom:14px;
+  text-transform:uppercase;
 }
-.bg-img img{
-  width:100%;height:100%;
-  object-fit:contain;object-position:center top;
-  filter:brightness(0.72) saturate(1.1);
+.hero h1{
+  font-family:'Bangers',cursive;font-size:clamp(38px,10vw,56px);
+  line-height:1;letter-spacing:2px;margin-bottom:4px;
+  background:linear-gradient(135deg, #ff9c2b 0%, #ff4488 50%, #b84eff 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 20px rgba(255,80,0,0.4));
 }
+.hero h2{
+  font-family:'Bangers',cursive;font-size:clamp(18px,5vw,26px);
+  color:rgba(255,240,216,0.85);letter-spacing:3px;margin-bottom:16px;
+}
+.hero .desc{font-size:14px;color:var(--subtext);line-height:1.6;max-width:340px;margin:0 auto}
 
 /* ─── FLOATING GHOSTS ─── */
 .ghost-float{
   position:fixed;font-size:clamp(24px,5vw,40px);pointer-events:none;
-  opacity:0;z-index:1;animation:ghostrise 20s linear infinite;
+  opacity:0;z-index:0;animation:ghostrise 20s linear infinite;
 }
 @keyframes ghostrise{
   0%{transform:translateY(110vh) rotate(-10deg);opacity:0}
   5%{opacity:0.3}
   90%{opacity:0.2}
   100%{transform:translateY(-200px) rotate(10deg);opacity:0}
-}
-
-/* ─── UI LAYER (scrollable) ─── */
-.ui-layer{
-  position:fixed;inset:0;z-index:2;
-  overflow-y:auto;overflow-x:hidden;
-  -webkit-overflow-scrolling:touch;
-  scrollbar-width:none;
-}
-.ui-layer::-webkit-scrollbar{display:none}
-
-/* ─── LAYOUT ─── */
-.page{max-width:480px;margin:0 auto;padding:0 16px 100px;position:relative;z-index:1}
-
-/* ─── HERO SPACER ─── */
-.hero-spacer{
-  height:55vh;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:flex-end;
-  padding-bottom:10px;
-}
-@supports (height:55dvh){.hero-spacer{height:55dvh}}
-.hero-title{
-  font-family:'Bangers',cursive;
-  font-size:clamp(38px,12vw,56px);
-  color:var(--orange);
-  line-height:1;letter-spacing:2px;text-align:center;
-  text-shadow:0 0 24px rgba(255,122,0,0.8),0 0 48px rgba(255,80,0,0.5),0 2px 8px rgba(0,0,0,0.8);
-  margin-bottom:6px;
-}
-.hero-sub{
-  font-family:'Bangers',cursive;
-  font-size:clamp(16px,5vw,22px);
-  color:var(--cream);letter-spacing:5px;text-align:center;
-  opacity:0.85;margin-bottom:10px;
-}
-.hero-tag{
-  font-size:11px;color:rgba(240,224,255,0.7);
-  background:rgba(0,0,0,0.5);border:1px solid rgba(255,122,0,0.3);
-  border-radius:99px;padding:4px 14px;letter-spacing:1px;
-  text-align:center;max-width:320px;
 }
 
 /* ─── SECTION CARDS ─── */
@@ -108,7 +90,8 @@ html,body{
 .stages-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
 .stage-card{
   background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
-  border-radius:10px;padding:12px;cursor:pointer;transition:all 0.25s;text-align:left;
+  border-radius:10px;padding:12px;cursor:pointer;transition:all 0.25s;
+  text-align:left;
 }
 .stage-card:active{transform:scale(0.97)}
 .stage-card .s-icon{font-size:28px;margin-bottom:6px;display:block}
@@ -119,7 +102,8 @@ html,body{
 /* Stage detail modal */
 .modal-overlay{
   display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);
-  z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px);
+  z-index:200;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(4px);
 }
 .modal-overlay.open{display:flex;animation:slideup 0.3s ease}
 @keyframes slideup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
@@ -151,7 +135,8 @@ html,body{
 .form-group input{
   width:100%;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);
   border-radius:10px;padding:14px 16px;font-size:17px;color:var(--cream);
-  font-family:'Nunito',sans-serif;outline:none;transition:border-color 0.2s;-webkit-appearance:none;
+  font-family:'Nunito',sans-serif;outline:none;transition:border-color 0.2s;
+  -webkit-appearance:none;
 }
 .form-group input:focus{border-color:var(--orange)}
 .form-group input::placeholder{color:rgba(255,255,255,0.25)}
@@ -172,32 +157,10 @@ html,body{
 }
 .btn-secondary:active{background:rgba(255,255,255,0.06)}
 
-/* ─── SKILLBAR IMAGE ─── */
-.skillbar-img-wrap{
-  margin-top:-2px;
-  padding:0 0 20px;
-  position:relative;
-  background:linear-gradient(to bottom, rgba(6,1,0,0.86) 0%, rgba(0,0,0,0) 22%);
-}
-.skillbar-img-wrap::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:18px;
-  background:linear-gradient(to bottom, rgba(6,1,0,0.9), transparent);
-  z-index:1;pointer-events:none;
-}
-.skillbar-img-wrap::after{
-  content:'';position:absolute;bottom:20px;left:0;right:0;height:22px;
-  background:linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-  z-index:1;pointer-events:none;
-}
-.skillbar-img{
-  display:block;width:100%;height:auto;
-  mix-blend-mode:lighten;
-  filter:brightness(1.08) contrast(1.05);
-  position:relative;z-index:0;
-}
-
 /* ─── DASHBOARD ─── */
-.player-header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.player-header{
+  display:flex;align-items:center;gap:14px;margin-bottom:16px;
+}
 .player-avatar{
   width:52px;height:52px;border-radius:50%;flex-shrink:0;
   background:linear-gradient(135deg, var(--purple) 0%, var(--orange) 100%);
@@ -206,22 +169,27 @@ html,body{
 .player-info .p-name{font-size:19px;font-weight:900;color:var(--cream)}
 .player-info .p-sid{font-size:12px;color:var(--subtext);letter-spacing:1px;margin-top:2px}
 
+/* Progress stages */
 .progress-stages{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
 .prog-stage{
   background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);
-  border-radius:10px;padding:11px 10px;display:flex;align-items:center;gap:9px;transition:all 0.3s;
+  border-radius:10px;padding:11px 10px;display:flex;align-items:center;gap:9px;
+  transition:all 0.3s;
 }
 .prog-stage.done{border-color:rgba(34,255,119,0.5);background:rgba(34,255,119,0.07)}
 .prog-stage .ps-icon{font-size:20px;flex-shrink:0}
+.prog-stage .ps-info{}
 .prog-stage .ps-name{font-size:12px;font-weight:700;color:var(--cream);line-height:1.2}
 .prog-stage .ps-status{font-size:11px;color:var(--subtext);margin-top:1px}
 .prog-stage.done .ps-status{color:var(--green)}
 
+/* Equipment rack */
 .equip-rack{display:flex;gap:8px;flex-wrap:wrap;padding:4px 0}
 .equip-item{
   display:flex;flex-direction:column;align-items:center;gap:4px;
   background:rgba(255,255,255,0.04);border:1.5px dashed rgba(255,255,255,0.15);
-  border-radius:10px;padding:10px 8px;min-width:64px;flex:1;transition:all 0.3s;opacity:0.5;
+  border-radius:10px;padding:10px 8px;min-width:64px;flex:1;
+  transition:all 0.3s;opacity:0.5;
 }
 .equip-item.owned{
   border-style:solid;border-color:var(--gold);background:rgba(255,215,0,0.08);
@@ -232,31 +200,46 @@ html,body{
 .equip-item .ei-name{font-size:11px;font-weight:700;text-align:center;color:rgba(255,255,255,0.3)}
 .equip-item.owned .ei-name{color:var(--gold)}
 
+/* Boss status */
 .boss-badge{
   display:flex;align-items:center;gap:12px;
-  background:rgba(255,34,85,0.08);border:1px solid rgba(255,34,85,0.3);border-radius:10px;padding:12px 14px;
+  background:rgba(255,34,85,0.08);border:1px solid rgba(255,34,85,0.3);
+  border-radius:10px;padding:12px 14px;
 }
-.boss-badge.defeated{background:rgba(34,255,119,0.08);border-color:rgba(34,255,119,0.3)}
+.boss-badge.defeated{
+  background:rgba(34,255,119,0.08);border-color:rgba(34,255,119,0.3);
+}
 .boss-badge .bb-icon{font-size:28px}
 .boss-badge .bb-text{font-size:13px;font-weight:700;color:var(--text);line-height:1.4}
 
+/* Gift card */
 .gift-card{
   background:linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,80,0,0.12));
   border:2px solid var(--gold);border-radius:var(--radius);padding:22px 18px;
   text-align:center;animation:giftPulse 2s ease-in-out infinite alternate;
 }
-@keyframes giftPulse{from{box-shadow:0 0 20px rgba(255,215,0,0.2)}to{box-shadow:0 0 40px rgba(255,215,0,0.5)}}
-.gift-card .gc-emoji{font-size:52px;display:block;margin-bottom:10px;animation:bounce 1.5s ease-in-out infinite}
+@keyframes giftPulse{
+  from{box-shadow:0 0 20px rgba(255,215,0,0.2)}
+  to{box-shadow:0 0 40px rgba(255,215,0,0.5)}
+}
+.gift-card .gc-emoji{font-size:52px;display:block;margin-bottom:10px;
+  animation:bounce 1.5s ease-in-out infinite}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
 .gift-card .gc-title{font-family:'Bangers',cursive;font-size:26px;letter-spacing:2px;color:var(--gold);margin-bottom:8px}
-.gift-card .gc-loc{font-family:'Bangers',cursive;font-size:22px;color:var(--orange2);letter-spacing:1px;margin:10px 0;line-height:1.3}
+.gift-card .gc-loc{
+  font-family:'Bangers',cursive;font-size:22px;color:var(--orange2);letter-spacing:1px;
+  margin:10px 0;line-height:1.3;
+}
 .gift-card .gc-hint{font-size:12px;color:var(--subtext);letter-spacing:1px}
 
+/* QR Scanner button */
 .scan-btn{
-  width:100%;background:linear-gradient(135deg, var(--purple) 0%, var(--purple2) 100%);
+  width:100%;
+  background:linear-gradient(135deg, var(--purple) 0%, var(--purple2) 100%);
   border:none;border-radius:12px;padding:17px;
   font-family:'Bangers',cursive;font-size:24px;letter-spacing:2px;
-  color:white;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 24px rgba(138,43,226,0.4);
+  color:white;cursor:pointer;transition:all 0.2s;
+  box-shadow:0 4px 24px rgba(138,43,226,0.4);
   display:flex;align-items:center;justify-content:center;gap:10px;
 }
 .scan-btn:active{transform:scale(0.97)}
@@ -265,7 +248,8 @@ html,body{
 .scanner-overlay{
   display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);
   z-index:300;flex-direction:column;align-items:center;
-  justify-content:flex-start;padding:20px 16px 40px;overflow-y:auto;
+  justify-content:flex-start;padding:20px 16px 40px;
+  overflow-y:auto;
 }
 .scanner-overlay.open{display:flex;animation:fadeIn 0.25s}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
@@ -273,7 +257,9 @@ html,body{
   display:flex;align-items:center;justify-content:space-between;
   width:100%;max-width:420px;margin-bottom:20px;
 }
-.scanner-header h3{font-family:'Bangers',cursive;font-size:26px;letter-spacing:2px;color:var(--green)}
+.scanner-header h3{
+  font-family:'Bangers',cursive;font-size:26px;letter-spacing:2px;color:var(--green);
+}
 .scanner-close-btn{
   background:rgba(255,255,255,0.1);border:none;border-radius:50%;
   width:40px;height:40px;color:white;font-size:20px;cursor:pointer;
@@ -288,6 +274,7 @@ html,body{
   border:2px solid var(--green);box-shadow:0 0 30px rgba(34,255,119,0.3);
 }
 #qr-reader video{width:100%!important;display:block!important}
+/* Hide library default UI */
 #qr-reader__dashboard_section_csr button,
 #qr-reader__dashboard{display:none!important}
 .scanner-status{
@@ -298,6 +285,7 @@ html,body{
 }
 .scanner-status.error{color:var(--red);background:rgba(255,34,85,0.08);border-color:rgba(255,34,85,0.25)}
 
+/* Logout row */
 .action-row{display:flex;gap:10px;margin-top:4px}
 .action-row .btn-secondary{flex:1}
 
@@ -306,39 +294,33 @@ html,body{
   position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(30px);
   background:#1a0035;border:1px solid var(--orange);border-radius:10px;
   padding:12px 20px;font-size:14px;font-weight:700;color:var(--cream);
-  z-index:400;white-space:nowrap;opacity:0;transition:all 0.3s;box-shadow:0 8px 24px rgba(0,0,0,0.5);
+  z-index:400;white-space:nowrap;opacity:0;transition:all 0.3s;
+  box-shadow:0 8px 24px rgba(0,0,0,0.5);
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* Stars */
+/* Stars bg */
 .star{
-  position:fixed;border-radius:50%;background:white;pointer-events:none;z-index:1;
+  position:fixed;border-radius:50%;background:white;pointer-events:none;z-index:0;
   animation:twinkle 4s infinite ease-in-out;
 }
 @keyframes twinkle{0%,100%{opacity:0.15;transform:scale(1)}50%{opacity:0.7;transform:scale(1.2)}}
 
+/* ─── RESPONSIVE ─── */
 @media(max-width:380px){
   .stages-grid{grid-template-columns:1fr 1fr}
-  .hero-title{font-size:34px}
+  .hero h1{font-size:34px}
   .progress-stages{grid-template-columns:1fr 1fr}
 }
 </style>
 </head>
 <body>
 
-<!-- Fixed background image -->
-<div class="bg-img">
-  <img src="主頁介面.jpg" alt="">
-</div>
-
-<!-- Floating decorations (z-index:1, between bg and ui-layer) -->
+<!-- Floating decorations -->
 <span class="ghost-float" style="left:8%;animation-delay:0s;animation-duration:25s">👻</span>
 <span class="ghost-float" style="left:35%;animation-delay:7s;animation-duration:32s">🦇</span>
 <span class="ghost-float" style="left:62%;animation-delay:14s;animation-duration:27s">🎃</span>
 <span class="ghost-float" style="left:82%;animation-delay:4s;animation-duration:21s">👻</span>
-
-<!-- Scrollable UI layer -->
-<div class="ui-layer">
 
 <!-- Stage info modal -->
 <div class="modal-overlay" id="stageModal" onclick="closeModal()">
@@ -366,12 +348,11 @@ html,body{
 
   <!-- ── LOGIN VIEW ── -->
   <div id="loginView">
-
-    <!-- Hero spacer -->
-    <div class="hero-spacer">
-      <div class="hero-title">GHOST<br>HUNTER</div>
-      <div class="hero-sub">MIDNIGHT SIGNAL</div>
-      <div class="hero-tag">// Ghost Mode：校園萬聖登入中 · 完成闖關任務，解除萬聖模式 //</div>
+    <div class="hero">
+      <div class="hero-badge">Halloween Event 2026</div>
+      <h1>GHOST HUNTER</h1>
+      <h2>Midnight Signal</h2>
+      <p class="desc">深夜，校園響起神秘訊號。勇者，出擊！收集四件裝備，打倒魔王，守護校園平安。</p>
     </div>
 
     <!-- Stage Info -->
@@ -418,13 +399,7 @@ html,body{
       </div>
       <button class="btn-primary" onclick="handleLogin()">🎮 開始冒險</button>
     </div>
-
-    <!-- Skillbar image -->
-    <div class="skillbar-img-wrap">
-      <img class="skillbar-img" src="1781488503275_主頁介面.jpg" alt="skill bar">
-    </div>
-
-  </div><!-- end #loginView -->
+  </div>
 
   <!-- ── DASHBOARD VIEW ── -->
   <div id="dashView" style="display:none">
@@ -437,6 +412,7 @@ html,body{
           <div class="p-sid" id="dashSid">---</div>
         </div>
       </div>
+      <!-- QR Scanner button -->
       <button class="scan-btn" onclick="openScanner()">
         <span>📷</span><span>掃描 QR Code 開始闖關</span>
       </button>
@@ -454,13 +430,17 @@ html,body{
     <!-- Progress -->
     <div class="section-card">
       <div class="section-title">🗺️ 闖關進度</div>
-      <div class="progress-stages" id="progressStages"></div>
+      <div class="progress-stages" id="progressStages">
+        <!-- Rendered by JS -->
+      </div>
     </div>
 
     <!-- Equipment -->
     <div class="section-card">
       <div class="section-title" id="equipTitle">🗡️ 裝備背包</div>
-      <div class="equip-rack" id="equipRack"></div>
+      <div class="equip-rack" id="equipRack">
+        <!-- Rendered by JS -->
+      </div>
     </div>
 
     <!-- Boss -->
@@ -481,13 +461,11 @@ html,body{
         <button class="btn-secondary" onclick="handleLogout()" style="flex:1">🚪 登出</button>
       </div>
     </div>
-  </div><!-- end #dashView -->
+  </div>
 
 </div><!-- end .page -->
 
 <div class="toast" id="toast"></div>
-
-</div><!-- end .ui-layer -->
 
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -496,6 +474,7 @@ html,body{
 const DB_KEY = 'ghost_hunter_db_v1';
 const SESSION_KEY = 'ghost_hunter_session';
 
+// ── Firebase 設定（請替換為你的專案資訊）──
 const FIREBASE_CONFIG = {
   apiKey: "AIzaSyDAMI3neAeRNrfVdG1NenlI6osL1qN6vyM",
   authDomain: "ghost-hunter-c8ec6.firebaseapp.com",
@@ -538,6 +517,7 @@ const STAGE_INFO = [
   {num:4,icon:'🗳️',title:'打卡牆與投票',loc:'活動中心三樓',desc:'投票選出你最喜歡的展區！每位勇者只能投票一次，完成後獲得第四件裝備「盔甲」！'},
 ];
 
+// ── DB helpers ──
 function getDB(){
   try{return JSON.parse(localStorage.getItem(DB_KEY)||'{"users":{},"voteStats":{"zone1":0,"zone2":0,"zone3":0,"zone4":0}}')}
   catch{return {users:{},voteStats:{zone1:0,zone2:0,zone3:0,zone4:0}}}
@@ -567,6 +547,7 @@ function createUser(sid,name){
   };
 }
 
+// ── Login ──
 async function handleLogin(){
   const sid=document.getElementById('inputSid').value.trim();
   const name=document.getElementById('inputName').value.trim();
@@ -599,6 +580,7 @@ function handleLogout(){
   document.getElementById('loginView').style.display='';
 }
 
+// ── Dashboard ──
 function renderDash(){
   const user=getCurrentUser(); if(!user) return;
   document.getElementById('loginView').style.display='none';
@@ -606,6 +588,7 @@ function renderDash(){
   document.getElementById('dashName').textContent=user.name;
   document.getElementById('dashSid').textContent='學號：'+user.sid;
 
+  // Progress stages
   const stages=[
     {key:'level1',icon:'🪦',name:'起源測驗',loc:'第一醫學'},
     {key:'level2',icon:'👻',name:'鬼怪文化',loc:'管理大樓'},
@@ -623,6 +606,7 @@ function renderDash(){
     </div>`;
   }).join('');
 
+  // Equipment
   const allEq=['sword','shield','grail','armor'];
   const eq2={sword:{icon:'⚔️',name:'聖劍'},shield:{icon:'🛡️',name:'聖盾'},grail:{icon:'🏆',name:'聖杯'},armor:{icon:'🛡️',name:'盔甲'}};
   const eqCount=(user.equipmentOrder||[]).length;
@@ -635,6 +619,7 @@ function renderDash(){
     </div>`;
   }).join('');
 
+  // Boss
   const bb=document.getElementById('bossBadge');
   if(user.bossDefeated){
     bb.className='boss-badge defeated';
@@ -647,10 +632,12 @@ function renderDash(){
     }
   }
 
+  // Gift
   const allDone4=['level1','level2','level3','level4'].every(k=>user.progress[k].completed);
   document.getElementById('giftCard').style.display=(allDone4&&user.bossDefeated)?'block':'none';
 }
 
+// ── Stage info modal ──
 function showStageInfo(num){
   const s=STAGE_INFO[num-1];
   document.getElementById('modalIcon').textContent=s.icon;
@@ -661,6 +648,7 @@ function showStageInfo(num){
 }
 function closeModal(){document.getElementById('stageModal').classList.remove('open')}
 
+// ── QR Scanner ──
 let html5Qr=null;
 function openScanner(){
   const user=getCurrentUser();
@@ -676,6 +664,7 @@ function closeScanner(){
 }
 function startQrScanner(){
   if(!html5Qr) html5Qr=new Html5Qrcode('qr-reader');
+  // Always try environment (back) camera first
   html5Qr.start(
     {facingMode:'environment'},
     {fps:10,qrbox:{width:240,height:240},aspectRatio:1.0},
@@ -683,39 +672,49 @@ function startQrScanner(){
     ()=>{}
   ).then(()=>{
     document.getElementById('scannerStatus').textContent='✓ 就緒 — 對準 QR Code';
-  }).catch(()=>{
+  }).catch(e=>{
     document.getElementById('scannerStatus').className='scanner-status error';
     document.getElementById('scannerStatus').textContent='無法存取後鏡頭。請允許相機權限後重試。';
   });
 }
 function stopQrScanner(){
-  if(html5Qr){try{html5Qr.isScanning&&html5Qr.stop().catch(()=>{})}catch{}}
+  if(html5Qr){
+    try{html5Qr.isScanning&&html5Qr.stop().catch(()=>{})}catch{}
+  }
 }
 function onScanSuccess(text){
   stopQrScanner();
   document.getElementById('scannerStatus').textContent='✓ 掃描成功！跳轉中…';
-  setTimeout(()=>{closeScanner();navigateFromQr(text.trim())},600);
+  setTimeout(()=>{
+    closeScanner();
+    navigateFromQr(text.trim());
+  },600);
 }
 function navigateFromQr(text){
   try{
     const url=new URL(text);
     const file=url.pathname.split('/').pop();
-    if(file==='quiz.html'||file==='vote.html'){window.location.href=text;return}
+    if(file==='quiz.html'||file==='vote.html'){
+      window.location.href=text; return;
+    }
     const lv=url.searchParams.get('level');
     if(lv){window.location.href=lv==='4'?'vote.html':`quiz.html?level=${lv}`;return}
   }catch{}
+  // Check plain text
   const m=text.match(/level[=:]?\s*(\d)/i);
   if(m){window.location.href=m[1]==='4'?'vote.html':`quiz.html?level=${m[1]}`;return}
   if(/vote/i.test(text)){window.location.href='vote.html';return}
   showToast('無法識別的 QR Code');
 }
 
+// ── Toast ──
 function showToast(msg,dur=2200){
   const t=document.getElementById('toast');
   t.textContent=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),dur);
 }
 
+// ── Stars bg ──
 (function(){
   for(let i=0;i<25;i++){
     const s=document.createElement('div');
@@ -728,9 +727,11 @@ function showToast(msg,dur=2200){
   }
 })();
 
+// ── Init ──
 (async function(){
   const sid=getSession();
   let user=getCurrentUser();
+  // Session exists but localStorage is empty → try Firestore recovery
   if(sid&&!user){
     const cloudUser=await loadUserFromCloud(sid);
     if(cloudUser){
