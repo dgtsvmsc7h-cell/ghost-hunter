@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Ghost Hunter: Midnight Signal</title>
+<link href="https://fonts.googleapis.com/css2?family=Creepster&family=Bangers&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #080010;
+  --card: rgba(18, 4, 35, 0.92);
+  --border: rgba(255, 120, 0, 0.35);
+  --orange: #ff7a00;
+  --orange2: #ff9c2b;
+  --purple: #8a2be2;
+  --purple2: #b84eff;
+  --green: #22ff77;
+  --red: #ff2255;
+  --gold: #ffd700;
+  --cream: #fff0d8;
+  --text: #f0e0ff;
+  --subtext: rgba(240,224,255,0.6);
+  --radius: 14px;
+  --shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{
+  min-height:100vh;background:var(--bg);color:var(--text);
+  font-family:'Nunito',sans-serif;overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse at 15% 20%, rgba(138,43,226,0.22) 0%,transparent 55%),
+    radial-gradient(ellipse at 85% 70%, rgba(255,122,0,0.18) 0%,transparent 55%),
+    radial-gradient(ellipse at 50% 100%, rgba(34,255,119,0.08) 0%,transparent 50%);
+}
+/* Scan-line overlay */
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.04) 3px,rgba(0,0,0,0.04) 4px);
+}
+
+/* ─── LAYOUT ─── */
+.page{max-width:480px;margin:0 auto;padding:16px 16px 100px;position:relative;z-index:1}
+
+/* ─── HEADER HERO ─── */
+.hero{text-align:center;padding:28px 8px 24px;position:relative}
+.hero-badge{
+  display:inline-block;background:rgba(255,122,0,0.15);
+  border:1px solid var(--orange);border-radius:99px;
+  padding:4px 14px;font-size:11px;letter-spacing:3px;
+  color:var(--orange);font-weight:700;margin-bottom:14px;
+  text-transform:uppercase;
+}
+.hero h1{
+  font-family:'Bangers',cursive;font-size:clamp(38px,10vw,56px);
+  line-height:1;letter-spacing:2px;margin-bottom:4px;
+  background:linear-gradient(135deg, #ff9c2b 0%, #ff4488 50%, #b84eff 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+  filter:drop-shadow(0 0 20px rgba(255,80,0,0.4));
+}
+.hero h2{
+  font-family:'Bangers',cursive;font-size:clamp(18px,5vw,26px);
+  color:rgba(255,240,216,0.85);letter-spacing:3px;margin-bottom:16px;
+}
+.hero .desc{font-size:14px;color:var(--subtext);line-height:1.6;max-width:340px;margin:0 auto}
+
+/* ─── FLOATING GHOSTS ─── */
+.ghost-float{
+  position:fixed;font-size:clamp(24px,5vw,40px);pointer-events:none;
+  opacity:0;z-index:0;animation:ghostrise 20s linear infinite;
+}
+@keyframes ghostrise{
+  0%{transform:translateY(110vh) rotate(-10deg);opacity:0}
+  5%{opacity:0.3}
+  90%{opacity:0.2}
+  100%{transform:translateY(-200px) rotate(10deg);opacity:0}
+}
+
+/* ─── SECTION CARDS ─── */
+.section-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:20px;margin-bottom:16px;
+  box-shadow:var(--shadow);backdrop-filter:blur(10px);
+}
+.section-title{
+  font-family:'Bangers',cursive;font-size:22px;letter-spacing:2px;
+  color:var(--orange2);margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+
+/* ─── STAGE INFO CARDS ─── */
+.stages-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
+.stage-card{
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);
+  border-radius:10px;padding:12px;cursor:pointer;transition:all 0.25s;
+  text-align:left;
+}
+.stage-card:active{transform:scale(0.97)}
+.stage-card .s-icon{font-size:28px;margin-bottom:6px;display:block}
+.stage-card .s-num{font-size:10px;letter-spacing:2px;color:var(--subtext);margin-bottom:2px}
+.stage-card .s-name{font-size:13px;font-weight:700;color:var(--cream);line-height:1.2}
+.stage-card .s-loc{font-size:11px;color:var(--subtext);margin-top:4px}
+
+/* Stage detail modal */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);
+  z-index:200;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(4px);
+}
+.modal-overlay.open{display:flex;animation:slideup 0.3s ease}
+@keyframes slideup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal-box{
+  background:#110020;border:1px solid rgba(255,100,0,0.4);border-radius:20px 20px 0 0;
+  padding:28px 20px 40px;width:100%;max-width:480px;
+}
+.modal-box .m-icon{font-size:54px;text-align:center;display:block;margin-bottom:12px}
+.modal-box h3{font-family:'Bangers',cursive;font-size:28px;letter-spacing:1px;color:var(--orange2);margin-bottom:8px;text-align:center}
+.modal-box .m-tag{text-align:center;margin-bottom:14px}
+.modal-box .m-tag span{
+  display:inline-block;background:rgba(255,122,0,0.15);border:1px solid var(--orange);
+  border-radius:99px;padding:3px 12px;font-size:12px;color:var(--orange);letter-spacing:1px;
+}
+.modal-box p{font-size:15px;color:var(--text);line-height:1.7;margin-bottom:14px}
+.modal-close{
+  width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);
+  border-radius:10px;padding:14px;font-size:15px;font-weight:700;
+  color:var(--text);cursor:pointer;font-family:'Nunito',sans-serif;
+}
+
+/* ─── LOGIN FORM ─── */
+.login-section{}
+.form-group{margin-bottom:14px}
+.form-group label{
+  display:block;font-size:13px;font-weight:700;color:var(--subtext);
+  margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;
+}
+.form-group input{
+  width:100%;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);
+  border-radius:10px;padding:14px 16px;font-size:17px;color:var(--cream);
+  font-family:'Nunito',sans-serif;outline:none;transition:border-color 0.2s;
+  -webkit-appearance:none;
+}
+.form-group input:focus{border-color:var(--orange)}
+.form-group input::placeholder{color:rgba(255,255,255,0.25)}
+.btn-primary{
+  width:100%;background:linear-gradient(135deg, var(--orange) 0%, #ff3a00 100%);
+  border:none;border-radius:12px;padding:17px;
+  font-family:'Bangers',cursive;font-size:22px;letter-spacing:3px;
+  color:white;cursor:pointer;transition:all 0.2s;
+  box-shadow:0 4px 20px rgba(255,80,0,0.35);margin-top:4px;
+  text-shadow:0 1px 3px rgba(0,0,0,0.4);
+}
+.btn-primary:active{transform:scale(0.97)}
+.btn-secondary{
+  width:100%;background:transparent;border:2px solid rgba(255,255,255,0.15);
+  border-radius:12px;padding:15px;
+  font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;
+  color:var(--text);cursor:pointer;transition:all 0.2s;
+}
+.btn-secondary:active{background:rgba(255,255,255,0.06)}
+
+/* ─── DASHBOARD ─── */
+.player-header{
+  display:flex;align-items:center;gap:14px;margin-bottom:16px;
+}
+.player-avatar{
+  width:52px;height:52px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg, var(--purple) 0%, var(--orange) 100%);
+  display:flex;align-items:center;justify-content:center;font-size:24px;
+}
+.player-info .p-name{font-size:19px;font-weight:900;color:var(--cream)}
+.player-info .p-sid{font-size:12px;color:var(--subtext);letter-spacing:1px;margin-top:2px}
+
+/* Progress stages */
+.progress-stages{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.prog-stage{
+  background:rgba(255,255,255,0.04);border:1.5px solid rgba(255,255,255,0.1);
+  border-radius:10px;padding:11px 10px;display:flex;align-items:center;gap:9px;
+  transition:all 0.3s;
+}
+.prog-stage.done{border-color:rgba(34,255,119,0.5);background:rgba(34,255,119,0.07)}
+.prog-stage .ps-icon{font-size:20px;flex-shrink:0}
+.prog-stage .ps-info{}
+.prog-stage .ps-name{font-size:12px;font-weight:700;color:var(--cream);line-height:1.2}
+.prog-stage .ps-status{font-size:11px;color:var(--subtext);margin-top:1px}
+.prog-stage.done .ps-status{color:var(--green)}
+
+/* Equipment rack */
+.equip-rack{display:flex;gap:8px;flex-wrap:wrap;padding:4px 0}
+.equip-item{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:rgba(255,255,255,0.04);border:1.5px dashed rgba(255,255,255,0.15);
+  border-radius:10px;padding:10px 8px;min-width:64px;flex:1;
+  transition:all 0.3s;opacity:0.5;
+}
+.equip-item.owned{
+  border-style:solid;border-color:var(--gold);background:rgba(255,215,0,0.08);
+  opacity:1;box-shadow:0 0 16px rgba(255,215,0,0.2);
+}
+.equip-item .ei-icon{font-size:26px;filter:brightness(0);opacity:0.45;transition:filter 0.3s,opacity 0.3s}
+.equip-item.owned .ei-icon{filter:none;opacity:1}
+.equip-item .ei-name{font-size:11px;font-weight:700;text-align:center;color:rgba(255,255,255,0.3)}
+.equip-item.owned .ei-name{color:var(--gold)}
+
+/* Boss status */
+.boss-badge{
+  display:flex;align-items:center;gap:12px;
+  background:rgba(255,34,85,0.08);border:1px solid rgba(255,34,85,0.3);
+  border-radius:10px;padding:12px 14px;
+}
+.boss-badge.defeated{
+  background:rgba(34,255,119,0.08);border-color:rgba(34,255,119,0.3);
+}
+.boss-badge .bb-icon{font-size:28px}
+.boss-badge .bb-text{font-size:13px;font-weight:700;color:var(--text);line-height:1.4}
+
+/* Gift card */
+.gift-card{
+  background:linear-gradient(135deg, rgba(255,215,0,0.12), rgba(255,80,0,0.12));
+  border:2px solid var(--gold);border-radius:var(--radius);padding:22px 18px;
+  text-align:center;animation:giftPulse 2s ease-in-out infinite alternate;
+}
+@keyframes giftPulse{
+  from{box-shadow:0 0 20px rgba(255,215,0,0.2)}
+  to{box-shadow:0 0 40px rgba(255,215,0,0.5)}
+}
+.gift-card .gc-emoji{font-size:52px;display:block;margin-bottom:10px;
+  animation:bounce 1.5s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.gift-card .gc-title{font-family:'Bangers',cursive;font-size:26px;letter-spacing:2px;color:var(--gold);margin-bottom:8px}
+.gift-card .gc-loc{
+  font-family:'Bangers',cursive;font-size:22px;color:var(--orange2);letter-spacing:1px;
+  margin:10px 0;line-height:1.3;
+}
+.gift-card .gc-hint{font-size:12px;color:var(--subtext);letter-spacing:1px}
+
+/* QR Scanner button */
+.scan-btn{
+  width:100%;
+  background:linear-gradient(135deg, var(--purple) 0%, var(--purple2) 100%);
+  border:none;border-radius:12px;padding:17px;
+  font-family:'Bangers',cursive;font-size:24px;letter-spacing:2px;
+  color:white;cursor:pointer;transition:all 0.2s;
+  box-shadow:0 4px 24px rgba(138,43,226,0.4);
+  display:flex;align-items:center;justify-content:center;gap:10px;
+}
+.scan-btn:active{transform:scale(0.97)}
+
+/* QR Scanner overlay */
+.scanner-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.97);
+  z-index:300;flex-direction:column;align-items:center;
+  justify-content:flex-start;padding:20px 16px 40px;
+  overflow-y:auto;
+}
+.scanner-overlay.open{display:flex;animation:fadeIn 0.25s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.scanner-header{
+  display:flex;align-items:center;justify-content:space-between;
+  width:100%;max-width:420px;margin-bottom:20px;
+}
+.scanner-header h3{
+  font-family:'Bangers',cursive;font-size:26px;letter-spacing:2px;color:var(--green);
+}
+.scanner-close-btn{
+  background:rgba(255,255,255,0.1);border:none;border-radius:50%;
+  width:40px;height:40px;color:white;font-size:20px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+}
+.scanner-sub{
+  font-size:13px;color:rgba(255,255,255,0.55);text-align:center;
+  margin-bottom:16px;letter-spacing:1px;max-width:320px;
+}
+#qr-reader{
+  width:100%;max-width:340px;border-radius:14px;overflow:hidden;
+  border:2px solid var(--green);box-shadow:0 0 30px rgba(34,255,119,0.3);
+}
+#qr-reader video{width:100%!important;display:block!important}
+/* Hide library default UI */
+#qr-reader__dashboard_section_csr button,
+#qr-reader__dashboard{display:none!important}
+.scanner-status{
+  margin-top:16px;max-width:340px;text-align:center;
+  font-size:14px;color:var(--green);letter-spacing:1px;padding:10px;
+  background:rgba(34,255,119,0.08);border:1px solid rgba(34,255,119,0.25);
+  border-radius:8px;width:100%;
+}
+.scanner-status.error{color:var(--red);background:rgba(255,34,85,0.08);border-color:rgba(255,34,85,0.25)}
+
+/* Logout row */
+.action-row{display:flex;gap:10px;margin-top:4px}
+.action-row .btn-secondary{flex:1}
+
+/* Toast */
+.toast{
+  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(30px);
+  background:#1a0035;border:1px solid var(--orange);border-radius:10px;
+  padding:12px 20px;font-size:14px;font-weight:700;color:var(--cream);
+  z-index:400;white-space:nowrap;opacity:0;transition:all 0.3s;
+  box-shadow:0 8px 24px rgba(0,0,0,0.5);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Stars bg */
+.star{
+  position:fixed;border-radius:50%;background:white;pointer-events:none;z-index:0;
+  animation:twinkle 4s infinite ease-in-out;
+}
+@keyframes twinkle{0%,100%{opacity:0.15;transform:scale(1)}50%{opacity:0.7;transform:scale(1.2)}}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:380px){
+  .stages-grid{grid-template-columns:1fr 1fr}
+  .hero h1{font-size:34px}
+  .progress-stages{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- Floating decorations -->
+<span class="ghost-float" style="left:8%;animation-delay:0s;animation-duration:25s">👻</span>
+<span class="ghost-float" style="left:35%;animation-delay:7s;animation-duration:32s">🦇</span>
+<span class="ghost-float" style="left:62%;animation-delay:14s;animation-duration:27s">🎃</span>
+<span class="ghost-float" style="left:82%;animation-delay:4s;animation-duration:21s">👻</span>
+
+<!-- Stage info modal -->
+<div class="modal-overlay" id="stageModal" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <span class="m-icon" id="modalIcon">🪦</span>
+    <h3 id="modalTitle">Stage 1</h3>
+    <div class="m-tag"><span id="modalLoc">第一醫學大樓</span></div>
+    <p id="modalDesc">關卡說明</p>
+    <button class="modal-close" onclick="closeModal()">關閉</button>
+  </div>
+</div>
+
+<!-- QR Scanner overlay -->
+<div class="scanner-overlay" id="scannerOverlay">
+  <div class="scanner-header">
+    <h3>📷 QR 掃描器</h3>
+    <button class="scanner-close-btn" onclick="closeScanner()">✕</button>
+  </div>
+  <div class="scanner-sub">對準展板 QR Code 後自動辨識</div>
+  <div id="qr-reader"></div>
+  <div class="scanner-status" id="scannerStatus">啟動後鏡頭中…</div>
+</div>
+
+<div class="page">
+
+  <!-- ── LOGIN VIEW ── -->
+  <div id="loginView">
+    <div class="hero">
+      <div class="hero-badge">Halloween Event 2026</div>
+      <h1>GHOST HUNTER</h1>
+      <h2>Midnight Signal</h2>
+      <p class="desc">深夜，校園響起神秘訊號。勇者，出擊！收集四件裝備，打倒魔王，守護校園平安。</p>
+    </div>
+
+    <!-- Stage Info -->
+    <div class="section-card">
+      <div class="section-title">🗺️ 四大關卡</div>
+      <div class="stages-grid">
+        <button class="stage-card" onclick="showStageInfo(1)">
+          <span class="s-icon">🪦</span>
+          <span class="s-num">STAGE 01</span>
+          <span class="s-name">萬聖節的起源</span>
+          <span class="s-loc">📍 第一醫學大樓</span>
+        </button>
+        <button class="stage-card" onclick="showStageInfo(2)">
+          <span class="s-icon">👻</span>
+          <span class="s-num">STAGE 02</span>
+          <span class="s-name">世界鬼怪文化</span>
+          <span class="s-loc">📍 管理大樓</span>
+        </button>
+        <button class="stage-card" onclick="showStageInfo(3)">
+          <span class="s-icon">🎃</span>
+          <span class="s-num">STAGE 03</span>
+          <span class="s-name">南瓜燈的秘密</span>
+          <span class="s-loc">📍 圖書館</span>
+        </button>
+        <button class="stage-card" onclick="showStageInfo(4)">
+          <span class="s-icon">🗳️</span>
+          <span class="s-num">STAGE 04</span>
+          <span class="s-name">打卡牆投票</span>
+          <span class="s-loc">📍 活動中心三樓</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Login -->
+    <div class="section-card login-section">
+      <div class="section-title">⚔️ 建立勇者帳號</div>
+      <div class="form-group">
+        <label>學號</label>
+        <input type="text" id="inputSid" placeholder="輸入學號" autocomplete="off" autocapitalize="off" autocorrect="off">
+      </div>
+      <div class="form-group">
+        <label>姓名</label>
+        <input type="text" id="inputName" placeholder="輸入姓名">
+      </div>
+      <button class="btn-primary" onclick="handleLogin()">🎮 開始冒險</button>
+    </div>
+  </div>
+
+  <!-- ── DASHBOARD VIEW ── -->
+  <div id="dashView" style="display:none">
+    <!-- Player card -->
+    <div class="section-card">
+      <div class="player-header">
+        <div class="player-avatar">⚔️</div>
+        <div class="player-info">
+          <div class="p-name" id="dashName">勇者</div>
+          <div class="p-sid" id="dashSid">---</div>
+        </div>
+      </div>
+      <!-- QR Scanner button -->
+      <button class="scan-btn" onclick="openScanner()">
+        <span>📷</span><span>掃描 QR Code 開始闖關</span>
+      </button>
+    </div>
+
+    <!-- Gift card (only when all 4 + boss done) -->
+    <div class="gift-card" id="giftCard" style="display:none;margin-bottom:16px">
+      <span class="gc-emoji">🎁</span>
+      <div class="gc-title">🏆 全部過關！任務完成！</div>
+      <div style="font-size:14px;color:var(--text);margin-bottom:6px">勇者，請前往領取禮物：</div>
+      <div class="gc-loc">📍 管院 8 樓<br>人文科學觀摩室</div>
+      <div class="gc-hint">// 憑此畫面或學號領取 //</div>
+    </div>
+
+    <!-- Progress -->
+    <div class="section-card">
+      <div class="section-title">🗺️ 闖關進度</div>
+      <div class="progress-stages" id="progressStages">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Equipment -->
+    <div class="section-card">
+      <div class="section-title" id="equipTitle">🗡️ 裝備背包</div>
+      <div class="equip-rack" id="equipRack">
+        <!-- Rendered by JS -->
+      </div>
+    </div>
+
+    <!-- Boss -->
+    <div class="section-card" id="bossCard">
+      <div class="section-title">💀 BOSS 狀態</div>
+      <div class="boss-badge" id="bossBadge">
+        <span class="bb-icon">💀</span>
+        <span class="bb-text">魔王仍在潛伏…<br><span style="font-size:11px;opacity:0.6">完成四關後解鎖 BOSS 戰</span></span>
+      </div>
+    </div>
+
+    <!-- Action row -->
+    <div class="section-card">
+      <div class="action-row">
+        <a href="warrior.html" style="flex:1">
+          <button class="btn-secondary" style="width:100%">⚔️ 查看勇者地圖</button>
+        </a>
+        <button class="btn-secondary" onclick="handleLogout()" style="flex:1">🚪 登出</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end .page -->
+
+<div class="toast" id="toast"></div>
+
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+const DB_KEY = 'ghost_hunter_db_v1';
+const SESSION_KEY = 'ghost_hunter_session';
+
+// ── Firebase 設定（請替換為你的專案資訊）──
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyDAMI3neAeRNrfVdG1NenlI6osL1qN6vyM",
+  authDomain: "ghost-hunter-c8ec6.firebaseapp.com",
+  projectId: "ghost-hunter-c8ec6",
+  storageBucket: "ghost-hunter-c8ec6.firebasestorage.app",
+  messagingSenderId: "822859188160",
+  appId: "1:822859188160:web:80eff0b443c7939224aa25"
+};
+let fbStore = null;
+(function initFirebase(){
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    fbStore = firebase.firestore();
+  }catch(e){ console.warn('Firebase 未初始化，使用本機儲存', e); }
+})();
+async function syncUserToCloud(user){
+  if(!fbStore) return;
+  try{ await fbStore.collection('users').doc(user.sid).set(user); }
+  catch(e){ console.warn('雲端寫入失敗', e); }
+}
+async function loadUserFromCloud(sid){
+  if(!fbStore) return null;
+  try{
+    const snap = await fbStore.collection('users').doc(sid).get();
+    if(snap.exists) return snap.data();
+  }catch(e){ console.warn('雲端讀取失敗', e); }
+  return null;
+}
+const EQUIPMENT_LIST = ['sword','shield','grail','armor'];
+const EQUIP_INFO = {
+  sword:  {icon:'⚔️', name:'聖劍'},
+  shield: {icon:'🛡️', name:'聖盾'},
+  grail:  {icon:'🏆', name:'聖杯'},
+  armor:  {icon:'🛡️', name:'盔甲'}
+};
+const STAGE_INFO = [
+  {num:1,icon:'🪦',title:'萬聖節的起源',loc:'第一醫學大樓',desc:'5 道萬聖節起源選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
+  {num:2,icon:'👻',title:'世界各國鬼怪文化',loc:'管理大樓（本活動起點）',desc:'5 道世界鬼怪文化選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
+  {num:3,icon:'🎃',title:'南瓜燈的秘密',loc:'圖書館',desc:'5 道關於傑克燈與南瓜的選擇題，答對 3 題即通關。通過後獲得隨機裝備！'},
+  {num:4,icon:'🗳️',title:'打卡牆與投票',loc:'活動中心三樓',desc:'投票選出你最喜歡的展區！每位勇者只能投票一次，完成後獲得第四件裝備「盔甲」！'},
+];
+
+// ── DB helpers ──
+function getDB(){
+  try{return JSON.parse(localStorage.getItem(DB_KEY)||'{"users":{},"voteStats":{"zone1":0,"zone2":0,"zone3":0,"zone4":0}}')}
+  catch{return {users:{},voteStats:{zone1:0,zone2:0,zone3:0,zone4:0}}}
+}
+function saveDB(db){localStorage.setItem(DB_KEY,JSON.stringify(db))}
+function getSession(){return localStorage.getItem(SESSION_KEY)||''}
+function setSession(sid){localStorage.setItem(SESSION_KEY,sid)}
+function clearSession(){localStorage.removeItem(SESSION_KEY)}
+function getCurrentUser(){
+  const sid=getSession(); if(!sid) return null;
+  return getDB().users[sid]||null;
+}
+function saveUser(user){
+  const db=getDB(); db.users[user.sid]=user; saveDB(db);
+  syncUserToCloud(user);
+}
+function createUser(sid,name){
+  return {
+    sid,name,createdAt:new Date().toISOString(),
+    progress:{
+      level1:{completed:false,score:0,completedAt:null,equipment:null},
+      level2:{completed:false,score:0,completedAt:null,equipment:null},
+      level3:{completed:false,score:0,completedAt:null,equipment:null},
+      level4:{completed:false,vote:null,completedAt:null,equipment:null},
+    },
+    equipmentOrder:[],bossDefeated:false,bossDefeatedAt:null
+  };
+}
+
+// ── Login ──
+async function handleLogin(){
+  const sid=document.getElementById('inputSid').value.trim();
+  const name=document.getElementById('inputName').value.trim();
+  if(!sid){showToast('請輸入學號');return}
+  if(!name){showToast('請輸入姓名');return}
+  showToast('⏳ 連線中…');
+  const cloudUser = await loadUserFromCloud(sid);
+  const db=getDB();
+  if(!db.users[sid]){
+    const newUser = cloudUser || createUser(sid,name);
+    saveUser(newUser);
+    showToast(cloudUser ? '☁️ 歡迎回來，'+cloudUser.name+'（雲端進度已同步）' : '🎃 帳號建立成功！');
+  } else {
+    if(cloudUser){
+      const local=db.users[sid];
+      const cloudEqLen=(cloudUser.equipmentOrder||[]).length;
+      const localEqLen=(local?.equipmentOrder||[]).length;
+      const cloudAhead=cloudEqLen>localEqLen||(cloudUser.bossDefeated&&!local?.bossDefeated);
+      if(cloudAhead){ db.users[sid]=cloudUser; saveDB(db); }
+    }
+    showToast('👻 歡迎回來，'+db.users[sid].name);
+  }
+  setSession(sid);
+  setTimeout(renderDash,400);
+}
+function handleLogout(){
+  if(!confirm('確定要登出嗎？\n（進度不會消失，下次輸入相同學號可繼續）')) return;
+  clearSession();
+  document.getElementById('dashView').style.display='none';
+  document.getElementById('loginView').style.display='';
+}
+
+// ── Dashboard ──
+function renderDash(){
+  const user=getCurrentUser(); if(!user) return;
+  document.getElementById('loginView').style.display='none';
+  document.getElementById('dashView').style.display='';
+  document.getElementById('dashName').textContent=user.name;
+  document.getElementById('dashSid').textContent='學號：'+user.sid;
+
+  // Progress stages
+  const stages=[
+    {key:'level1',icon:'🪦',name:'起源測驗',loc:'第一醫學'},
+    {key:'level2',icon:'👻',name:'鬼怪文化',loc:'管理大樓'},
+    {key:'level3',icon:'🎃',name:'南瓜秘密',loc:'圖書館'},
+    {key:'level4',icon:'🗳️',name:'打卡投票',loc:'活動中心'},
+  ];
+  document.getElementById('progressStages').innerHTML=stages.map(s=>{
+    const done=user.progress[s.key].completed;
+    return`<div class="prog-stage ${done?'done':''}">
+      <span class="ps-icon">${s.icon}</span>
+      <div class="ps-info">
+        <div class="ps-name">${s.name}</div>
+        <div class="ps-status">${done?'✓ 完成':'○ 待解鎖'}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Equipment
+  const allEq=['sword','shield','grail','armor'];
+  const eq2={sword:{icon:'⚔️',name:'聖劍'},shield:{icon:'🛡️',name:'聖盾'},grail:{icon:'🏆',name:'聖杯'},armor:{icon:'🛡️',name:'盔甲'}};
+  const eqCount=(user.equipmentOrder||[]).length;
+  document.getElementById('equipTitle').textContent=`🗡️ 裝備背包（${eqCount}/4）`;
+  document.getElementById('equipRack').innerHTML=allEq.map(e=>{
+    const has=user.equipmentOrder.includes(e);
+    return`<div class="equip-item ${has?'owned':''}">
+      <span class="ei-icon">${eq2[e].icon}</span>
+      <span class="ei-name">${has?eq2[e].name:'？？？'}</span>
+    </div>`;
+  }).join('');
+
+  // Boss
+  const bb=document.getElementById('bossBadge');
+  if(user.bossDefeated){
+    bb.className='boss-badge defeated';
+    bb.innerHTML='<span class="bb-icon">💥</span><span class="bb-text">魔王已被擊敗！<br><span style="font-size:11px;opacity:0.7">'+new Date(user.bossDefeatedAt).toLocaleDateString('zh-TW')+'</span></span>';
+  } else {
+    const allDone=['level1','level2','level3','level4'].every(k=>user.progress[k].completed);
+    if(allDone){
+      bb.className='boss-badge';
+      bb.innerHTML='<span class="bb-icon">⚔️</span><span class="bb-text">前往地圖挑戰最終 BOSS！<br><a href="warrior.html" style="color:var(--orange);font-size:12px">→ 查看勇者地圖</a></span>';
+    }
+  }
+
+  // Gift
+  const allDone4=['level1','level2','level3','level4'].every(k=>user.progress[k].completed);
+  document.getElementById('giftCard').style.display=(allDone4&&user.bossDefeated)?'block':'none';
+}
+
+// ── Stage info modal ──
+function showStageInfo(num){
+  const s=STAGE_INFO[num-1];
+  document.getElementById('modalIcon').textContent=s.icon;
+  document.getElementById('modalTitle').textContent=`STAGE 0${s.num}｜${s.title}`;
+  document.getElementById('modalLoc').textContent='📍 '+s.loc;
+  document.getElementById('modalDesc').textContent=s.desc;
+  document.getElementById('stageModal').classList.add('open');
+}
+function closeModal(){document.getElementById('stageModal').classList.remove('open')}
+
+// ── QR Scanner ──
+let html5Qr=null;
+function openScanner(){
+  const user=getCurrentUser();
+  if(!user){showToast('請先登入再掃描');return}
+  document.getElementById('scannerOverlay').classList.add('open');
+  document.getElementById('scannerStatus').className='scanner-status';
+  document.getElementById('scannerStatus').textContent='正在啟動後鏡頭…';
+  startQrScanner();
+}
+function closeScanner(){
+  document.getElementById('scannerOverlay').classList.remove('open');
+  stopQrScanner();
+}
+function startQrScanner(){
+  if(!html5Qr) html5Qr=new Html5Qrcode('qr-reader');
+  // Always try environment (back) camera first
+  html5Qr.start(
+    {facingMode:'environment'},
+    {fps:10,qrbox:{width:240,height:240},aspectRatio:1.0},
+    onScanSuccess,
+    ()=>{}
+  ).then(()=>{
+    document.getElementById('scannerStatus').textContent='✓ 就緒 — 對準 QR Code';
+  }).catch(e=>{
+    document.getElementById('scannerStatus').className='scanner-status error';
+    document.getElementById('scannerStatus').textContent='無法存取後鏡頭。請允許相機權限後重試。';
+  });
+}
+function stopQrScanner(){
+  if(html5Qr){
+    try{html5Qr.isScanning&&html5Qr.stop().catch(()=>{})}catch{}
+  }
+}
+function onScanSuccess(text){
+  stopQrScanner();
+  document.getElementById('scannerStatus').textContent='✓ 掃描成功！跳轉中…';
+  setTimeout(()=>{
+    closeScanner();
+    navigateFromQr(text.trim());
+  },600);
+}
+function navigateFromQr(text){
+  try{
+    const url=new URL(text);
+    const file=url.pathname.split('/').pop();
+    if(file==='quiz.html'||file==='vote.html'){
+      window.location.href=text; return;
+    }
+    const lv=url.searchParams.get('level');
+    if(lv){window.location.href=lv==='4'?'vote.html':`quiz.html?level=${lv}`;return}
+  }catch{}
+  // Check plain text
+  const m=text.match(/level[=:]?\s*(\d)/i);
+  if(m){window.location.href=m[1]==='4'?'vote.html':`quiz.html?level=${m[1]}`;return}
+  if(/vote/i.test(text)){window.location.href='vote.html';return}
+  showToast('無法識別的 QR Code');
+}
+
+// ── Toast ──
+function showToast(msg,dur=2200){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),dur);
+}
+
+// ── Stars bg ──
+(function(){
+  for(let i=0;i<25;i++){
+    const s=document.createElement('div');
+    s.className='star';
+    const sz=Math.random()*2+1;
+    s.style.cssText=`width:${sz}px;height:${sz}px;
+      left:${Math.random()*100}vw;top:${Math.random()*100}vh;
+      animation-delay:${Math.random()*4}s;animation-duration:${3+Math.random()*4}s`;
+    document.body.appendChild(s);
+  }
+})();
+
+// ── Init ──
+(async function(){
+  const sid=getSession();
+  let user=getCurrentUser();
+  // Session exists but localStorage is empty → try Firestore recovery
+  if(sid&&!user){
+    const cloudUser=await loadUserFromCloud(sid);
+    if(cloudUser){
+      const db=getDB();
+      db.users[sid]=cloudUser;
+      saveDB(db);
+      user=cloudUser;
+    }
+  }
+  if(user) renderDash();
+  ['inputSid','inputName'].forEach(id=>{
+    document.getElementById(id).addEventListener('keydown',e=>{
+      if(e.key==='Enter') handleLogin();
+    });
+  });
+})();
+</script>
+</body>
+</html>
