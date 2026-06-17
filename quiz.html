@@ -447,7 +447,7 @@ function nextQ(){
 function finishQuiz(){
   const correct=userAnswers.filter(a=>a).length;
   const total=quizData.questions.length;
-  const pass=correct>=3;
+  const pass=correct>=5;
   if(pass){
     const owned=userData.equipmentOrder||[];
     const available=['sword','shield','grail','armor'].filter(e=>!owned.includes(e));
