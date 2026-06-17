@@ -259,7 +259,7 @@ body::before{
   <div class="reward-box">
     <div class="rb-badge">// 寶箱開啟 //</div>
     <div class="rb-title">🎁 獲得裝備！</div>
-    <img class="rb-chest-img" src="chest_open.webp" alt="寶箱"/>
+    <img class="rb-chest-img" src="已開啟寶箱.webp" alt="寶箱"/>
     <div class="rb-name" id="rbName">聖劍</div>
     <div class="rb-desc" id="rbDesc">傳說武器</div>
     <button class="rb-btn" onclick="closeReward()">⚡ 收下裝備！</button>
@@ -629,7 +629,7 @@ function buildChest(cx,cy,open){
     <ellipse cx="0" cy="16" rx="16" ry="3" fill="#000" opacity="0.5"/>
     ${open?`
       <circle r="34" fill="url(#chestGlow)" opacity="0.7"><animate attributeName="r" values="30;38;30" dur="1.8s" repeatCount="indefinite"/></circle>
-      <image href="chest_open.webp" x="-28" y="-44" width="56" height="56" preserveAspectRatio="xMidYMid meet"/>
+      <image href="已開啟寶箱.webp" x="-28" y="-44" width="56" height="56" preserveAspectRatio="xMidYMid meet"/>
       <text x="-13" y="-38" font-size="8" fill="#ffd700" opacity="0.9">✦</text>
       <text x="11" y="-42" font-size="7" fill="#ffd700" opacity="0.9">✦</text>
     `:`
