@@ -448,7 +448,7 @@ body::after{
 
     <!-- Equipment -->
     <div class="section-card">
-      <div class="section-title" id="equipTitle"><img src="裝備背包元素.png" style="width:100%;height:auto;display:block;"></div>
+      <div class="section-title" id="equipTitle">🗡️ 裝備背包</div>
       <div class="equip-rack" id="equipRack">
         <!-- Rendered by JS -->
       </div>
@@ -621,11 +621,11 @@ function renderDash(){
   const allEq=['sword','shield','grail','armor'];
   const eq2={sword:{icon:'<img src="劍元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖劍'},shield:{icon:'<img src="聖盾元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖盾'},grail:{icon:'<img src="聖杯元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖杯'},armor:{icon:'<img src="盔甲元素.png" style="width:48px;height:48px;object-fit:contain">',name:'盔甲'}};
   const eqCount=(user.equipmentOrder||[]).length;
-  document.getElementById('equipTitle').innerHTML=`<img src="裝備背包元素.png" style="width:100%;height:auto;display:block;">`;
+  document.getElementById('equipTitle').textContent=`🗡️ 裝備背包（${eqCount}/4）`;
   document.getElementById('equipRack').innerHTML=allEq.map(e=>{
     const has=user.equipmentOrder.includes(e);
     return`<div class="equip-item ${has?'owned':''}">
-      <span class="ei-icon">${eq2[e].icon}</span>
+      <span class="ei-icon"><img src="裝備背包元素.png" style="width:32px;height:32px;object-fit:contain"></span>
       <span class="ei-name">${has?eq2[e].name:'？？？'}</span>
     </div>`;
   }).join('');
