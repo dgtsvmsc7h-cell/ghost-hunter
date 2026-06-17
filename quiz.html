@@ -382,7 +382,8 @@ function renderAlreadyDone(qd,user){
     <div class="already-card">
       <span class="ac-icon">✅</span>
       <h3>已完成此關！</h3>
-      <p>分數：${p.score} / ${qd.questions.length}<br>已獲得裝備：${eq.icon} ${eq.name}</p>
+      <p>分數：${p.score} / ${qd.questions.length}</p>
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px">${eq.icon}<span>${eq.name}</span></div>
       <a href="warrior.html"><button class="result-btn main" style="margin-bottom:10px">⚔️ 查看勇者地圖</button></a>
       <a href="index.html"><button class="result-btn sec">🏠 回首頁</button></a>
     </div>`;
