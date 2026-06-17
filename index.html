@@ -625,7 +625,7 @@ function renderDash(){
   document.getElementById('equipRack').innerHTML=allEq.map(e=>{
     const has=user.equipmentOrder.includes(e);
     return`<div class="equip-item ${has?'owned':''}">
-      <span class="ei-icon"><img src="裝備背包元素.png" style="width:32px;height:32px;object-fit:contain"></span>
+      <span class="ei-icon">${eq2[e].icon}</span>
       <span class="ei-name">${has?eq2[e].name:'？？？'}</span>
     </div>`;
   }).join('');
