@@ -634,7 +634,7 @@ function renderDash(){
   const bb=document.getElementById('bossBadge');
   if(user.bossDefeated){
     bb.className='boss-badge defeated';
-    bb.innerHTML='<span class="bb-icon">💥</span><span class="bb-text">魔王已被擊敗！<br><span style="font-size:11px;opacity:0.7">'+new Date(user.bossDefeatedAt).toLocaleDateString('zh-TW')+'</span></span>';
+    bb.innerHTML='<span class="bb-icon"><img src="魔王已擊敗.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;"></span><span class="bb-text">魔王已被擊敗！<br><span style="font-size:11px;opacity:0.7">'+new Date(user.bossDefeatedAt).toLocaleDateString('zh-TW')+'</span></span>';
   } else {
     const allDone=['level1','level2','level3','level4'].every(k=>user.progress[k].completed);
     if(allDone){
