@@ -258,7 +258,7 @@ body::before{
 <div class="reward-overlay" id="rewardOverlay">
   <div class="reward-box">
     <div class="rb-badge">// 寶箱開啟 //</div>
-    <div class="rb-title">🎁 獲得裝備！</div>
+    <div class="rb-title">獲得裝備！</div>
     <img class="rb-chest-img" src="已開啟寶箱.png" alt="寶箱"/>
     <div class="rb-name" id="rbName">聖劍</div>
     <div class="rb-desc" id="rbDesc">傳說武器</div>
@@ -597,7 +597,7 @@ ${!bossDefeated?buildBoss(860,95):`
 <text x="29" y="73" fill="#c060ff" font-size="8.5" font-family="'Noto Sans TC',sans-serif">圖書館 Lv.3</text>
 <rect x="15" y="80" width="8" height="8" rx="1" fill="rgba(255,85,0,0.25)" stroke="#ff5500" stroke-width="0.8"/>
 <text x="29" y="89" fill="#ff7733" font-size="8.5" font-family="'Noto Sans TC',sans-serif">活動中心 Lv.4</text>
-<text x="15" y="107" fill="#ffd700" font-size="9">🎁 = 寶箱  💀 = BOSS</text>
+<text x="15" y="107" fill="#ffd700" font-size="9"> = 寶箱  💀 = BOSS</text>
 
 <!-- Compass -->
 <g transform="translate(960,30)" opacity="0.7">
@@ -927,7 +927,7 @@ async function animateNewCompletion(user,newLevel,newEqKey){
     await animateBossFight(user,currentPos,tmpUser);
   } else {
     const remaining=[1,2,3,4].filter(lv=>!tmpUser.progress['level'+lv].completed).length;
-    setStory(remaining>0?`🎁 獲得 ${EQ_INFO[newEqKey].name}！還有 ${remaining} 關待攻略…`:`🏆 四關全通！前往管理大樓迎戰 BOSS！`);
+    setStory(remaining>0?`獲得 ${EQ_INFO[newEqKey].name}！還有 ${remaining} 關待攻略…`:`🏆 四關全通！前往管理大樓迎戰 BOSS！`);
   }
   animationRunning=false;
 }
