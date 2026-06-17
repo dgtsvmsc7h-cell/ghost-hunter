@@ -1091,12 +1091,20 @@ function launchConfetti(){
   document.getElementById('userTag').textContent=user.name;
 
   if(reward&&level){
+    // Validate URL params: level must actually be completed and reward must be in equipmentOrder
+    const validLevels=[1,2,3,4];
+    const levelCompleted=validLevels.includes(level)&&user.progress['level'+level]?.completed===true;
+    const rewardOwned=(user.equipmentOrder||[]).includes(reward);
+    if(!levelCompleted||!rewardOwned){
+      window.location.href='index.html';
+    } else {
     // Just completed a level — animate, then clean URL to prevent re-trigger on reload
     // user.bossDefeated already reflects latest Firestore state after sync above
     setTimeout(async()=>{
       await animateNewCompletion(user,level,reward);
       history.replaceState(null,'',location.pathname);
     },400);
+    }
   } else {
     // Static view
     const wpos=getCurrentWarriorPos(user);
