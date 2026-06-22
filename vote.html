@@ -410,8 +410,8 @@ function submitVote(){
 }
 
 function showVictory(user,eq,redirectUrl){
-  const eqInfo={sword:{icon:'⚔️',name:'聖劍'},shield:{icon:'🛡️',name:'聖盾'},grail:{icon:'🏆',name:'聖杯'},armor:{icon:'🛡️',name:'盔甲'}};
-  const info=eqInfo[eq]||{icon:'🛡️',name:'盔甲'};
+  const eqInfo={sword:{icon:'<img src="劍元素.png" style="width:54px;height:54px;object-fit:contain">',name:'聖劍'},shield:{icon:'<img src="聖盾元素.png" style="width:54px;height:54px;object-fit:contain">',name:'聖盾'},grail:{icon:'<img src="聖杯元素.png" style="width:54px;height:54px;object-fit:contain">',name:'聖杯'},armor:{icon:'<img src="盔甲元素.png" style="width:54px;height:54px;object-fit:contain">',name:'盔甲'}};
+  const info=eqInfo[eq]||{icon:'<img src="盔甲元素.png" style="width:54px;height:54px;object-fit:contain">',name:'盔甲'};
   document.getElementById('pageContent').innerHTML=`
     <div class="victory-screen show">
       <span class="victory-anim">🎊</span>
