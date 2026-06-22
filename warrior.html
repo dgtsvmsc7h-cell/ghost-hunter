@@ -324,7 +324,7 @@ body::before{
   <!-- Actions -->
   <div class="actions">
     <a href="index.html" class="action-btn"><img src="回首頁.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;position:relative;top:-2px;margin-right:2px;"> 首頁</a>
-    <button class="action-btn" onclick="goNextQr()">📷 繼續闖關</button>
+    <button class="action-btn" onclick="goNextQr()"><img src="繼續闖關.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;margin-right:4px"> 繼續闖關</button>
   </div>
 </div>
 
@@ -587,7 +587,7 @@ ${!bossDefeated?buildBoss(860,95):`
 </g>`}
 
 <!-- Legend (top-left overlay) -->
-<rect x="8" y="8" width="145" height="110" rx="4" fill="rgba(3,1,6,0.85)" stroke="#0066ff" stroke-width="0.8" opacity="0.7"/>
+<rect x="8" y="8" width="145" height="92" rx="4" fill="rgba(3,1,6,0.85)" stroke="#0066ff" stroke-width="0.8" opacity="0.7"/>
 <text x="80" y="24" text-anchor="middle" fill="#00d2ff" font-size="9" font-family="'Share Tech Mono',monospace">CAMPUS LEGEND</text>
 <rect x="15" y="32" width="8" height="8" rx="1" fill="rgba(0,225,255,0.25)" stroke="#00e1ff" stroke-width="0.8"/>
 <text x="29" y="41" fill="#00e1ff" font-size="8.5" font-family="'Noto Sans TC',sans-serif">第一醫學大樓 Lv.1</text>
@@ -597,8 +597,6 @@ ${!bossDefeated?buildBoss(860,95):`
 <text x="29" y="73" fill="#c060ff" font-size="8.5" font-family="'Noto Sans TC',sans-serif">圖書館 Lv.3</text>
 <rect x="15" y="80" width="8" height="8" rx="1" fill="rgba(255,85,0,0.25)" stroke="#ff5500" stroke-width="0.8"/>
 <text x="29" y="89" fill="#ff7733" font-size="8.5" font-family="'Noto Sans TC',sans-serif">活動中心 Lv.4</text>
-<text x="15" y="107" fill="#ffd700" font-size="9"> = 寶箱  💀 = BOSS</text>
-
 <!-- Compass -->
 <g transform="translate(960,30)" opacity="0.7">
   <circle r="18" fill="rgba(0,210,255,0.05)" stroke="#00d2ff" stroke-width="1"/>
