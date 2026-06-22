@@ -791,7 +791,7 @@ let animationRunning=false;
 function delay(ms){return new Promise(r=>setTimeout(r,ms))}
 function setStory(msg,gold=false){
   const el=document.getElementById('storyBox');
-  el.textContent=msg;
+  el.innerHTML=msg;
   el.className='story-box'+(gold?' gold':'');
 }
 
