@@ -609,7 +609,7 @@ function renderDash(){
   ];
   document.getElementById('progressStages').innerHTML=stages.map(s=>{
     const done=user.progress[s.key].completed;
-    return`<div class="prog-stage ${done?'done':''}">
+    return`<div class="prog-stage ${done?'done':''}" onclick="showStageInfo(${stages.indexOf(s)+1})" style="cursor:pointer">
       <span class="ps-icon">${s.icon}</span>
       <div class="ps-info">
         <div class="ps-name">${s.name}</div>
