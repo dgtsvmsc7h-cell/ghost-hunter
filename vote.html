@@ -385,7 +385,7 @@ function submitVote(){
   // Assign armor (calculated first to guard before any writes)
   const owned=user.equipmentOrder||[];
   const available=['sword','shield','grail','armor'].filter(e=>!owned.includes(e));
-  const newEq=available.includes('armor')?'armor':(available.length>0?available[Math.floor(Math.random()*available.length)]:null);
+  const newEq=available.length>0?available[Math.floor(Math.random()*available.length)]:null;
   if(!newEq) return;
 
   // Save vote
