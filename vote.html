@@ -327,7 +327,7 @@ async function quickLogin(){
   const db=getDB();
   if(!db.users[sid]){
     const newUser=cloudUser||{
-      sid,name,createdAt:new Date().toISOString(),
+      sid,name,avatar:Math.floor(Math.random()*5)+1,createdAt:new Date().toISOString(),
       progress:{
         level1:{completed:false,score:0,completedAt:null,equipment:null},
         level2:{completed:false,score:0,completedAt:null,equipment:null},
