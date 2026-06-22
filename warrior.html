@@ -377,10 +377,10 @@ function saveUser(user){const db=getDB();db.users[user.sid]=user;saveDB(db);sync
 
 // ─── Stage info ───
 const STAGE_INFO=[
-  {num:1,icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',title:'萬聖節的起源',loc:'第一醫學大樓',desc:'5 道萬聖節起源選擇題，需 5 題全對才算通關。通過後獲得隨機裝備！'},
-  {num:2,icon:'<img src="關卡二元素.png" style="width:28px;height:28px;object-fit:contain">',title:'世界各國鬼怪文化',loc:'管理大樓（本活動起點）',desc:'5 道世界鬼怪文化選擇題，需 5 題全對才算通關。通過後獲得隨機裝備！'},
-  {num:3,icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',title:'南瓜燈的秘密',loc:'圖書館',desc:'5 道關於傑克燈與南瓜的選擇題，需 5 題全對才算通關。通過後獲得隨機裝備！'},
-  {num:4,icon:'<img src="關卡四元素.png" style="width:28px;height:28px;object-fit:contain">',title:'打卡牆與投票',loc:'活動中心三樓',desc:'投票選出你最喜歡的展區！每位勇者只能投票一次，完成後獲得第四件裝備「盔甲」！'},
+  {num:1,icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Origin Signal 起源觀測站',loc:'第一醫學大樓',desc:'萬聖節起源於古代凱爾特人的薩溫節，當時人們相信陰陽界線模糊，會以篝火與變裝來驅邪避凶。經過與基督教諸聖節前夕融合後，逐漸演變成今日以變裝、糖果與娛樂為主的節日。'},
+  {num:2,icon:'<img src="關卡二元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Ghost Database 各國鬼怪資料庫',loc:'管理大樓（本活動起點）',desc:'世界各地的鬼怪傳說反映了不同文化對死亡、恐懼與社會記憶的詮釋，這些故事不只是靈異傳說，更像文化鏡子，映照出人們對未知世界與人性情感的共同理解。'},
+  {num:3,icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Pumpkin Signal 南瓜異訊',loc:'圖書館',desc:'Jack O\'Lantern 源自愛爾蘭傳說，講述一位名叫 Jack 的人因欺騙惡魔而無法進入天堂或地獄，只能提著燈在黑暗中流浪。這項傳統最初用蕪菁雕刻成燈，後來在北美改以南瓜製作，逐漸成為萬聖節最具代表性的象徵之一。'},
+  {num:4,icon:'<img src="關卡四元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Ghost Mode ON 打卡投票站',loc:'活動中心三樓',desc:'投票選出你最喜歡的展區！每位勇者只能投票一次。'},
 ];
 function showBuildingInfo(num){
   const s=STAGE_INFO[num-1]; if(!s) return;
