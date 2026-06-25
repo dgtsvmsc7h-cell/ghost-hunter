@@ -597,7 +597,7 @@ function renderDash(){
   document.getElementById('dashView').style.display='';
   document.getElementById('dashName').textContent=user.name;
   document.getElementById('dashSid').textContent='學號：'+user.sid;
-  document.getElementById('dashAvatar').outerHTML=`<div class="player-avatar" id="dashAvatar" style="position:relative;width:80px;height:80px;flex-shrink:0;border-radius:50%;background:#6b4423;display:flex;align-items:center;justify-content:center;overflow:visible"><img src="頭像${user.avatar||1}.png" style="position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px);object-fit:cover;border-radius:50%;z-index:0"><img src="頭像框.png" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:130%;height:130%;object-fit:contain;z-index:1;pointer-events:none;mix-blend-mode:multiply"></div>`;
+  document.getElementById('dashAvatar').outerHTML=`<div class="player-avatar" id="dashAvatar" style="position:relative;width:80px;height:80px;flex-shrink:0;border-radius:50%;background:#6b4423;display:flex;align-items:center;justify-content:center;overflow:visible"><img src="頭像${user.avatar||1}.png" style="position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px);object-fit:cover;border-radius:50%;z-index:0"><img src="頭像框.png" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-56%);width:170%;height:170%;object-fit:contain;z-index:2;pointer-events:none"></div>`;
   console.log('頭像框 img:', document.querySelector('.player-avatar img[src*="頭像框"]'));
 
   // Progress stages
