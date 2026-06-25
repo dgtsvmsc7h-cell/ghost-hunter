@@ -597,7 +597,7 @@ function renderDash(){
   document.getElementById('dashView').style.display='';
   document.getElementById('dashName').textContent=user.name;
   document.getElementById('dashSid').textContent='學號：'+user.sid;
-  document.getElementById('dashAvatar').outerHTML=`<div class="player-avatar" id="dashAvatar" style="padding:0;overflow:hidden;background:#6b4423;display:flex;align-items:center;justify-content:center"><img src="頭像${user.avatar||1}.png" style="width:80%;height:80%;object-fit:cover;border-radius:50%"></div>`;
+  document.getElementById('dashAvatar').outerHTML=`<div class="player-avatar" id="dashAvatar" style="position:relative;width:52px;height:52px;flex-shrink:0"><img src="頭像${user.avatar||1}.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%;padding:6px;background:#6b4423"><img src="頭像框.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:contain;z-index:1;pointer-events:none"></div>`;
 
   // Progress stages
   const stages=[
