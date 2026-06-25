@@ -165,9 +165,9 @@ body::after{
   display:flex;align-items:center;gap:14px;margin-bottom:16px;
 }
 .player-avatar{
-  width:52px;height:52px;border-radius:50%;flex-shrink:0;
-  background:#6b4423;
+  width:80px;height:80px;border-radius:50%;flex-shrink:0;
   display:flex;align-items:center;justify-content:center;font-size:24px;
+  overflow:visible;
 }
 .player-info .p-name{font-size:19px;font-weight:900;color:var(--cream)}
 .player-info .p-sid{font-size:12px;color:var(--subtext);letter-spacing:1px;margin-top:2px}
@@ -597,7 +597,7 @@ function renderDash(){
   document.getElementById('dashView').style.display='';
   document.getElementById('dashName').textContent=user.name;
   document.getElementById('dashSid').textContent='學號：'+user.sid;
-  document.getElementById('dashAvatar').outerHTML=`<div class="player-avatar" id="dashAvatar" style="position:relative;width:80px;height:80px;flex-shrink:0"><img src="頭像${user.avatar||1}.png" style="position:absolute;inset:5px;width:calc(100% - 10px);height:calc(100% - 10px);object-fit:cover;border-radius:50%;background:#6b4423"><img src="頭像框.png" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:120%;height:120%;object-fit:contain;z-index:1;pointer-events:none;border:none"></div>`;
+  document.getElementById('dashAvatar').outerHTML=`<div class="player-avatar" id="dashAvatar" style="position:relative;width:80px;height:80px;flex-shrink:0;border-radius:50%;background:#6b4423;display:flex;align-items:center;justify-content:center;overflow:visible"><img src="頭像${user.avatar||1}.png" style="position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px);object-fit:cover;border-radius:50%;z-index:0"><img src="頭像框.png" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:130%;height:130%;object-fit:contain;z-index:1;pointer-events:none;mix-blend-mode:multiply"></div>`;
   console.log('頭像框 img:', document.querySelector('.player-avatar img[src*="頭像框"]'));
 
   // Progress stages
