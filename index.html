@@ -171,6 +171,7 @@ body::after{
 }
 .player-info .p-name{font-size:19px;font-weight:900;color:var(--cream)}
 .player-info .p-sid{font-size:12px;color:var(--subtext);letter-spacing:1px;margin-top:2px}
+.en-sub { display:block; font-size:10px; opacity:0.5; letter-spacing:0.8px; font-family:'Cinzel',serif; margin-top:1px; }
 
 /* Progress stages */
 .progress-stages{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
@@ -397,16 +398,16 @@ body::after{
 
     <!-- Login -->
     <div class="section-card login-section">
-      <div class="section-title">⚔️ 建立勇者帳號</div>
+      <div class="section-title">⚔️ 建立勇者帳號<span class="en-sub">CREATE HERO ACCOUNT</span></div>
       <div class="form-group">
-        <label>學號</label>
+        <label>學號<span class="en-sub">STUDENT ID</span></label>
         <input type="text" id="inputSid" placeholder="輸入學號" autocomplete="off" autocapitalize="off" autocorrect="off">
       </div>
       <div class="form-group">
-        <label>姓名</label>
+        <label>姓名<span class="en-sub">NAME</span></label>
         <input type="text" id="inputName" placeholder="輸入姓名">
       </div>
-      <button class="btn-primary" onclick="handleLogin()">🎮 開始冒險</button>
+      <button class="btn-primary" onclick="handleLogin()">🎮 開始冒險<span class="en-sub">START ADVENTURE</span></button>
     </div>
 
 
@@ -425,7 +426,7 @@ body::after{
       </div>
       <!-- QR Scanner button -->
       <button class="scan-btn" onclick="openScanner()">
-        <span><img src="掃描元素.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;"></span><span>掃描 QR Code 開始闖關</span>
+        <span><img src="掃描元素.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;"></span><span>掃描 QR Code 開始闖關<span class="en-sub">SCAN QR CODE TO BEGIN</span></span>
       </button>
     </div>
 
@@ -440,7 +441,7 @@ body::after{
 
     <!-- Progress -->
     <div class="section-card">
-      <div class="section-title"><img src="地圖.webp" style="width:22px;height:22px;object-fit:contain;vertical-align:middle"> 闖關進度</div>
+      <div class="section-title"><img src="地圖.webp" style="width:22px;height:22px;object-fit:contain;vertical-align:middle"> 闖關進度<span class="en-sub">STAGE PROGRESS</span></div>
       <div class="progress-stages" id="progressStages">
         <!-- Rendered by JS -->
       </div>
@@ -448,7 +449,7 @@ body::after{
 
     <!-- Equipment -->
     <div class="section-card">
-      <div class="section-title" id="equipTitle"><img src="裝備背包元素.png" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;"> 裝備背包</div>
+      <div class="section-title" id="equipTitle"><img src="裝備背包元素.png" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;"> 裝備背包<span class="en-sub">EQUIPMENT BAG</span></div>
       <div class="equip-rack" id="equipRack">
         <!-- Rendered by JS -->
       </div>
@@ -456,18 +457,18 @@ body::after{
 
     <!-- Boss -->
     <div class="section-card" id="bossCard">
-      <div class="section-title"><img src="魔王.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;"> BOSS 狀態</div>
+      <div class="section-title"><img src="魔王.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;"> BOSS 狀態<span class="en-sub">BOSS STATUS</span></div>
       <div class="boss-badge" id="bossBadge">
         <span class="bb-icon"><img src="魔王.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle"></span>
-        <span class="bb-text">魔王仍在潛伏…<br><span style="font-size:11px;opacity:0.6">完成四關後解鎖 BOSS 戰</span></span>
+        <span class="bb-text">魔王仍在潛伏…<span class="en-sub">THE BOSS IS LURKING</span><br><span style="font-size:11px;opacity:0.6">完成四關後解鎖 BOSS 戰<span class="en-sub">UNLOCK AFTER ALL 4 STAGES</span></span></span>
       </div>
     </div>
 
     <!-- Action row -->
     <div class="section-card">
       <div class="action-row">
-        <a href="warrior.html" class="btn-secondary" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none"><img src="地圖.webp" style="width:20px;height:20px;object-fit:contain"> 勇者地圖</a>
-        <button class="btn-secondary" onclick="handleLogout()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px"><img src="登出.png" style="width:38px;height:38px;object-fit:contain"> 登出</button>
+        <a href="warrior.html" class="btn-secondary" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px;text-decoration:none"><img src="地圖.webp" style="width:20px;height:20px;object-fit:contain"> 勇者地圖<span class="en-sub">HERO MAP</span></a>
+        <button class="btn-secondary" onclick="handleLogout()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:6px"><img src="登出.png" style="width:38px;height:38px;object-fit:contain"> 登出<span class="en-sub">LOGOUT</span></button>
       </div>
     </div>
   </div>
@@ -613,7 +614,7 @@ function renderDash(){
       <span class="ps-icon">${s.icon}</span>
       <div class="ps-info">
         <div class="ps-name">${s.name}</div>
-        <div class="ps-status">${done?'✓ 完成':'○ 待解鎖'}</div>
+        <div class="ps-status">${done?'✓ 完成<span class="en-sub">COMPLETED</span>':'○ 待解鎖<span class="en-sub">LOCKED</span>'}</div>
       </div>
     </div>`;
   }).join('');
@@ -622,12 +623,12 @@ function renderDash(){
   const allEq=['sword','shield','grail','armor'];
   const eq2={sword:{icon:'<img src="劍元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖劍'},shield:{icon:'<img src="聖盾元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖盾'},grail:{icon:'<img src="聖杯元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖杯'},armor:{icon:'<img src="盔甲元素.png" style="width:48px;height:48px;object-fit:contain">',name:'盔甲'}};
   const eqCount=(user.equipmentOrder||[]).length;
-  document.getElementById('equipTitle').innerHTML=`<img src="裝備背包元素.png" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;"> 裝備背包（${eqCount}/4）`;
+  document.getElementById('equipTitle').innerHTML=`<img src="裝備背包元素.png" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;"> 裝備背包（${eqCount}/4）<span class="en-sub">EQUIPMENT BAG</span>`;
   document.getElementById('equipRack').innerHTML=allEq.map(e=>{
     const has=user.equipmentOrder.includes(e);
     return`<div class="equip-item ${has?'owned':''}">
       <span class="ei-icon">${eq2[e].icon}</span>
-      <span class="ei-name">${has?eq2[e].name:'？？？'}</span>
+      <span class="ei-name">${has?eq2[e].name+'<span class="en-sub">'+{sword:'HOLY SWORD',shield:'HOLY SHIELD',grail:'HOLY GRAIL',armor:'ARMOR'}[e]+'</span>':'？？？<span class="en-sub">UNKNOWN</span>'}</span>
     </div>`;
   }).join('');
 
@@ -635,12 +636,12 @@ function renderDash(){
   const bb=document.getElementById('bossBadge');
   if(user.bossDefeated){
     bb.className='boss-badge defeated';
-    bb.innerHTML='<span class="bb-icon"><img src="魔王已擊敗.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;"></span><span class="bb-text">魔王已被擊敗！<br><span style="font-size:11px;opacity:0.7">'+new Date(user.bossDefeatedAt).toLocaleDateString('zh-TW')+'</span></span>';
+    bb.innerHTML='<span class="bb-icon"><img src="魔王已擊敗.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;"></span><span class="bb-text">魔王已被擊敗！<span class="en-sub">BOSS DEFEATED</span><br><span style="font-size:11px;opacity:0.7">'+new Date(user.bossDefeatedAt).toLocaleDateString('zh-TW')+'</span></span>';
   } else {
     const allDone=['level1','level2','level3','level4'].every(k=>user.progress[k].completed);
     if(allDone){
       bb.className='boss-badge';
-      bb.innerHTML='<span class="bb-icon">⚔️</span><span class="bb-text">前往地圖挑戰最終 BOSS！<br><a href="warrior.html" style="color:var(--orange);font-size:12px">→ 查看勇者地圖</a></span>';
+      bb.innerHTML='<span class="bb-icon">⚔️</span><span class="bb-text">前往地圖挑戰最終 BOSS！<span class="en-sub">CHALLENGE THE FINAL BOSS</span><br><a href="warrior.html" style="color:var(--orange);font-size:12px">→ 查看勇者地圖</a></span>';
     }
   }
 
