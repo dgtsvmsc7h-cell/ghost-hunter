@@ -780,6 +780,10 @@ function showToast(msg,dur=2200){
     }
   }
   if(user) renderDash();
+  if(user && new URLSearchParams(window.location.search).get('scan')==='1'){
+    history.replaceState(null,'',window.location.pathname);
+    openScanner();
+  }
   ['inputSid','inputName'].forEach(id=>{
     document.getElementById(id).addEventListener('keydown',e=>{
       if(e.key==='Enter') handleLogin();
