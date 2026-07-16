@@ -610,7 +610,7 @@ async function handleLogin(){
   setTimeout(renderDash,400);
 }
 function handleLogout(){
-  if(!confirm('確定要登出嗎？\n（進度不會消失，下次輸入相同學號／工號可繼續）')) return;
+  if(!confirm('確定要登出嗎？\n（進度不會消失，下次輸入相同學號／工號可繼續）\n\nAre you sure you want to log out?\n(Your progress won\'t be lost. Enter the same Student/Staff ID next time to continue.)')) return;
   clearSession();
   document.getElementById('dashView').style.display='none';
   document.getElementById('loginView').style.display='';
