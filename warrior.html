@@ -41,6 +41,7 @@ body::before{
   font-family:'Bangers','Noto Sans TC',cursive;font-size:20px;letter-spacing:2px;
   color:var(--gold);flex:1;text-align:center;
 }
+.cjk-bold{font-weight:700}
 .map-header .user-tag{
   font-size:12px;color:var(--subtext);font-family:'Share Tech Mono',monospace;flex-shrink:0;
   text-align:right;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
@@ -258,9 +259,9 @@ body::before{
 <div class="reward-overlay" id="rewardOverlay">
   <div class="reward-box">
     <div class="rb-badge">// 寶箱開啟 //</div>
-    <div class="rb-title">獲得裝備！</div>
+    <div class="rb-title"><span class="cjk-bold">獲得裝備！</span></div>
     <img class="rb-chest-img" src="已開啟寶箱.png" alt="寶箱"/>
-    <div class="rb-name" id="rbName">聖劍</div>
+    <div class="rb-name" id="rbName"><span class="cjk-bold">聖劍</span></div>
     <div class="rb-desc" id="rbDesc">傳說武器</div>
     <button class="rb-btn" onclick="closeReward()">⚡ 收下裝備！</button>
   </div>
@@ -296,7 +297,7 @@ body::before{
     <div class="vb-title">VICTORY!</div>
     <div class="vb-msg">魔王已被擊敗！<br>校園平安了，勇者萬歲！</div>
     <div class="vb-msg">請前往領取獎品：</div>
-    <div class="vb-loc">📍 管院 8 樓<br>人文科學觀摩室</div>
+    <div class="vb-loc">📍 <span class="cjk-bold">管院 8 樓</span><br><span class="cjk-bold">人文科學觀摩室</span></div>
     <div class="vb-hint">// 憑此畫面或學號領取 //</div>
     <button class="vb-btn" onclick="closeVictory()">🎊 太棒了！</button>
   </div>
@@ -305,7 +306,7 @@ body::before{
 <div class="page">
   <div class="map-header">
     <a href="index.html" class="back-link">← 首頁</a>
-    <h1>校園冒險地圖</h1>
+    <h1><span class="cjk-bold">校園冒險地圖</span></h1>
     <div class="user-tag" id="userTag">--</div>
   </div>
 
@@ -1016,7 +1017,7 @@ async function animateBossFight(user,currentPos,currentState){
 function showRewardPopup(eqKey){
   return new Promise(resolve=>{
     const info=EQ_INFO[eqKey]||{icon:'?',name:'?',desc:'?'};
-    document.getElementById('rbName').textContent=info.name;
+    document.getElementById('rbName').innerHTML='<span class="cjk-bold">'+info.name+'</span>';
     document.getElementById('rbDesc').textContent=info.desc;
     document.getElementById('rewardOverlay').classList.add('open');
     launchConfetti();

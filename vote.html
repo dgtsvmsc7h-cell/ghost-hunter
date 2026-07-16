@@ -60,6 +60,7 @@ body{background:#000;}
   font-family:'Bangers','Noto Sans TC',cursive;font-size:24px;letter-spacing:2px;
   color:var(--gold);margin-bottom:14px;text-align:center;
 }
+.cjk-bold{font-weight:700}
 
 /* Vote options */
 .vote-options{display:flex;flex-direction:column;gap:10px}
@@ -154,7 +155,7 @@ body{background:#000;}
 
 <div class="page" id="mainPage">
   <div class="vote-header">
-    <h1>打卡牆<br>投票站</h1>
+    <h1><span class="cjk-bold">打卡牆</span><br><span class="cjk-bold">投票站</span></h1>
     <div class="sub">Ghost Mode ON 🎃</div>
     <p class="desc">歡迎來到活動打卡牆！投票選出你最愛的展區，獲得最後一件裝備！</p>
   </div>
@@ -310,7 +311,7 @@ function renderLockedForm(user,incomplete){
       </div>
       <div style="text-align:center;font-size:48px;margin-bottom:10px">🔒</div>
       <div style="font-family:'Bangers','Noto Sans TC',cursive;font-size:26px;letter-spacing:2px;
-        color:var(--orange2);text-align:center;margin-bottom:6px">第四關尚未解鎖</div>
+        color:var(--orange2);text-align:center;margin-bottom:6px"><span class="cjk-bold">第四關尚未解鎖</span></div>
       <div style="font-size:14px;color:var(--text);text-align:center;line-height:1.7;margin-bottom:18px">
         請先至其他關卡取得裝備，<br>再來挑戰第四關!!
       </div>
@@ -319,14 +320,14 @@ function renderLockedForm(user,incomplete){
     </div>
     <a href="index.html" style="display:block;text-align:center;margin-top:14px;
       font-family:'Bangers','Noto Sans TC',cursive;font-size:20px;letter-spacing:2px;
-      color:var(--orange2);text-decoration:none">← 回首頁繼續闖關</a>`;
+      color:var(--orange2);text-decoration:none">← <span class="cjk-bold">回首頁繼續闖關</span></a>`;
 }
 
 function renderLoginForm(){
   document.getElementById('pageContent').innerHTML=`
     <div class="login-box">
       <div style="text-align:center;font-size:50px;margin-bottom:14px">🔐</div>
-      <div style="text-align:center;font-family:'Bangers','Noto Sans TC',cursive;font-size:26px;color:var(--gold);letter-spacing:2px;margin-bottom:8px">請先登入</div>
+      <div style="text-align:center;font-family:'Bangers','Noto Sans TC',cursive;font-size:26px;color:var(--gold);letter-spacing:2px;margin-bottom:8px"><span class="cjk-bold">請先登入</span></div>
       <div style="text-align:center;font-size:13px;color:var(--subtext);margin-bottom:18px;line-height:1.6">輸入學號與姓名開始投票</div>
       <input type="text" id="pSid" placeholder="學號" autocomplete="off" autocapitalize="off">
       <input type="text" id="pName" placeholder="姓名">
@@ -385,7 +386,7 @@ function renderVoteForm(user){
   document.getElementById('pageContent').innerHTML=`
     <div class="section-card">
       <div style="font-size:11px;letter-spacing:3px;color:var(--subtext);margin-bottom:6px;text-align:center">勇者 ${user.name}（${user.sid}）</div>
-      <div class="section-title">🗳️ 你最喜歡哪個展區？</div>
+      <div class="section-title">🗳️ <span class="cjk-bold">你最喜歡哪個展區？</span></div>
       <div class="vote-options" id="voteOpts">
         ${VOTE_OPTIONS.map((o,i)=>`
           <button class="vote-opt" onclick="selectVote('${o.key}',this)" data-key="${o.key}">
@@ -448,7 +449,7 @@ function showVictory(user,eq,redirectUrl){
   document.getElementById('pageContent').innerHTML=`
     <div class="victory-screen show">
       <span class="victory-anim">🎊</span>
-      <div class="victory-title">投票成功！</div>
+      <div class="victory-title"><span class="cjk-bold">投票成功！</span></div>
       <div class="victory-msg">感謝你的投票！你獲得了第四件裝備：</div>
       <div class="victory-eq">
         <span class="ve-icon">${info.icon}</span>
@@ -466,7 +467,7 @@ function renderAlreadyVoted(user){
   document.getElementById('pageContent').innerHTML=`
     <div class="voted-card">
       <div style="font-size:60px;text-align:center;display:block;margin-bottom:14px">✅</div>
-      <div style="font-family:'Bangers','Noto Sans TC',cursive;font-size:28px;color:var(--green);text-align:center;letter-spacing:1px;margin-bottom:8px">已完成投票</div>
+      <div style="font-family:'Bangers','Noto Sans TC',cursive;font-size:28px;color:var(--green);text-align:center;letter-spacing:1px;margin-bottom:8px"><span class="cjk-bold">已完成投票</span></div>
       <p style="font-size:14px;color:var(--subtext);text-align:center;line-height:1.6;margin-bottom:18px">
         你投給了：${voted.icon} ${voted.name}<br>
         <span style="font-size:12px;opacity:0.7">進度已儲存，可隨時回首頁查看通關紀錄。</span>
