@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Ghost Hunter — 關卡測驗</title>
-<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Nunito:wght@400;600;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#080010;--card:rgba(18,4,35,0.92);--border:rgba(255,120,0,0.35);
@@ -15,7 +15,7 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{
   min-height:100vh;background:#000;color:var(--text);
-  font-family:'Nunito',sans-serif;overflow-x:hidden;
+  font-family:'Nunito','Noto Sans TC',sans-serif;overflow-x:hidden;
 }
 .bg-img{
   position:fixed;inset:0;z-index:0;
@@ -73,7 +73,7 @@ html,body{
   display:flex;align-items:center;gap:12px;
   background:rgba(255,255,255,0.05);border:2px solid rgba(255,255,255,0.1);
   border-radius:11px;padding:14px 14px;cursor:pointer;transition:all 0.2s;
-  text-align:left;width:100%;font-family:'Nunito',sans-serif;
+  text-align:left;width:100%;font-family:'Nunito','Noto Sans TC',sans-serif;
 }
 .option-btn:active:not(:disabled){transform:scale(0.98)}
 .option-btn .opt-letter{
@@ -346,8 +346,8 @@ function renderLoginPrompt(qd){
       <h3 style="font-family:'Bangers',cursive;font-size:26px;color:var(--orange2);margin-bottom:8px">請先登入</h3>
       <p style="font-size:14px;color:var(--subtext);margin-bottom:20px;line-height:1.6">輸入學號與姓名後即可開始挑戰<br>（若已建立帳號，自動接續進度）</p>
       <div style="margin-bottom:12px">
-        <input type="text" id="pSid" placeholder="學號" style="width:100%;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);border-radius:10px;padding:13px 14px;font-size:17px;color:var(--cream);font-family:'Nunito',sans-serif;outline:none;box-sizing:border-box;margin-bottom:10px;-webkit-appearance:none">
-        <input type="text" id="pName" placeholder="姓名" style="width:100%;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);border-radius:10px;padding:13px 14px;font-size:17px;color:var(--cream);font-family:'Nunito',sans-serif;outline:none;box-sizing:border-box;-webkit-appearance:none">
+        <input type="text" id="pSid" placeholder="學號" style="width:100%;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);border-radius:10px;padding:13px 14px;font-size:17px;color:var(--cream);font-family:'Nunito','Noto Sans TC',sans-serif;outline:none;box-sizing:border-box;margin-bottom:10px;-webkit-appearance:none">
+        <input type="text" id="pName" placeholder="姓名" style="width:100%;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);border-radius:10px;padding:13px 14px;font-size:17px;color:var(--cream);font-family:'Nunito','Noto Sans TC',sans-serif;outline:none;box-sizing:border-box;-webkit-appearance:none">
       </div>
       <button onclick="quickLogin()" style="width:100%;background:linear-gradient(135deg,var(--orange),#ff3a00);border:none;border-radius:12px;padding:16px;font-family:'Bangers',cursive;font-size:21px;letter-spacing:2px;color:white;cursor:pointer">🎮 開始挑戰</button>
     </div>`;

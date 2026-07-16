@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Ghost Hunter — 勇者地圖</title>
-<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Share+Tech+Mono&family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Share+Tech+Mono&family=Nunito:wght@400;700;900&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#030106;--card:rgba(10,2,20,0.9);--border:rgba(0,210,255,0.3);
@@ -14,7 +14,7 @@
   --cyan:#00d2ff;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;overflow-x:hidden}
+html,body{min-height:100vh;background:var(--bg);color:var(--text);font-family:'Nunito','Noto Sans TC',sans-serif;overflow-x:hidden}
 body::before{
   content:'';position:fixed;inset:0;z-index:-1;
   background-color:#030106;
@@ -99,7 +99,7 @@ body::before{
 .actions{display:flex;gap:10px}
 .action-btn{
   flex:1;border:1.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.05);
-  border-radius:10px;padding:14px;font-family:'Nunito',sans-serif;font-size:14px;
+  border-radius:10px;padding:14px;font-family:'Nunito','Noto Sans TC',sans-serif;font-size:14px;
   font-weight:700;color:var(--text);cursor:pointer;text-align:center;
   text-decoration:none;display:block;transition:all 0.2s;
 }
@@ -248,7 +248,7 @@ body::before{
 .info-close{
   width:100%;background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.15);
   border-radius:10px;padding:14px;font-size:15px;font-weight:700;
-  color:var(--text);cursor:pointer;font-family:'Nunito',sans-serif;
+  color:var(--text);cursor:pointer;font-family:'Nunito','Noto Sans TC',sans-serif;
 }
 </style>
 </head>
@@ -374,6 +374,19 @@ function getCurrentUser(){
   return getDB().users[sid]||null;
 }
 function saveUser(user){const db=getDB();db.users[user.sid]=user;saveDB(db);syncUserToCloud(user);}
+function sanitizeUser(user){
+  if(!user) return user;
+  const allDone=['level1','level2','level3','level4'].every(k=>user.progress?.[k]?.completed===true);
+  const hasAllEquip=(user.equipmentOrder||[]).length===4;
+  if(user.bossDefeated&&!(allDone&&hasAllEquip)){
+    console.warn('[GH] bossDefeated 不一致，自動重設。sid='+user.sid,
+      {equipmentOrder:user.equipmentOrder,bossDefeatedAt:user.bossDefeatedAt});
+    user.bossDefeated=false;
+    user.bossDefeatedAt=null;
+    saveUser(user);
+  }
+  return user;
+}
 
 // ─── Stage info ───
 const STAGE_INFO=[
@@ -1076,6 +1089,7 @@ function launchConfetti(){
   }
 
   const user=getCurrentUser();
+  sanitizeUser(user);
   if(!user){
     setStory('請先在首頁登入！');
     document.getElementById('campusSvg').innerHTML=buildSvg(
