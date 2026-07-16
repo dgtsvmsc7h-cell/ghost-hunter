@@ -88,6 +88,7 @@ body::after{
   font-family:'Bangers','Noto Sans TC',cursive;font-size:22px;letter-spacing:2px;
   color:var(--orange2);margin-bottom:12px;display:flex;align-items:center;gap:8px;
 }
+.cjk-bold{font-weight:700}
 
 /* ─── STAGE INFO CARDS ─── */
 .stages-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:4px}
@@ -367,7 +368,7 @@ body::after{
 
     <!-- Stage Info -->
     <div class="section-card">
-      <div class="section-title"><img src="地圖.webp" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-right:4px"> 四大關卡</div>
+      <div class="section-title"><img src="地圖.webp" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-right:4px"> <span class="cjk-bold">四大關卡</span></div>
       <div class="stages-grid">
         <button class="stage-card" onclick="showStageInfo(1)">
           <span class="s-icon"><img src="關卡一元素.png" style="width:48px;height:48px;object-fit:contain"></span>
@@ -398,7 +399,7 @@ body::after{
 
     <!-- LINE official account -->
     <div class="section-card" style="border-color:rgba(6,199,85,0.45);text-align:center">
-      <div class="section-title" style="justify-content:center">💚 加入官方 LINE</div>
+      <div class="section-title" style="justify-content:center">💚 <span class="cjk-bold">加入官方</span> LINE</div>
       <p style="font-size:13px;color:var(--subtext);margin:6px 0 14px;line-height:1.6">
         請先加入藝文中心官方 LINE，完成活動後即可兌換獎品<span class="en-sub">JOIN LINE TO REDEEM YOUR PRIZE</span>
       </p>
@@ -467,7 +468,7 @@ body::after{
 
     <!-- Progress -->
     <div class="section-card">
-      <div class="section-title"><img src="地圖.webp" style="width:22px;height:22px;object-fit:contain;vertical-align:middle"> 闖關進度<span class="en-sub">STAGE PROGRESS</span></div>
+      <div class="section-title"><img src="地圖.webp" style="width:22px;height:22px;object-fit:contain;vertical-align:middle"> <span class="cjk-bold">闖關進度</span><span class="en-sub">STAGE PROGRESS</span></div>
       <div class="progress-stages" id="progressStages">
         <!-- Rendered by JS -->
       </div>
@@ -475,7 +476,7 @@ body::after{
 
     <!-- Equipment -->
     <div class="section-card">
-      <div class="section-title" id="equipTitle"><img src="裝備背包元素.png" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;"> 裝備背包<span class="en-sub">EQUIPMENT BAG</span></div>
+      <div class="section-title" id="equipTitle"><img src="裝備背包元素.png" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;"> <span class="cjk-bold">裝備背包</span><span class="en-sub">EQUIPMENT BAG</span></div>
       <div class="equip-rack" id="equipRack">
         <!-- Rendered by JS -->
       </div>
@@ -483,7 +484,7 @@ body::after{
 
     <!-- Boss -->
     <div class="section-card" id="bossCard">
-      <div class="section-title"><img src="魔王.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;"> BOSS 狀態<span class="en-sub">BOSS STATUS</span></div>
+      <div class="section-title"><img src="魔王.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;"> BOSS <span class="cjk-bold">狀態</span><span class="en-sub">BOSS STATUS</span></div>
       <div class="boss-badge" id="bossBadge">
         <span class="bb-icon"><img src="魔王.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle"></span>
         <span class="bb-text">魔王仍在潛伏…<span class="en-sub">THE BOSS IS LURKING</span><br><span style="font-size:11px;opacity:0.6">完成四關後解鎖 BOSS 戰<span class="en-sub">UNLOCK AFTER ALL 4 STAGES</span></span></span>
@@ -669,7 +670,7 @@ function renderDash(){
   const allEq=['sword','shield','grail','armor'];
   const eq2={sword:{icon:'<img src="劍元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖劍'},shield:{icon:'<img src="聖盾元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖盾'},grail:{icon:'<img src="聖杯元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖杯'},armor:{icon:'<img src="盔甲元素.png" style="width:48px;height:48px;object-fit:contain">',name:'盔甲'}};
   const eqCount=(user.equipmentOrder||[]).length;
-  document.getElementById('equipTitle').innerHTML=`<img src="裝備背包元素.png" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;"> 裝備背包（${eqCount}/4）<span class="en-sub">EQUIPMENT BAG</span>`;
+  document.getElementById('equipTitle').innerHTML=`<img src="裝備背包元素.png" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;"> <span class="cjk-bold">裝備背包（${eqCount}/4）</span><span class="en-sub">EQUIPMENT BAG</span>`;
   document.getElementById('equipRack').innerHTML=allEq.map(e=>{
     const has=user.equipmentOrder.includes(e);
     return`<div class="equip-item ${has?'owned':''}">
