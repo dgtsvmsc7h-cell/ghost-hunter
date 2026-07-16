@@ -42,12 +42,12 @@ body{background:#000;}
 /* Header */
 .vote-header{text-align:center;padding:24px 8px 20px}
 .vote-header h1{
-  font-family:'Bangers',cursive;font-size:clamp(36px,10vw,52px);
+  font-family:'Bangers','Noto Sans TC',cursive;font-size:clamp(36px,10vw,52px);
   line-height:1;letter-spacing:2px;margin-bottom:6px;
   color:#ffffff;
   text-shadow:0 0 30px rgba(255,255,255,0.4),4px 4px 0 rgba(0,0,0,0.5);
 }
-.vote-header .sub{font-family:'Creepster',cursive;font-size:24px;color:#ffffff;letter-spacing:2px;margin-bottom:10px}
+.vote-header .sub{font-family:'Creepster','Noto Sans TC',cursive;font-size:24px;color:#ffffff;letter-spacing:2px;margin-bottom:10px}
 .vote-header .desc{font-size:14px;color:var(--subtext);line-height:1.6;max-width:320px;margin:0 auto}
 
 /* Card */
@@ -57,7 +57,7 @@ body{background:#000;}
   backdrop-filter:blur(8px);
 }
 .section-title{
-  font-family:'Bangers',cursive;font-size:24px;letter-spacing:2px;
+  font-family:'Bangers','Noto Sans TC',cursive;font-size:24px;letter-spacing:2px;
   color:var(--gold);margin-bottom:14px;text-align:center;
 }
 
@@ -84,7 +84,7 @@ body{background:#000;}
 .submit-btn{
   width:100%;background:linear-gradient(135deg,var(--gold),#ff8c00);
   border:none;border-radius:12px;padding:17px;
-  font-family:'Bangers',cursive;font-size:24px;letter-spacing:2px;
+  font-family:'Bangers','Noto Sans TC',cursive;font-size:24px;letter-spacing:2px;
   color:#1a0000;cursor:pointer;transition:all 0.2s;
   box-shadow:0 4px 24px rgba(255,215,0,0.35);
   display:block;text-align:center;text-decoration:none;
@@ -119,7 +119,7 @@ body{background:#000;}
 .victory-screen.show{display:block}
 .victory-anim{font-size:80px;display:block;margin-bottom:14px;animation:victoryBounce 1.5s ease-in-out infinite}
 @keyframes victoryBounce{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-10px) rotate(3deg)}}
-.victory-title{font-family:'Bangers',cursive;font-size:38px;letter-spacing:2px;color:var(--gold);margin-bottom:8px;text-shadow:0 0 20px rgba(255,215,0,0.5)}
+.victory-title{font-family:'Bangers','Noto Sans TC',cursive;font-size:38px;letter-spacing:2px;color:var(--gold);margin-bottom:8px;text-shadow:0 0 20px rgba(255,215,0,0.5)}
 .victory-eq{
   display:inline-flex;flex-direction:column;align-items:center;gap:6px;
   background:rgba(255,215,0,0.1);border:2px solid var(--gold);
@@ -127,13 +127,13 @@ body{background:#000;}
   box-shadow:0 0 30px rgba(255,215,0,0.3);
 }
 .victory-eq .ve-icon{font-size:54px}
-.victory-eq .ve-name{font-family:'Bangers',cursive;font-size:24px;color:var(--gold);letter-spacing:2px}
+.victory-eq .ve-name{font-family:'Bangers','Noto Sans TC',cursive;font-size:24px;color:var(--gold);letter-spacing:2px}
 .victory-msg{font-size:15px;color:var(--text);line-height:1.6;margin-bottom:18px}
 
 .action-btn{
   width:100%;background:linear-gradient(135deg,var(--orange),#ff3a00);
   border:none;border-radius:12px;padding:17px;
-  font-family:'Bangers',cursive;font-size:22px;letter-spacing:2px;
+  font-family:'Bangers','Noto Sans TC',cursive;font-size:22px;letter-spacing:2px;
   color:white;cursor:pointer;margin-bottom:10px;display:block;text-align:center;text-decoration:none;
   box-shadow:0 4px 20px rgba(255,80,0,0.3);
 }
@@ -309,7 +309,7 @@ function renderLockedForm(user,incomplete){
         勇者 ${user.name}（${user.sid}）
       </div>
       <div style="text-align:center;font-size:48px;margin-bottom:10px">🔒</div>
-      <div style="font-family:'Bangers',cursive;font-size:26px;letter-spacing:2px;
+      <div style="font-family:'Bangers','Noto Sans TC',cursive;font-size:26px;letter-spacing:2px;
         color:var(--orange2);text-align:center;margin-bottom:6px">第四關尚未解鎖</div>
       <div style="font-size:14px;color:var(--text);text-align:center;line-height:1.7;margin-bottom:18px">
         請先至其他關卡取得裝備，<br>再來挑戰第四關!!
@@ -318,7 +318,7 @@ function renderLockedForm(user,incomplete){
       ${completedSection}
     </div>
     <a href="index.html" style="display:block;text-align:center;margin-top:14px;
-      font-family:'Bangers',cursive;font-size:20px;letter-spacing:2px;
+      font-family:'Bangers','Noto Sans TC',cursive;font-size:20px;letter-spacing:2px;
       color:var(--orange2);text-decoration:none">← 回首頁繼續闖關</a>`;
 }
 
@@ -326,7 +326,7 @@ function renderLoginForm(){
   document.getElementById('pageContent').innerHTML=`
     <div class="login-box">
       <div style="text-align:center;font-size:50px;margin-bottom:14px">🔐</div>
-      <div style="text-align:center;font-family:'Bangers',cursive;font-size:26px;color:var(--gold);letter-spacing:2px;margin-bottom:8px">請先登入</div>
+      <div style="text-align:center;font-family:'Bangers','Noto Sans TC',cursive;font-size:26px;color:var(--gold);letter-spacing:2px;margin-bottom:8px">請先登入</div>
       <div style="text-align:center;font-size:13px;color:var(--subtext);margin-bottom:18px;line-height:1.6">輸入學號與姓名開始投票</div>
       <input type="text" id="pSid" placeholder="學號" autocomplete="off" autocapitalize="off">
       <input type="text" id="pName" placeholder="姓名">
@@ -466,7 +466,7 @@ function renderAlreadyVoted(user){
   document.getElementById('pageContent').innerHTML=`
     <div class="voted-card">
       <div style="font-size:60px;text-align:center;display:block;margin-bottom:14px">✅</div>
-      <div style="font-family:'Bangers',cursive;font-size:28px;color:var(--green);text-align:center;letter-spacing:1px;margin-bottom:8px">已完成投票</div>
+      <div style="font-family:'Bangers','Noto Sans TC',cursive;font-size:28px;color:var(--green);text-align:center;letter-spacing:1px;margin-bottom:8px">已完成投票</div>
       <p style="font-size:14px;color:var(--subtext);text-align:center;line-height:1.6;margin-bottom:18px">
         你投給了：${voted.icon} ${voted.name}<br>
         <span style="font-size:12px;opacity:0.7">進度已儲存，可隨時回首頁查看通關紀錄。</span>

@@ -34,7 +34,7 @@ html,body{
   box-shadow:0 0 40px rgba(0,210,255,0.15);
 }
 .login-box h1{
-  font-family:'Bangers',cursive;font-size:36px;letter-spacing:3px;color:var(--cyan);
+  font-family:'Bangers','Noto Sans TC',cursive;font-size:36px;letter-spacing:3px;color:var(--cyan);
   margin-bottom:6px;text-shadow:0 0 20px rgba(0,210,255,0.5);
 }
 .login-box .sub{font-family:'Share Tech Mono',monospace;font-size:13px;color:var(--subtext);
@@ -50,7 +50,7 @@ html,body{
 .login-btn{
   width:100%;background:linear-gradient(135deg,var(--cyan),#0080cc);
   border:none;border-radius:10px;padding:16px;
-  font-family:'Bangers',cursive;font-size:22px;letter-spacing:3px;
+  font-family:'Bangers','Noto Sans TC',cursive;font-size:22px;letter-spacing:3px;
   color:#001020;cursor:pointer;transition:all 0.2s;
   box-shadow:0 4px 20px rgba(0,210,255,0.3);
 }
@@ -65,7 +65,7 @@ html,body{
   border-bottom:1px solid var(--border);
 }
 .top-bar .logo{
-  font-family:'Bangers',cursive;font-size:22px;letter-spacing:3px;color:var(--cyan);
+  font-family:'Bangers','Noto Sans TC',cursive;font-size:22px;letter-spacing:3px;color:var(--cyan);
 }
 .top-bar .meta{
   font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--subtext);
@@ -86,7 +86,7 @@ html,body{
   box-shadow:0 4px 16px rgba(0,0,0,0.4);
 }
 .stat-card .sc-val{
-  font-family:'Bangers',cursive;font-size:44px;line-height:1;
+  font-family:'Bangers','Noto Sans TC',cursive;font-size:44px;line-height:1;
   color:var(--cyan);text-shadow:0 0 16px rgba(0,210,255,0.5);
 }
 .stat-card .sc-label{font-size:12px;color:var(--subtext);margin-top:6px;letter-spacing:1px}
@@ -97,7 +97,7 @@ html,body{
   padding:20px;margin-bottom:20px;
 }
 .vote-chart h3{
-  font-family:'Bangers',cursive;font-size:20px;letter-spacing:2px;color:var(--gold);
+  font-family:'Bangers','Noto Sans TC',cursive;font-size:20px;letter-spacing:2px;color:var(--gold);
   margin-bottom:16px;
 }
 .vote-bars{display:flex;flex-direction:column;gap:12px}
@@ -126,7 +126,7 @@ html,body{
   display:flex;align-items:center;justify-content:space-between;
   padding:14px 18px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:10px;
 }
-.table-actions .ta-title{font-family:'Bangers',cursive;font-size:18px;letter-spacing:2px;color:var(--cyan)}
+.table-actions .ta-title{font-family:'Bangers','Noto Sans TC',cursive;font-size:18px;letter-spacing:2px;color:var(--cyan)}
 .table-actions .ta-right{display:flex;gap:8px;align-items:center}
 .search-input{
   background:rgba(0,210,255,0.06);border:1px solid rgba(0,210,255,0.2);
@@ -187,7 +187,7 @@ tbody td{padding:10px 14px;font-size:13px;color:var(--text);white-space:nowrap}
   padding:7px 14px;font-size:13px;font-weight:700;color:var(--text);
   cursor:pointer;margin-bottom:20px;font-family:'Nunito','Noto Sans TC',sans-serif;
 }
-.drawer-title{font-family:'Bangers',cursive;font-size:24px;letter-spacing:2px;color:var(--cyan);margin-bottom:14px}
+.drawer-title{font-family:'Bangers','Noto Sans TC',cursive;font-size:24px;letter-spacing:2px;color:var(--cyan);margin-bottom:14px}
 .detail-row{display:flex;justify-content:space-between;align-items:flex-start;
   padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);
 }
@@ -449,7 +449,7 @@ function renderTable(){
       <td>${badge(p.level2?.completed)}</td>
       <td>${badge(p.level3?.completed)}</td>
       <td>${badge(p.level4?.completed)}</td>
-      <td style="text-align:center;font-family:'Bangers',cursive;font-size:18px;color:var(--gold)">${(u.equipmentOrder||[]).length}/4</td>
+      <td style="text-align:center;font-family:'Bangers','Noto Sans TC',cursive;font-size:18px;color:var(--gold)">${(u.equipmentOrder||[]).length}/4</td>
       <td>${allDone?`<span class="badge done">✅ 全通</span>`:`<span class="badge red">${[1,2,3,4].filter(lv=>!p?.['level'+lv]?.completed).length} 關未過</span>`}</td>
       <td style="color:var(--subtext);font-size:12px">${createdAt}</td>
     </tr>`;

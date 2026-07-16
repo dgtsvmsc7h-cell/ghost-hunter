@@ -41,7 +41,7 @@ html,body{
   font-size:10px;letter-spacing:3px;color:var(--subtext);text-transform:uppercase;
 }
 .stage-info .s-name{
-  font-family:'Bangers',cursive;font-size:20px;letter-spacing:1px;color:var(--orange2);line-height:1.1;
+  font-family:'Bangers','Noto Sans TC',cursive;font-size:20px;letter-spacing:1px;color:var(--orange2);line-height:1.1;
 }
 .stage-icon{font-size:32px}
 
@@ -79,7 +79,7 @@ html,body{
 .option-btn .opt-letter{
   width:30px;height:30px;flex-shrink:0;border-radius:50%;
   background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;
-  font-family:'Bangers',cursive;font-size:17px;color:var(--orange2);
+  font-family:'Bangers','Noto Sans TC',cursive;font-size:17px;color:var(--orange2);
 }
 .option-btn .opt-text{font-size:15px;color:var(--text);line-height:1.4;flex:1}
 .option-btn.selected{border-color:var(--orange);background:rgba(255,122,0,0.12)}
@@ -101,7 +101,7 @@ html,body{
 .next-btn{
   width:100%;background:linear-gradient(135deg,var(--orange),#ff3a00);
   border:none;border-radius:12px;padding:17px;
-  font-family:'Bangers',cursive;font-size:22px;letter-spacing:2px;
+  font-family:'Bangers','Noto Sans TC',cursive;font-size:22px;letter-spacing:2px;
   color:white;cursor:pointer;margin-top:14px;
   display:none;box-shadow:0 4px 20px rgba(255,80,0,0.3);
 }
@@ -115,7 +115,7 @@ html,body{
 .result-screen.show{display:block}
 .result-icon{font-size:80px;margin-bottom:16px;display:block}
 .result-title{
-  font-family:'Bangers',cursive;font-size:36px;letter-spacing:2px;margin-bottom:8px;
+  font-family:'Bangers','Noto Sans TC',cursive;font-size:36px;letter-spacing:2px;margin-bottom:8px;
 }
 .result-title.pass{color:var(--green)}
 .result-title.fail{color:var(--red)}
@@ -127,7 +127,7 @@ html,body{
 }
 .result-btn{
   width:100%;border:none;border-radius:12px;padding:17px;
-  font-family:'Bangers',cursive;font-size:22px;letter-spacing:2px;
+  font-family:'Bangers','Noto Sans TC',cursive;font-size:22px;letter-spacing:2px;
   color:white;cursor:pointer;margin-bottom:10px;
 }
 .result-btn.main{background:linear-gradient(135deg,var(--orange),#ff3a00);box-shadow:0 4px 20px rgba(255,80,0,0.3)}
@@ -140,7 +140,7 @@ html,body{
   padding:28px 20px;text-align:center;
 }
 .already-card .ac-icon{font-size:64px;display:block;margin-bottom:14px}
-.already-card h3{font-family:'Bangers',cursive;font-size:30px;color:var(--green);margin-bottom:8px;letter-spacing:1px}
+.already-card h3{font-family:'Bangers','Noto Sans TC',cursive;font-size:30px;color:var(--green);margin-bottom:8px;letter-spacing:1px}
 .already-card p{font-size:15px;color:var(--subtext);margin-bottom:20px;line-height:1.5}
 </style>
 </head>
@@ -329,7 +329,7 @@ function init(){
 function render404(){
   document.getElementById('quizContent').innerHTML=`<div style="text-align:center;padding:60px 20px">
     <div style="font-size:60px;margin-bottom:16px">💀</div>
-    <h3 style="font-family:'Bangers',cursive;font-size:28px;color:#ff2255;margin-bottom:12px">關卡不存在</h3>
+    <h3 style="font-family:'Bangers','Noto Sans TC',cursive;font-size:28px;color:#ff2255;margin-bottom:12px">關卡不存在</h3>
     <a href="index.html" style="color:#ff9c2b;font-size:15px">← 返回首頁</a>
   </div>`;
 }
@@ -343,13 +343,13 @@ function renderLoginPrompt(qd){
     </div>
     <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px 20px;text-align:center">
       <div style="font-size:54px;margin-bottom:14px">🔐</div>
-      <h3 style="font-family:'Bangers',cursive;font-size:26px;color:var(--orange2);margin-bottom:8px">請先登入</h3>
+      <h3 style="font-family:'Bangers','Noto Sans TC',cursive;font-size:26px;color:var(--orange2);margin-bottom:8px">請先登入</h3>
       <p style="font-size:14px;color:var(--subtext);margin-bottom:20px;line-height:1.6">輸入學號與姓名後即可開始挑戰<br>（若已建立帳號，自動接續進度）</p>
       <div style="margin-bottom:12px">
         <input type="text" id="pSid" placeholder="學號" style="width:100%;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);border-radius:10px;padding:13px 14px;font-size:17px;color:var(--cream);font-family:'Nunito','Noto Sans TC',sans-serif;outline:none;box-sizing:border-box;margin-bottom:10px;-webkit-appearance:none">
         <input type="text" id="pName" placeholder="姓名" style="width:100%;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);border-radius:10px;padding:13px 14px;font-size:17px;color:var(--cream);font-family:'Nunito','Noto Sans TC',sans-serif;outline:none;box-sizing:border-box;-webkit-appearance:none">
       </div>
-      <button onclick="quickLogin()" style="width:100%;background:linear-gradient(135deg,var(--orange),#ff3a00);border:none;border-radius:12px;padding:16px;font-family:'Bangers',cursive;font-size:21px;letter-spacing:2px;color:white;cursor:pointer">🎮 開始挑戰</button>
+      <button onclick="quickLogin()" style="width:100%;background:linear-gradient(135deg,var(--orange),#ff3a00);border:none;border-radius:12px;padding:16px;font-family:'Bangers','Noto Sans TC',cursive;font-size:21px;letter-spacing:2px;color:white;cursor:pointer">🎮 開始挑戰</button>
     </div>`;
 }
 
