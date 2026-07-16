@@ -413,8 +413,8 @@ body::after{
     <div class="section-card login-section">
       <div class="section-title">⚔️ 建立勇者帳號<span class="en-sub">CREATE HERO ACCOUNT</span></div>
       <div class="form-group">
-        <label>學號<span class="en-sub">STUDENT ID</span></label>
-        <input type="text" id="inputSid" placeholder="輸入學號" autocomplete="off" autocapitalize="off" autocorrect="off">
+        <label>學號／工號<span class="en-sub">STUDENT ID</span></label>
+        <input type="text" id="inputSid" placeholder="輸入學號／工號" autocomplete="off" autocapitalize="off" autocorrect="off">
       </div>
       <div class="form-group">
         <label>姓名<span class="en-sub">NAME</span></label>
@@ -587,7 +587,7 @@ function createUser(sid,name){
 async function handleLogin(){
   const sid=document.getElementById('inputSid').value.trim();
   const name=document.getElementById('inputName').value.trim();
-  if(!sid){showToast('請輸入學號');return}
+  if(!sid){showToast('請輸入學號／工號');return}
   if(!name){showToast('請輸入姓名');return}
   showToast('⏳ 連線中…');
   const cloudUser = await loadUserFromCloud(sid);
@@ -610,7 +610,7 @@ async function handleLogin(){
   setTimeout(renderDash,400);
 }
 function handleLogout(){
-  if(!confirm('確定要登出嗎？\n（進度不會消失，下次輸入相同學號可繼續）')) return;
+  if(!confirm('確定要登出嗎？\n（進度不會消失，下次輸入相同學號／工號可繼續）')) return;
   clearSession();
   document.getElementById('dashView').style.display='none';
   document.getElementById('loginView').style.display='';
@@ -622,7 +622,7 @@ function renderDash(){
   document.getElementById('loginView').style.display='none';
   document.getElementById('dashView').style.display='';
   document.getElementById('dashName').textContent=user.name;
-  document.getElementById('dashSid').textContent='學號：'+user.sid;
+  document.getElementById('dashSid').textContent='學號／工號：'+user.sid;
   document.getElementById('dashAvatar').outerHTML=`<div class="player-avatar" id="dashAvatar" style="position:relative;width:64px;height:64px;flex-shrink:0;border-radius:50%;background:#6b4423;display:flex;align-items:center;justify-content:center;overflow:visible"><img src="頭像${user.avatar||1}.png" style="position:absolute;inset:8px;width:calc(100% - 16px);height:calc(100% - 16px);object-fit:cover;border-radius:50%;z-index:0"><img src="頭像框.png" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-46%);width:220%;height:220%;object-fit:contain;z-index:2;pointer-events:none"></div>`;
   console.log('頭像框 img:', document.querySelector('.player-avatar img[src*="頭像框"]'));
 
