@@ -216,6 +216,19 @@ function getCurrentUser(){
   return getDB().users[sid]||null;
 }
 function saveUser(user){const db=getDB();db.users[user.sid]=user;saveDB(db);syncUserToCloud(user);}
+function sanitizeUser(user){
+  if(!user) return user;
+  const allDone=['level1','level2','level3','level4'].every(k=>user.progress?.[k]?.completed===true);
+  const hasAllEquip=(user.equipmentOrder||[]).length===4;
+  if(user.bossDefeated&&!(allDone&&hasAllEquip)){
+    console.warn('[GH] bossDefeated 不一致，自動重設。sid='+user.sid,
+      {equipmentOrder:user.equipmentOrder,bossDefeatedAt:user.bossDefeatedAt});
+    user.bossDefeated=false;
+    user.bossDefeatedAt=null;
+    saveUser(user);
+  }
+  return user;
+}
 
 // Create stars
 for(let i=0;i<30;i++){
@@ -249,6 +262,7 @@ const LEVEL_INFO={
 function init(){
   const user=getCurrentUser();
   if(!user){renderLoginForm(); return}
+  sanitizeUser(user);
   if(user.progress?.level4?.completed){renderAlreadyVoted(user); return}
   const incomplete=[1,2,3].filter(lv=>!user.progress?.['level'+lv]?.completed);
   if(incomplete.length>0){renderLockedForm(user,incomplete); return}
@@ -323,29 +337,48 @@ async function quickLogin(){
   const sid=document.getElementById('pSid').value.trim();
   const name=document.getElementById('pName').value.trim();
   if(!sid||!name){alert('請填入學號與姓名');return}
-  const cloudUser = await loadUserFromCloud(sid);
-  const db=getDB();
-  if(!db.users[sid]){
-    const newUser=cloudUser||{
-      sid,name,avatar:Math.floor(Math.random()*5)+1,createdAt:new Date().toISOString(),
-      progress:{
-        level1:{completed:false,score:0,completedAt:null,equipment:null},
-        level2:{completed:false,score:0,completedAt:null,equipment:null},
-        level3:{completed:false,score:0,completedAt:null,equipment:null},
-        level4:{completed:false,vote:null,completedAt:null,equipment:null},
-      },
-      equipmentOrder:[],bossDefeated:false,bossDefeatedAt:null
-    };
-    saveUser(newUser);
-  } else if(cloudUser){
-    const local=db.users[sid];
-    const cloudEqLen=(cloudUser.equipmentOrder||[]).length;
-    const localEqLen=(local?.equipmentOrder||[]).length;
-    const cloudAhead=cloudEqLen>localEqLen||(cloudUser.bossDefeated&&!local?.bossDefeated);
-    if(cloudAhead){ db.users[sid]=cloudUser; saveDB(db); }
+  const btn=document.querySelector('[onclick="quickLogin()"]');
+  if(btn) btn.disabled=true;
+  try{
+    const cloudUser=await loadUserFromCloud(sid);
+    const db=getDB();
+    const localUser=db.users[sid]||null;
+    const accountExists=!!(cloudUser||localUser);
+    if(!accountExists){
+      // 全新帳號：直接建立
+      const newUser={
+        sid,name,avatar:Math.floor(Math.random()*5)+1,createdAt:new Date().toISOString(),
+        progress:{
+          level1:{completed:false,score:0,completedAt:null,equipment:null},
+          level2:{completed:false,score:0,completedAt:null,equipment:null},
+          level3:{completed:false,score:0,completedAt:null,equipment:null},
+          level4:{completed:false,vote:null,completedAt:null,equipment:null},
+        },
+        equipmentOrder:[],bossDefeated:false,bossDefeatedAt:null
+      };
+      saveUser(newUser);
+    } else {
+      // 已存在帳號：必須驗證姓名
+      const canonicalName=(cloudUser?.name||localUser?.name||'').trim();
+      if(name!==canonicalName){
+        alert('學號／工號或姓名有誤，請確認後再試一次');
+        return;
+      }
+      // 姓名驗證通過：同步進度
+      if(!localUser){
+        saveUser(cloudUser);
+      } else if(cloudUser){
+        const cloudEqLen=(cloudUser.equipmentOrder||[]).length;
+        const localEqLen=(localUser.equipmentOrder||[]).length;
+        const cloudAhead=cloudEqLen>localEqLen||(cloudUser.bossDefeated&&!localUser.bossDefeated);
+        if(cloudAhead){db.users[sid]=cloudUser;saveDB(db);}
+      }
+    }
+    localStorage.setItem(SESSION_KEY,sid);
+    init();
+  } finally {
+    if(btn) btn.disabled=false;
   }
-  localStorage.setItem(SESSION_KEY,sid);
-  init();
 }
 
 function renderVoteForm(user){

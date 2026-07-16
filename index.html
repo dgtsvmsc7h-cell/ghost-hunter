@@ -589,25 +589,45 @@ async function handleLogin(){
   const name=document.getElementById('inputName').value.trim();
   if(!sid){showToast('請輸入學號／工號');return}
   if(!name){showToast('請輸入姓名');return}
+  const btn=document.querySelector('#loginView .btn-primary');
+  if(btn) btn.disabled=true;
   showToast('⏳ 連線中…');
-  const cloudUser = await loadUserFromCloud(sid);
-  const db=getDB();
-  if(!db.users[sid]){
-    const newUser = cloudUser || createUser(sid,name);
-    saveUser(newUser);
-    showToast(cloudUser ? '☁️ 歡迎回來，'+cloudUser.name+'（雲端進度已同步）' : '🎃 帳號建立成功！');
-  } else {
-    if(cloudUser){
-      const local=db.users[sid];
-      const cloudEqLen=(cloudUser.equipmentOrder||[]).length;
-      const localEqLen=(local?.equipmentOrder||[]).length;
-      const cloudAhead=cloudEqLen>localEqLen||(cloudUser.bossDefeated&&!local?.bossDefeated);
-      if(cloudAhead){ const localAvatar=local?.avatar; db.users[sid]=cloudUser; if(!db.users[sid].avatar&&localAvatar) db.users[sid].avatar=localAvatar; saveDB(db); }
+  try{
+    const cloudUser=await loadUserFromCloud(sid);
+    const db=getDB();
+    const localUser=db.users[sid]||null;
+    const accountExists=!!(cloudUser||localUser);
+    if(!accountExists){
+      // 全新帳號：直接建立，不需驗證姓名
+      const newUser=createUser(sid,name);
+      saveUser(newUser);
+      showToast('🎃 帳號建立成功！');
+    } else {
+      // 已存在帳號：必須驗證姓名
+      const canonicalName=(cloudUser?.name||localUser?.name||'').trim();
+      if(name!==canonicalName){
+        showToast('學號／工號或姓名有誤，請確認後再試一次');
+        return;
+      }
+      // 姓名驗證通過：同步進度並登入
+      if(!localUser){
+        saveUser(cloudUser);
+        showToast('☁️ 歡迎回來，'+cloudUser.name+'（雲端進度已同步）');
+      } else {
+        if(cloudUser){
+          const cloudEqLen=(cloudUser.equipmentOrder||[]).length;
+          const localEqLen=(localUser.equipmentOrder||[]).length;
+          const cloudAhead=cloudEqLen>localEqLen||(cloudUser.bossDefeated&&!localUser.bossDefeated);
+          if(cloudAhead){const localAvatar=localUser.avatar;db.users[sid]=cloudUser;if(!db.users[sid].avatar&&localAvatar)db.users[sid].avatar=localAvatar;saveDB(db);}
+        }
+        showToast('👻 歡迎回來，'+(db.users[sid]?.name||name));
+      }
     }
-    showToast('👻 歡迎回來，'+db.users[sid].name);
+    setSession(sid);
+    setTimeout(renderDash,400);
+  } finally {
+    if(btn) btn.disabled=false;
   }
-  setSession(sid);
-  setTimeout(renderDash,400);
 }
 function handleLogout(){
   if(!confirm('確定要登出嗎？\n（進度不會消失，下次輸入相同學號／工號可繼續）\n\nAre you sure you want to log out?\n(Your progress won\'t be lost. Enter the same Student/Staff ID next time to continue.)')) return;
