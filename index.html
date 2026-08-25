@@ -118,13 +118,16 @@ body::after{
 }
 .modal-box .m-icon{font-size:54px;text-align:center;display:block;margin-bottom:12px}
 .modal-box h3{font-family:'Bangers','Noto Sans TC',cursive;font-size:28px;letter-spacing:1px;color:var(--orange2);margin-bottom:8px;text-align:center}
-.modal-lang-switch{display:flex;justify-content:center;gap:8px;margin-bottom:14px}
-.modal-lang-switch button{
+.lang-switch{
+  position:fixed;top:12px;right:12px;z-index:500;
+  display:flex;gap:8px;
+}
+.lang-switch button{
   font-family:'Nunito','Noto Sans TC',sans-serif;font-size:13px;font-weight:700;
   padding:5px 16px;border-radius:99px;border:1px solid var(--orange);
   background:transparent;color:var(--orange);cursor:pointer;transition:background 0.15s,color 0.15s;
 }
-.modal-lang-switch button.active{background:var(--orange);color:#110020;border-color:var(--orange2)}
+.lang-switch button.active{background:var(--orange);color:#110020;border-color:var(--orange2)}
 .modal-box .m-tag{text-align:center;margin-bottom:14px}
 .modal-box .m-tag span{
   display:inline-block;background:rgba(255,122,0,0.15);border:1px solid var(--orange);
@@ -307,7 +310,7 @@ body::after{
   position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(30px);
   background:#1a0035;border:1px solid var(--orange);border-radius:10px;
   padding:12px 20px;font-size:14px;font-weight:700;color:var(--cream);
-  z-index:400;white-space:nowrap;opacity:0;transition:all 0.3s;
+  z-index:400;white-space:normal;max-width:320px;text-align:center;opacity:0;transition:all 0.3s;
   box-shadow:0 8px 24px rgba(0,0,0,0.5);
 }
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -329,6 +332,12 @@ body::after{
 </head>
 <body>
 
+<!-- Global language switch -->
+<div class="lang-switch" id="pageLangSwitch">
+  <button type="button" id="langBtnZh" onclick="applyLang('zh')">中</button>
+  <button type="button" id="langBtnEn" onclick="applyLang('en')">EN</button>
+</div>
+
 <!-- Background image -->
 <div class="bg-img">
   <img src="遊戲介面/主頁介面.jpg" alt="">
@@ -345,10 +354,6 @@ body::after{
   <div class="modal-box" onclick="event.stopPropagation()">
     <span class="m-icon" id="modalIcon"><img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain"></span>
     <h3 id="modalTitle">Stage 1</h3>
-    <div class="modal-lang-switch">
-      <button type="button" id="langBtnZh" onclick="setModalLang('zh')">中</button>
-      <button type="button" id="langBtnEn" onclick="setModalLang('en')">EN</button>
-    </div>
     <div class="m-tag"><span id="modalLoc">第一醫學大樓</span></div>
     <p id="modalDesc">關卡說明</p>
     <button class="modal-close" onclick="closeModal()">關閉</button>
@@ -358,12 +363,12 @@ body::after{
 <!-- QR Scanner overlay -->
 <div class="scanner-overlay" id="scannerOverlay">
   <div class="scanner-header">
-    <h3>📷 QR 掃描器</h3>
+    <h3>📷 QR 掃描器<span class="en-sub">QR Scanner</span></h3>
     <button class="scanner-close-btn" onclick="closeScanner()">✕</button>
   </div>
-  <div class="scanner-sub">對準展板 QR Code 後自動辨識</div>
+  <div class="scanner-sub">對準展板 QR Code 後自動辨識<span class="en-sub">Point at the QR code — it scans automatically</span></div>
   <div id="qr-reader"></div>
-  <div class="scanner-status" id="scannerStatus">啟動後鏡頭中…</div>
+  <div class="scanner-status" id="scannerStatus">啟動後鏡頭中…<span class="en-sub">Starting camera…</span></div>
 </div>
 
 <div class="page">
@@ -601,11 +606,11 @@ function createUser(sid,name){
 async function handleLogin(){
   const sid=document.getElementById('inputSid').value.trim();
   const name=document.getElementById('inputName').value.trim();
-  if(!sid){showToast('請輸入學號／工號');return}
-  if(!name){showToast('請輸入姓名');return}
+  if(!sid){showToast('請輸入學號／工號<span class="en-sub">Please enter your ID</span>');return}
+  if(!name){showToast('請輸入姓名<span class="en-sub">Please enter your name</span>');return}
   const btn=document.querySelector('#loginView .btn-primary');
   if(btn) btn.disabled=true;
-  showToast('⏳ 連線中…');
+  showToast('⏳ 連線中…<span class="en-sub">Connecting…</span>');
   try{
     const cloudUser=await loadUserFromCloud(sid);
     const db=getDB();
@@ -615,18 +620,18 @@ async function handleLogin(){
       // 全新帳號：直接建立，不需驗證姓名
       const newUser=createUser(sid,name);
       saveUser(newUser);
-      showToast('🎃 帳號建立成功！');
+      showToast('🎃 帳號建立成功！<span class="en-sub">Account created!</span>');
     } else {
       // 已存在帳號：必須驗證姓名
       const canonicalName=(cloudUser?.name||localUser?.name||'').trim();
       if(name!==canonicalName){
-        showToast('學號／工號或姓名有誤，請確認後再試一次');
+        showToast('學號／工號或姓名有誤，請確認後再試一次<span class="en-sub">ID or name doesn\'t match. Please check and try again.</span>');
         return;
       }
       // 姓名驗證通過：同步進度並登入
       if(!localUser){
         saveUser(cloudUser);
-        showToast('☁️ 歡迎回來，'+cloudUser.name+'（雲端進度已同步）');
+        showToast('☁️ 歡迎回來，'+escapeHtml(cloudUser.name)+'（雲端進度已同步）<span class="en-sub">Welcome back, '+escapeHtml(cloudUser.name)+'! (Synced from cloud)</span>');
       } else {
         if(cloudUser){
           const cloudEqLen=(cloudUser.equipmentOrder||[]).length;
@@ -634,7 +639,7 @@ async function handleLogin(){
           const cloudAhead=cloudEqLen>localEqLen||(cloudUser.bossDefeated&&!localUser.bossDefeated);
           if(cloudAhead){const localAvatar=localUser.avatar;db.users[sid]=cloudUser;if(!db.users[sid].avatar&&localAvatar)db.users[sid].avatar=localAvatar;saveDB(db);}
         }
-        showToast('👻 歡迎回來，'+(db.users[sid]?.name||name));
+        showToast('👻 歡迎回來，'+escapeHtml(db.users[sid]?.name||name)+'<span class="en-sub">Welcome back, '+escapeHtml(db.users[sid]?.name||name)+'!</span>');
       }
     }
     setSession(sid);
@@ -709,23 +714,28 @@ function renderDash(){
   document.getElementById('giftCard').style.display=(allDone4&&user.bossDefeated)?'block':'none';
 }
 
-// ── Stage info modal ──
+// ── Site-wide language switch ──
 const LANG_KEY='gh_lang_pref';
+let pageLang=localStorage.getItem(LANG_KEY)||'zh';
+function applyLang(lang){
+  pageLang=lang;
+  localStorage.setItem(LANG_KEY,lang);
+  document.getElementById('langBtnZh').classList.toggle('active',lang==='zh');
+  document.getElementById('langBtnEn').classList.toggle('active',lang==='en');
+  if(document.getElementById('stageModal').classList.contains('open')){
+    renderStageModal();
+  }
+}
+applyLang(pageLang);
+
+// ── Stage info modal ──
 let modalStageNum=1;
-let modalLang=localStorage.getItem(LANG_KEY)||'zh';
 function renderStageModal(){
   const s=STAGE_INFO[modalStageNum-1];
   document.getElementById('modalIcon').innerHTML=s.icon;
   document.getElementById('modalTitle').textContent=`STAGE 0${s.num}｜${s.title}`;
   document.getElementById('modalLoc').textContent='📍 '+s.loc;
-  document.getElementById('modalDesc').textContent=modalLang==='en'?s.descEn:s.desc;
-  document.getElementById('langBtnZh').classList.toggle('active',modalLang==='zh');
-  document.getElementById('langBtnEn').classList.toggle('active',modalLang==='en');
-}
-function setModalLang(lang){
-  modalLang=lang;
-  localStorage.setItem(LANG_KEY,lang);
-  renderStageModal();
+  document.getElementById('modalDesc').textContent=pageLang==='en'?s.descEn:s.desc;
 }
 function showStageInfo(num){
   modalStageNum=num;
@@ -738,14 +748,16 @@ function closeModal(){document.getElementById('stageModal').classList.remove('op
 let html5Qr=null;
 function openScanner(){
   const user=getCurrentUser();
-  if(!user){showToast('請先登入再掃描');return}
+  if(!user){showToast('請先登入再掃描<span class="en-sub">Please log in before scanning</span>');return}
   document.getElementById('scannerOverlay').classList.add('open');
+  document.getElementById('pageLangSwitch').style.display='none';
   document.getElementById('scannerStatus').className='scanner-status';
-  document.getElementById('scannerStatus').textContent='正在啟動後鏡頭…';
+  document.getElementById('scannerStatus').innerHTML='正在啟動後鏡頭…<span class="en-sub">Starting camera…</span>';
   startQrScanner();
 }
 function closeScanner(){
   document.getElementById('scannerOverlay').classList.remove('open');
+  document.getElementById('pageLangSwitch').style.display='';
   stopQrScanner();
 }
 function startQrScanner(){
@@ -757,10 +769,10 @@ function startQrScanner(){
     onScanSuccess,
     ()=>{}
   ).then(()=>{
-    document.getElementById('scannerStatus').textContent='✓ 就緒 — 對準 QR Code';
+    document.getElementById('scannerStatus').innerHTML='✓ 就緒 — 對準 QR Code<span class="en-sub">Ready — point at the QR code</span>';
   }).catch(e=>{
     document.getElementById('scannerStatus').className='scanner-status error';
-    document.getElementById('scannerStatus').textContent='無法存取後鏡頭。請允許相機權限後重試。';
+    document.getElementById('scannerStatus').innerHTML='無法存取後鏡頭。請允許相機權限後重試。<span class="en-sub">Can\'t access the camera. Please allow permission and try again.</span>';
   });
 }
 function stopQrScanner(){
@@ -770,7 +782,7 @@ function stopQrScanner(){
 }
 function onScanSuccess(text){
   stopQrScanner();
-  document.getElementById('scannerStatus').textContent='✓ 掃描成功！跳轉中…';
+  document.getElementById('scannerStatus').innerHTML='✓ 掃描成功！跳轉中…<span class="en-sub">Scanned! Redirecting…</span>';
   setTimeout(()=>{
     closeScanner();
     navigateFromQr(text.trim());
@@ -790,13 +802,16 @@ function navigateFromQr(text){
   const m=text.match(/level[=:]?\s*(\d)/i);
   if(m){window.location.href=m[1]==='4'?'vote.html':`quiz.html?level=${m[1]}`;return}
   if(/vote/i.test(text)){window.location.href='vote.html';return}
-  showToast('無法識別的 QR Code');
+  showToast('無法識別的 QR Code<span class="en-sub">QR code not recognized</span>');
 }
 
 // ── Toast ──
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 function showToast(msg,dur=2200){
   const t=document.getElementById('toast');
-  t.textContent=msg;t.classList.add('show');
+  t.innerHTML=msg;t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),dur);
 }
 
