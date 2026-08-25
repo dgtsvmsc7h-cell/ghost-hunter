@@ -114,9 +114,17 @@ body::after{
 .modal-box{
   background:#110020;border:1px solid rgba(255,100,0,0.4);border-radius:20px 20px 0 0;
   padding:28px 20px 40px;width:100%;max-width:480px;
+  max-height:80vh;overflow-y:auto;
 }
 .modal-box .m-icon{font-size:54px;text-align:center;display:block;margin-bottom:12px}
 .modal-box h3{font-family:'Bangers','Noto Sans TC',cursive;font-size:28px;letter-spacing:1px;color:var(--orange2);margin-bottom:8px;text-align:center}
+.modal-lang-switch{display:flex;justify-content:center;gap:8px;margin-bottom:14px}
+.modal-lang-switch button{
+  font-family:'Nunito','Noto Sans TC',sans-serif;font-size:13px;font-weight:700;
+  padding:5px 16px;border-radius:99px;border:1px solid var(--orange);
+  background:transparent;color:var(--orange);cursor:pointer;transition:background 0.15s,color 0.15s;
+}
+.modal-lang-switch button.active{background:var(--orange);color:#110020;border-color:var(--orange2)}
 .modal-box .m-tag{text-align:center;margin-bottom:14px}
 .modal-box .m-tag span{
   display:inline-block;background:rgba(255,122,0,0.15);border:1px solid var(--orange);
@@ -337,6 +345,10 @@ body::after{
   <div class="modal-box" onclick="event.stopPropagation()">
     <span class="m-icon" id="modalIcon"><img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain"></span>
     <h3 id="modalTitle">Stage 1</h3>
+    <div class="modal-lang-switch">
+      <button type="button" id="langBtnZh" onclick="setModalLang('zh')">中</button>
+      <button type="button" id="langBtnEn" onclick="setModalLang('en')">EN</button>
+    </div>
     <div class="m-tag"><span id="modalLoc">第一醫學大樓</span></div>
     <p id="modalDesc">關卡說明</p>
     <button class="modal-close" onclick="closeModal()">關閉</button>
@@ -548,10 +560,10 @@ const EQUIP_INFO = {
   armor:  {icon:'<img src="盔甲元素.png" style="width:48px;height:48px;object-fit:contain">', name:'盔甲'}
 };
 const STAGE_INFO = [
-  {num:1,icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Origin Signal 起源觀測站',loc:'第一醫學大樓',desc:'萬聖節起源於古代凱爾特人的薩溫節，當時人們相信陰陽界線模糊，會以篝火與變裝來驅邪避凶。經過與基督教諸聖節前夕融合後，逐漸演變成今日以變裝、糖果與娛樂為主的節日。'},
-  {num:2,icon:'<img src="關卡二元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Ghost Database 各國鬼怪資料庫',loc:'管理大樓（本活動起點）',desc:'世界各地的鬼怪傳說反映了不同文化對死亡、恐懼與社會記憶的詮釋，這些故事不只是靈異傳說，更像文化鏡子，映照出人們對未知世界與人性情感的共同理解。'},
-  {num:3,icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Pumpkin Signal 南瓜異訊',loc:'圖書館',desc:'Jack O\' Lantern 源自愛爾蘭傳說，講述一位名叫 Jack 的人因欺騙惡魔而無法進入天堂或地獄，只能提著燈在黑暗中流浪。這項傳統最初用蕪菁雕刻成燈，後來在北美改以南瓜製作，逐漸成為萬聖節最具代表性的象徵之一。'},
-  {num:4,icon:'<img src="關卡四元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Ghost Mode ON 最終區域',loc:'活動中心三樓',desc:'投票選出你最喜歡的展區！每位勇者只能投票一次。'},
+  {num:1,icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Origin Signal 起源觀測站',loc:'第一醫學大樓',desc:'萬聖節起源於古代凱爾特人的薩溫節，當時人們相信陰陽界線模糊，會以篝火與變裝來驅邪避凶。經過與基督教諸聖節前夕融合後，逐漸演變成今日以變裝、糖果與娛樂為主的節日。',descEn:'Halloween traces back to the ancient Celtic festival of Samhain, when people believed the border between the living and the dead grew thin. They lit bonfires and wore costumes to ward off evil — a tradition that evolved into today\'s holiday of costumes and candy.'},
+  {num:2,icon:'<img src="關卡二元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Ghost Database 各國鬼怪資料庫',loc:'管理大樓（本活動起點）',desc:'世界各地的鬼怪傳說反映了不同文化對死亡、恐懼與社會記憶的詮釋，這些故事不只是靈異傳說，更像文化鏡子，映照出人們對未知世界與人性情感的共同理解。',descEn:'Ghost legends from around the world reveal how different cultures understand death, fear, and memory. More than spooky stories, they\'re cultural mirrors reflecting shared human fears and emotions.'},
+  {num:3,icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Pumpkin Signal 南瓜異訊',loc:'圖書館',desc:'Jack O\' Lantern 源自愛爾蘭傳說，講述一位名叫 Jack 的人因欺騙惡魔而無法進入天堂或地獄，只能提著燈在黑暗中流浪。這項傳統最初用蕪菁雕刻成燈，後來在北美改以南瓜製作，逐漸成為萬聖節最具代表性的象徵之一。',descEn:'The Jack O\'Lantern comes from an Irish legend about Jack, who tricked the devil and was doomed to wander in darkness with only a lantern to light his way. Originally carved from turnips, the tradition later became pumpkins in North America — now Halloween\'s most iconic symbol.'},
+  {num:4,icon:'<img src="關卡四元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Ghost Mode ON 最終區域',loc:'活動中心三樓',desc:'投票選出你最喜歡的展區！每位勇者只能投票一次。',descEn:'Vote for your favorite zone! Each hero gets only one vote.'},
 ];
 
 // ── DB helpers ──
@@ -698,12 +710,26 @@ function renderDash(){
 }
 
 // ── Stage info modal ──
-function showStageInfo(num){
-  const s=STAGE_INFO[num-1];
+const LANG_KEY='gh_lang_pref';
+let modalStageNum=1;
+let modalLang=localStorage.getItem(LANG_KEY)||'zh';
+function renderStageModal(){
+  const s=STAGE_INFO[modalStageNum-1];
   document.getElementById('modalIcon').innerHTML=s.icon;
   document.getElementById('modalTitle').textContent=`STAGE 0${s.num}｜${s.title}`;
   document.getElementById('modalLoc').textContent='📍 '+s.loc;
-  document.getElementById('modalDesc').textContent=s.desc;
+  document.getElementById('modalDesc').textContent=modalLang==='en'?s.descEn:s.desc;
+  document.getElementById('langBtnZh').classList.toggle('active',modalLang==='zh');
+  document.getElementById('langBtnEn').classList.toggle('active',modalLang==='en');
+}
+function setModalLang(lang){
+  modalLang=lang;
+  localStorage.setItem(LANG_KEY,lang);
+  renderStageModal();
+}
+function showStageInfo(num){
+  modalStageNum=num;
+  renderStageModal();
   document.getElementById('stageModal').classList.add('open');
 }
 function closeModal(){document.getElementById('stageModal').classList.remove('open')}
