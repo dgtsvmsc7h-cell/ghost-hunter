@@ -288,7 +288,7 @@ body::before{
     <h3 id="infoTitle">STAGE 01</h3>
     <div class="ib-tag"><span id="infoLoc">地點</span></div>
     <p id="infoDesc">關卡說明</p>
-    <button class="info-close" onclick="closeBuildingInfo()">關閉</button>
+    <button class="info-close" onclick="closeBuildingInfo()"><span class="i18n-zh">關閉</span><span class="i18n-en">Close</span></button>
   </div>
 </div>
 
@@ -397,17 +397,17 @@ function sanitizeUser(user){
 
 // ─── Stage info ───
 const STAGE_INFO=[
-  {num:1,icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Origin Signal 起源觀測站',loc:'第一醫學大樓',desc:'萬聖節起源於古代凱爾特人的薩溫節，當時人們相信陰陽界線模糊，會以篝火與變裝來驅邪避凶。經過與基督教諸聖節前夕融合後，逐漸演變成今日以變裝、糖果與娛樂為主的節日。'},
-  {num:2,icon:'<img src="關卡二元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Ghost Database 各國鬼怪資料庫',loc:'管理大樓（本活動起點）',desc:'世界各地的鬼怪傳說反映了不同文化對死亡、恐懼與社會記憶的詮釋，這些故事不只是靈異傳說，更像文化鏡子，映照出人們對未知世界與人性情感的共同理解。'},
-  {num:3,icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Pumpkin Signal 南瓜異訊',loc:'圖書館',desc:'Jack O\'Lantern 源自愛爾蘭傳說，講述一位名叫 Jack 的人因欺騙惡魔而無法進入天堂或地獄，只能提著燈在黑暗中流浪。這項傳統最初用蕪菁雕刻成燈，後來在北美改以南瓜製作，逐漸成為萬聖節最具代表性的象徵之一。'},
-  {num:4,icon:'<img src="關卡四元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Ghost Mode ON 最終區域',loc:'活動中心三樓',desc:'投票選出你最喜歡的展區！每位勇者只能投票一次。'},
+  {num:1,icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Origin Signal 起源觀測站',loc:'第一醫學大樓',locEn:'The 1st Medical Science Building',desc:'萬聖節起源於古代凱爾特人的薩溫節，當時人們相信陰陽界線模糊，會以篝火與變裝來驅邪避凶。經過與基督教諸聖節前夕融合後，逐漸演變成今日以變裝、糖果與娛樂為主的節日。',descEn:'Halloween traces back to the ancient Celtic festival of Samhain, when people believed the border between the living and the dead grew thin. They lit bonfires and wore costumes to ward off evil — a tradition that evolved into today\'s holiday of costumes and candy.'},
+  {num:2,icon:'<img src="關卡二元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Ghost Database 各國鬼怪資料庫',loc:'管理大樓（本活動起點）',locEn:'Management Building (Event Start)',desc:'世界各地的鬼怪傳說反映了不同文化對死亡、恐懼與社會記憶的詮釋，這些故事不只是靈異傳說，更像文化鏡子，映照出人們對未知世界與人性情感的共同理解。',descEn:'Ghost legends from around the world reveal how different cultures understand death, fear, and memory. More than spooky stories, they\'re cultural mirrors reflecting shared human fears and emotions.'},
+  {num:3,icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Pumpkin Signal 南瓜異訊',loc:'圖書館',locEn:'Library',desc:'Jack O\'Lantern 源自愛爾蘭傳說，講述一位名叫 Jack 的人因欺騙惡魔而無法進入天堂或地獄，只能提著燈在黑暗中流浪。這項傳統最初用蕪菁雕刻成燈，後來在北美改以南瓜製作，逐漸成為萬聖節最具代表性的象徵之一。',descEn:'The Jack O\'Lantern comes from an Irish legend about Jack, who tricked the devil and was doomed to wander in darkness with only a lantern to light his way. Originally carved from turnips, the tradition later became pumpkins in North America — now Halloween\'s most iconic symbol.'},
+  {num:4,icon:'<img src="關卡四元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Ghost Mode ON 最終區域',loc:'活動中心三樓',locEn:'Student Activity Center, 3F',desc:'投票選出你最喜歡的展區！每位勇者只能投票一次。',descEn:'Vote for your favorite zone! Each hero gets only one vote.'},
 ];
 function showBuildingInfo(num){
   const s=STAGE_INFO[num-1]; if(!s) return;
   document.getElementById('infoIcon').innerHTML=s.icon;
   document.getElementById('infoTitle').textContent=`STAGE 0${s.num}｜${s.title}`;
-  document.getElementById('infoLoc').textContent='📍 '+s.loc;
-  document.getElementById('infoDesc').textContent=s.desc;
+  document.getElementById('infoLoc').textContent='📍 '+(pageLang==='en'?s.locEn:s.loc);
+  document.getElementById('infoDesc').textContent=pageLang==='en'?s.descEn:s.desc;
   document.getElementById('infoOverlay').classList.add('open');
 }
 function closeBuildingInfo(){
