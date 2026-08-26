@@ -669,17 +669,17 @@ function renderDash(){
 
   // Progress stages
   const stages=[
-    {key:'level1',icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',name:'起源觀測站',loc:'第一醫學'},
-    {key:'level2',icon:'<img src="關卡二元素.png" style="width:28px;height:28px;object-fit:contain">',name:'各國鬼怪資料庫',loc:'管理大樓'},
-    {key:'level3',icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',name:'南瓜異訊',loc:'圖書館'},
-    {key:'level4',icon:'<img src="關卡四元素.png" style="width:28px;height:28px;object-fit:contain">',name:'Ghost Mode ON 最終區域',loc:'活動中心'},
+    {key:'level1',icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',name:'起源觀測站',nameEn:'Origin Signal',loc:'第一醫學'},
+    {key:'level2',icon:'<img src="關卡二元素.png" style="width:28px;height:28px;object-fit:contain">',name:'各國鬼怪資料庫',nameEn:'Ghost Database',loc:'管理大樓'},
+    {key:'level3',icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',name:'南瓜異訊',nameEn:'Pumpkin Signal',loc:'圖書館'},
+    {key:'level4',icon:'<img src="關卡四元素.png" style="width:28px;height:28px;object-fit:contain">',name:'Ghost Mode ON 最終區域',nameEn:'Ghost Mode ON',loc:'活動中心'},
   ];
   document.getElementById('progressStages').innerHTML=stages.map(s=>{
     const done=user.progress[s.key].completed;
     return`<div class="prog-stage ${done?'done':''}" onclick="showStageInfo(${stages.indexOf(s)+1})" style="cursor:pointer">
       <span class="ps-icon">${s.icon}</span>
       <div class="ps-info">
-        <div class="ps-name">${s.name}</div>
+        <div class="ps-name"><span class="i18n-zh">${s.name}</span><span class="i18n-en">${s.nameEn}</span></div>
         <div class="ps-status">${done?'<span class="i18n-zh">✓ 完成</span><span class="i18n-en">Completed</span>':'<span class="i18n-zh">○ 待解鎖</span><span class="i18n-en">Locked</span>'}</div>
       </div>
     </div>`;
