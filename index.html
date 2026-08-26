@@ -513,8 +513,8 @@ html[data-lang="zh"] .i18n-en{display:none}
     <!-- Action row -->
     <div class="section-card">
       <div class="action-row">
-        <a href="warrior.html" class="btn-secondary" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none"><img src="地圖.webp" style="width:22px;height:22px;object-fit:contain;flex-shrink:0"><span style="display:flex;flex-direction:column;align-items:center;line-height:1.3"><span style="white-space:nowrap">勇者地圖</span><span class="en-sub">HERO MAP</span></span></a>
-        <button class="btn-secondary" onclick="handleLogout()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px"><img src="登出.png" style="width:22px;height:22px;object-fit:contain;flex-shrink:0"><span style="display:flex;flex-direction:column;align-items:center;line-height:1.3"><span style="white-space:nowrap">登出</span><span class="en-sub">LOGOUT</span></span></button>
+        <a href="warrior.html" class="btn-secondary" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none"><img src="地圖.webp" style="width:22px;height:22px;object-fit:contain;flex-shrink:0"><span style="display:flex;flex-direction:column;align-items:center;line-height:1.3"><span style="white-space:nowrap"><span class="i18n-zh">勇者地圖</span><span class="i18n-en">Hero Map</span></span></span></a>
+        <button class="btn-secondary" onclick="handleLogout()" style="flex:1;display:flex;align-items:center;justify-content:center;gap:8px"><img src="登出.png" style="width:22px;height:22px;object-fit:contain;flex-shrink:0"><span style="display:flex;flex-direction:column;align-items:center;line-height:1.3"><span style="white-space:nowrap"><span class="i18n-zh">登出</span><span class="i18n-en">Logout</span></span></span></button>
       </div>
     </div>
   </div>
@@ -722,6 +722,7 @@ let pageLang=localStorage.getItem(LANG_KEY)||'zh';
 function applyLang(lang){
   pageLang=lang;
   document.documentElement.setAttribute('data-lang',lang);
+  document.documentElement.setAttribute('lang', lang==='en'?'en':'zh-TW');
   localStorage.setItem(LANG_KEY,lang);
   document.getElementById('langBtnZh').classList.toggle('active',lang==='zh');
   document.getElementById('langBtnEn').classList.toggle('active',lang==='en');
