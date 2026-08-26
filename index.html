@@ -480,8 +480,8 @@ html[data-lang="zh"] .i18n-en{display:none}
     <div class="gift-card" id="giftCard" style="display:none;margin-bottom:16px;position:relative;overflow:hidden;padding:0;min-height:220px">
       <img src="過關.jpg" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 50%;z-index:0;border-radius:inherit;">
       <div style="position:relative;z-index:1;padding:130px 18px 18px;text-align:center">
-        <div style="font-size:14px;color:var(--gold);margin-bottom:6px">請前往領取禮物：</div>
-        <div class="gc-loc">📍 管院 8 樓<br>人文科學觀摩室</div>
+        <div style="font-size:14px;color:var(--gold);margin-bottom:6px"><span class="i18n-zh">請前往領取禮物：</span><span class="i18n-en">Please collect your gift at:</span></div>
+        <div class="gc-loc"><span class="i18n-zh">📍 管院 8 樓<br>人文科學觀摩室</span><span class="i18n-en">📍 Management Building, 8F<br>Humanities Observation Room</span></div>
       </div>
     </div>
 
@@ -495,7 +495,7 @@ html[data-lang="zh"] .i18n-en{display:none}
 
     <!-- Equipment -->
     <div class="section-card">
-      <div class="section-title" id="equipTitle"><img src="裝備背包元素.png" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;"> <span class="cjk-bold">裝備背包</span><span class="en-sub">EQUIPMENT BAG</span></div>
+      <div class="section-title" id="equipTitle"><img src="裝備背包元素.png" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;"> <span class="cjk-bold i18n-zh">裝備背包</span><span class="cjk-bold i18n-en">Equipment Bag</span></div>
       <div class="equip-rack" id="equipRack">
         <!-- Rendered by JS -->
       </div>
@@ -503,10 +503,10 @@ html[data-lang="zh"] .i18n-en{display:none}
 
     <!-- Boss -->
     <div class="section-card" id="bossCard">
-      <div class="section-title"><img src="魔王.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;"> BOSS <span class="cjk-bold">狀態</span><span class="en-sub">BOSS STATUS</span></div>
+      <div class="section-title"><img src="魔王.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;"> BOSS <span class="cjk-bold i18n-zh">狀態</span><span class="cjk-bold i18n-en">Status</span></div>
       <div class="boss-badge" id="bossBadge">
         <span class="bb-icon"><img src="魔王.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle"></span>
-        <span class="bb-text">魔王仍在潛伏…<span class="en-sub">THE BOSS IS LURKING</span><br><span style="font-size:11px;opacity:0.6">完成四關後解鎖 BOSS 戰<span class="en-sub">UNLOCK AFTER ALL 4 STAGES</span></span></span>
+        <span class="bb-text"><span class="i18n-zh">魔王仍在潛伏…</span><span class="i18n-en">The boss is still lurking…</span><br><span style="font-size:11px;opacity:0.6"><span class="i18n-zh">完成四關後解鎖 BOSS 戰</span><span class="i18n-en">Unlock the boss battle after all 4 stages</span></span></span>
       </div>
     </div>
 
@@ -689,12 +689,12 @@ function renderDash(){
   const allEq=['sword','shield','grail','armor'];
   const eq2={sword:{icon:'<img src="劍元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖劍'},shield:{icon:'<img src="聖盾元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖盾'},grail:{icon:'<img src="聖杯元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖杯'},armor:{icon:'<img src="盔甲元素.png" style="width:48px;height:48px;object-fit:contain">',name:'盔甲'}};
   const eqCount=(user.equipmentOrder||[]).length;
-  document.getElementById('equipTitle').innerHTML=`<img src="裝備背包元素.png" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;"> <span class="cjk-bold">裝備背包（${eqCount}/4）</span><span class="en-sub">EQUIPMENT BAG</span>`;
+  document.getElementById('equipTitle').innerHTML=`<img src="裝備背包元素.png" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;"> <span class="cjk-bold i18n-zh">裝備背包（${eqCount}/4）</span><span class="cjk-bold i18n-en">Equipment Bag (${eqCount}/4)</span>`;
   document.getElementById('equipRack').innerHTML=allEq.map(e=>{
     const has=user.equipmentOrder.includes(e);
     return`<div class="equip-item ${has?'owned':''}">
       <span class="ei-icon">${eq2[e].icon}</span>
-      <span class="ei-name">${has?eq2[e].name+'<span class="en-sub">'+{sword:'HOLY SWORD',shield:'HOLY SHIELD',grail:'HOLY GRAIL',armor:'ARMOR'}[e]+'</span>':'？？？<span class="en-sub">UNKNOWN</span>'}</span>
+      <span class="ei-name">${has?eq2[e].name+'<span class="en-sub">'+{sword:'HOLY SWORD',shield:'HOLY SHIELD',grail:'HOLY GRAIL',armor:'ARMOR'}[e]+'</span>':'<span class="i18n-zh">？？？</span><span class="i18n-en">Unknown</span>'}</span>
     </div>`;
   }).join('');
 
@@ -702,12 +702,12 @@ function renderDash(){
   const bb=document.getElementById('bossBadge');
   if(user.bossDefeated){
     bb.className='boss-badge defeated';
-    bb.innerHTML='<span class="bb-icon"><img src="魔王已擊敗.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;"></span><span class="bb-text">魔王已被擊敗！<span class="en-sub">BOSS DEFEATED</span><br><span style="font-size:11px;opacity:0.7">'+new Date(user.bossDefeatedAt).toLocaleDateString('zh-TW')+'</span></span>';
+    bb.innerHTML='<span class="bb-icon"><img src="魔王已擊敗.png" style="width:28px;height:28px;object-fit:contain;vertical-align:middle;"></span><span class="bb-text"><span class="i18n-zh">魔王已被擊敗！</span><span class="i18n-en">Boss defeated!</span><br><span style="font-size:11px;opacity:0.7"><span class="i18n-zh">'+new Date(user.bossDefeatedAt).toLocaleDateString('zh-TW')+'</span><span class="i18n-en">'+new Date(user.bossDefeatedAt).toLocaleDateString('en-US')+'</span></span></span>';
   } else {
     const allDone=['level1','level2','level3','level4'].every(k=>user.progress[k].completed);
     if(allDone){
       bb.className='boss-badge';
-      bb.innerHTML='<span class="bb-icon">⚔️</span><span class="bb-text">前往地圖挑戰最終 BOSS！<span class="en-sub">CHALLENGE THE FINAL BOSS</span><br><a href="warrior.html" style="color:var(--orange);font-size:12px">→ 查看勇者地圖</a></span>';
+      bb.innerHTML='<span class="bb-icon">⚔️</span><span class="bb-text"><span class="i18n-zh">前往地圖挑戰最終 BOSS！</span><span class="i18n-en">Head to the map to challenge the final boss!</span><br><a href="warrior.html" style="color:var(--orange);font-size:12px"><span class="i18n-zh">→ 查看勇者地圖</span><span class="i18n-en">→ View Hero Map</span></a></span>';
     }
   }
 
