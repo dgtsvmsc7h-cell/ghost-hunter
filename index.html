@@ -118,6 +118,8 @@ body::after{
 }
 .modal-box .m-icon{font-size:54px;text-align:center;display:block;margin-bottom:12px}
 .modal-box h3{font-family:'Bangers','Noto Sans TC',cursive;font-size:28px;letter-spacing:1px;color:var(--orange2);margin-bottom:8px;text-align:center}
+html[data-lang="en"] .i18n-zh{display:none}
+html[data-lang="zh"] .i18n-en{display:none}
 .lang-switch{
   position:fixed;top:12px;right:12px;z-index:500;
   display:flex;gap:8px;
@@ -129,7 +131,7 @@ body::after{
 }
 .lang-switch button.active{background:var(--orange);color:#110020;border-color:var(--orange2)}
 .modal-box .m-tag{text-align:center;margin-bottom:14px}
-.modal-box .m-tag span{
+.modal-box .m-tag > span{
   display:inline-block;background:rgba(255,122,0,0.15);border:1px solid var(--orange);
   border-radius:99px;padding:3px 12px;font-size:12px;color:var(--orange);letter-spacing:1px;
 }
@@ -356,19 +358,19 @@ body::after{
     <h3 id="modalTitle">Stage 1</h3>
     <div class="m-tag"><span id="modalLoc">第一醫學大樓</span></div>
     <p id="modalDesc">關卡說明</p>
-    <button class="modal-close" onclick="closeModal()">關閉</button>
+    <button class="modal-close" onclick="closeModal()"><span class="i18n-zh">關閉</span><span class="i18n-en">Close</span></button>
   </div>
 </div>
 
 <!-- QR Scanner overlay -->
 <div class="scanner-overlay" id="scannerOverlay">
   <div class="scanner-header">
-    <h3>📷 QR 掃描器<span class="en-sub">QR Scanner</span></h3>
+    <h3><span class="i18n-zh">📷 QR 掃描器</span><span class="i18n-en">QR Scanner</span></h3>
     <button class="scanner-close-btn" onclick="closeScanner()">✕</button>
   </div>
-  <div class="scanner-sub">對準展板 QR Code 後自動辨識<span class="en-sub">Point at the QR code — it scans automatically</span></div>
+  <div class="scanner-sub"><span class="i18n-zh">對準展板 QR Code 後自動辨識</span><span class="i18n-en">Point at the QR code — it scans automatically</span></div>
   <div id="qr-reader"></div>
-  <div class="scanner-status" id="scannerStatus">啟動後鏡頭中…<span class="en-sub">Starting camera…</span></div>
+  <div class="scanner-status" id="scannerStatus"><span class="i18n-zh">啟動後鏡頭中…</span><span class="i18n-en">Starting camera…</span></div>
 </div>
 
 <div class="page">
@@ -379,37 +381,37 @@ body::after{
       <div class="hero">
         <h1>GHOST HUNTER</h1>
         <h2>Midnight Signal</h2>
-        <p class="desc">深夜，校園響起神秘訊號。勇者，出擊！收集四件裝備，打倒魔王，守護校園平安。</p>
+        <p class="desc"><span class="i18n-zh">深夜，校園響起神秘訊號。勇者，出擊！收集四件裝備，打倒魔王，守護校園平安。</span><span class="i18n-en">A mysterious signal echoes through campus at midnight. Rise, hero! Collect all 4 items, defeat the boss, and save the school.</span></p>
       </div>
     </div>
 
     <!-- Stage Info -->
     <div class="section-card">
-      <div class="section-title"><img src="地圖.webp" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-right:4px"> <span class="cjk-bold">四大關卡</span></div>
+      <div class="section-title"><img src="地圖.webp" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-right:4px"> <span class="cjk-bold i18n-zh">四大關卡</span><span class="cjk-bold i18n-en">The Four Stages</span></div>
       <div class="stages-grid">
         <button class="stage-card" onclick="showStageInfo(1)">
           <span class="s-icon"><img src="關卡一元素.png" style="width:48px;height:48px;object-fit:contain"></span>
           <span class="s-num">STAGE 01 · Origin Signal</span>
           <span class="s-name">起源觀測站</span>
-          <span class="s-loc">📍 第一醫學大樓</span>
+          <span class="s-loc"><span class="i18n-zh">📍 第一醫學大樓</span><span class="i18n-en">📍 The 1st Medical Science Building</span></span>
         </button>
         <button class="stage-card" onclick="showStageInfo(2)">
           <span class="s-icon"><img src="關卡二元素.png" style="width:48px;height:48px;object-fit:contain"></span>
           <span class="s-num">STAGE 02 · Ghost Database</span>
           <span class="s-name">各國鬼怪資料庫</span>
-          <span class="s-loc">📍 管理大樓</span>
+          <span class="s-loc"><span class="i18n-zh">📍 管理大樓</span><span class="i18n-en">📍 Management Building</span></span>
         </button>
         <button class="stage-card" onclick="showStageInfo(3)">
           <span class="s-icon"><img src="關卡三元素.png" style="width:48px;height:48px;object-fit:contain"></span>
           <span class="s-num">STAGE 03 · Pumpkin Signal</span>
           <span class="s-name">南瓜異訊</span>
-          <span class="s-loc">📍 圖書館</span>
+          <span class="s-loc"><span class="i18n-zh">📍 圖書館</span><span class="i18n-en">📍 Library</span></span>
         </button>
         <button class="stage-card" onclick="showStageInfo(4)">
           <span class="s-icon"><img src="關卡四元素.png" style="width:48px;height:48px;object-fit:contain"></span>
           <span class="s-num">STAGE 04</span>
           <span class="s-name">Ghost Mode ON 最終區域</span>
-          <span class="s-loc">📍 活動中心三樓</span>
+          <span class="s-loc"><span class="i18n-zh">📍 活動中心三樓</span><span class="i18n-en">📍 Student Activity Center, 3F</span></span>
         </button>
       </div>
     </div>
@@ -565,10 +567,10 @@ const EQUIP_INFO = {
   armor:  {icon:'<img src="盔甲元素.png" style="width:48px;height:48px;object-fit:contain">', name:'盔甲'}
 };
 const STAGE_INFO = [
-  {num:1,icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Origin Signal 起源觀測站',loc:'第一醫學大樓',desc:'萬聖節起源於古代凱爾特人的薩溫節，當時人們相信陰陽界線模糊，會以篝火與變裝來驅邪避凶。經過與基督教諸聖節前夕融合後，逐漸演變成今日以變裝、糖果與娛樂為主的節日。',descEn:'Halloween traces back to the ancient Celtic festival of Samhain, when people believed the border between the living and the dead grew thin. They lit bonfires and wore costumes to ward off evil — a tradition that evolved into today\'s holiday of costumes and candy.'},
-  {num:2,icon:'<img src="關卡二元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Ghost Database 各國鬼怪資料庫',loc:'管理大樓（本活動起點）',desc:'世界各地的鬼怪傳說反映了不同文化對死亡、恐懼與社會記憶的詮釋，這些故事不只是靈異傳說，更像文化鏡子，映照出人們對未知世界與人性情感的共同理解。',descEn:'Ghost legends from around the world reveal how different cultures understand death, fear, and memory. More than spooky stories, they\'re cultural mirrors reflecting shared human fears and emotions.'},
-  {num:3,icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Pumpkin Signal 南瓜異訊',loc:'圖書館',desc:'Jack O\' Lantern 源自愛爾蘭傳說，講述一位名叫 Jack 的人因欺騙惡魔而無法進入天堂或地獄，只能提著燈在黑暗中流浪。這項傳統最初用蕪菁雕刻成燈，後來在北美改以南瓜製作，逐漸成為萬聖節最具代表性的象徵之一。',descEn:'The Jack O\'Lantern comes from an Irish legend about Jack, who tricked the devil and was doomed to wander in darkness with only a lantern to light his way. Originally carved from turnips, the tradition later became pumpkins in North America — now Halloween\'s most iconic symbol.'},
-  {num:4,icon:'<img src="關卡四元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Ghost Mode ON 最終區域',loc:'活動中心三樓',desc:'投票選出你最喜歡的展區！每位勇者只能投票一次。',descEn:'Vote for your favorite zone! Each hero gets only one vote.'},
+  {num:1,icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Origin Signal 起源觀測站',loc:'第一醫學大樓',locEn:'The 1st Medical Science Building',desc:'萬聖節起源於古代凱爾特人的薩溫節，當時人們相信陰陽界線模糊，會以篝火與變裝來驅邪避凶。經過與基督教諸聖節前夕融合後，逐漸演變成今日以變裝、糖果與娛樂為主的節日。',descEn:'Halloween traces back to the ancient Celtic festival of Samhain, when people believed the border between the living and the dead grew thin. They lit bonfires and wore costumes to ward off evil — a tradition that evolved into today\'s holiday of costumes and candy.'},
+  {num:2,icon:'<img src="關卡二元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Ghost Database 各國鬼怪資料庫',loc:'管理大樓（本活動起點）',locEn:'Management Building (Event Start)',desc:'世界各地的鬼怪傳說反映了不同文化對死亡、恐懼與社會記憶的詮釋，這些故事不只是靈異傳說，更像文化鏡子，映照出人們對未知世界與人性情感的共同理解。',descEn:'Ghost legends from around the world reveal how different cultures understand death, fear, and memory. More than spooky stories, they\'re cultural mirrors reflecting shared human fears and emotions.'},
+  {num:3,icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Pumpkin Signal 南瓜異訊',loc:'圖書館',locEn:'Library',desc:'Jack O\' Lantern 源自愛爾蘭傳說，講述一位名叫 Jack 的人因欺騙惡魔而無法進入天堂或地獄，只能提著燈在黑暗中流浪。這項傳統最初用蕪菁雕刻成燈，後來在北美改以南瓜製作，逐漸成為萬聖節最具代表性的象徵之一。',descEn:'The Jack O\'Lantern comes from an Irish legend about Jack, who tricked the devil and was doomed to wander in darkness with only a lantern to light his way. Originally carved from turnips, the tradition later became pumpkins in North America — now Halloween\'s most iconic symbol.'},
+  {num:4,icon:'<img src="關卡四元素.png" style="width:28px;height:28px;object-fit:contain">',title:'Ghost Mode ON 最終區域',loc:'活動中心三樓',locEn:'Student Activity Center, 3F',desc:'投票選出你最喜歡的展區！每位勇者只能投票一次。',descEn:'Vote for your favorite zone! Each hero gets only one vote.'},
 ];
 
 // ── DB helpers ──
@@ -606,11 +608,11 @@ function createUser(sid,name){
 async function handleLogin(){
   const sid=document.getElementById('inputSid').value.trim();
   const name=document.getElementById('inputName').value.trim();
-  if(!sid){showToast('請輸入學號／工號<span class="en-sub">Please enter your ID</span>');return}
-  if(!name){showToast('請輸入姓名<span class="en-sub">Please enter your name</span>');return}
+  if(!sid){showToast('<span class="i18n-zh">請輸入學號／工號</span><span class="i18n-en">Please enter your ID</span>');return}
+  if(!name){showToast('<span class="i18n-zh">請輸入姓名</span><span class="i18n-en">Please enter your name</span>');return}
   const btn=document.querySelector('#loginView .btn-primary');
   if(btn) btn.disabled=true;
-  showToast('⏳ 連線中…<span class="en-sub">Connecting…</span>');
+  showToast('<span class="i18n-zh">⏳ 連線中…</span><span class="i18n-en">Connecting…</span>');
   try{
     const cloudUser=await loadUserFromCloud(sid);
     const db=getDB();
@@ -620,18 +622,18 @@ async function handleLogin(){
       // 全新帳號：直接建立，不需驗證姓名
       const newUser=createUser(sid,name);
       saveUser(newUser);
-      showToast('🎃 帳號建立成功！<span class="en-sub">Account created!</span>');
+      showToast('<span class="i18n-zh">🎃 帳號建立成功！</span><span class="i18n-en">Account created!</span>');
     } else {
       // 已存在帳號：必須驗證姓名
       const canonicalName=(cloudUser?.name||localUser?.name||'').trim();
       if(name!==canonicalName){
-        showToast('學號／工號或姓名有誤，請確認後再試一次<span class="en-sub">ID or name doesn\'t match. Please check and try again.</span>');
+        showToast('<span class="i18n-zh">學號／工號或姓名有誤，請確認後再試一次</span><span class="i18n-en">ID or name doesn\'t match. Please check and try again.</span>');
         return;
       }
       // 姓名驗證通過：同步進度並登入
       if(!localUser){
         saveUser(cloudUser);
-        showToast('☁️ 歡迎回來，'+escapeHtml(cloudUser.name)+'（雲端進度已同步）<span class="en-sub">Welcome back, '+escapeHtml(cloudUser.name)+'! (Synced from cloud)</span>');
+        showToast('<span class="i18n-zh">☁️ 歡迎回來，'+escapeHtml(cloudUser.name)+'（雲端進度已同步）</span><span class="i18n-en">Welcome back, '+escapeHtml(cloudUser.name)+'! (Synced from cloud)</span>');
       } else {
         if(cloudUser){
           const cloudEqLen=(cloudUser.equipmentOrder||[]).length;
@@ -639,7 +641,7 @@ async function handleLogin(){
           const cloudAhead=cloudEqLen>localEqLen||(cloudUser.bossDefeated&&!localUser.bossDefeated);
           if(cloudAhead){const localAvatar=localUser.avatar;db.users[sid]=cloudUser;if(!db.users[sid].avatar&&localAvatar)db.users[sid].avatar=localAvatar;saveDB(db);}
         }
-        showToast('👻 歡迎回來，'+escapeHtml(db.users[sid]?.name||name)+'<span class="en-sub">Welcome back, '+escapeHtml(db.users[sid]?.name||name)+'!</span>');
+        showToast('<span class="i18n-zh">👻 歡迎回來，'+escapeHtml(db.users[sid]?.name||name)+'</span><span class="i18n-en">Welcome back, '+escapeHtml(db.users[sid]?.name||name)+'!</span>');
       }
     }
     setSession(sid);
@@ -719,12 +721,10 @@ const LANG_KEY='gh_lang_pref';
 let pageLang=localStorage.getItem(LANG_KEY)||'zh';
 function applyLang(lang){
   pageLang=lang;
+  document.documentElement.setAttribute('data-lang',lang);
   localStorage.setItem(LANG_KEY,lang);
   document.getElementById('langBtnZh').classList.toggle('active',lang==='zh');
   document.getElementById('langBtnEn').classList.toggle('active',lang==='en');
-  if(document.getElementById('stageModal').classList.contains('open')){
-    renderStageModal();
-  }
 }
 applyLang(pageLang);
 
@@ -734,8 +734,8 @@ function renderStageModal(){
   const s=STAGE_INFO[modalStageNum-1];
   document.getElementById('modalIcon').innerHTML=s.icon;
   document.getElementById('modalTitle').textContent=`STAGE 0${s.num}｜${s.title}`;
-  document.getElementById('modalLoc').textContent='📍 '+s.loc;
-  document.getElementById('modalDesc').textContent=pageLang==='en'?s.descEn:s.desc;
+  document.getElementById('modalLoc').innerHTML='<span class="i18n-zh">📍 '+s.loc+'</span><span class="i18n-en">📍 '+s.locEn+'</span>';
+  document.getElementById('modalDesc').innerHTML='<span class="i18n-zh">'+s.desc+'</span><span class="i18n-en">'+s.descEn+'</span>';
 }
 function showStageInfo(num){
   modalStageNum=num;
@@ -748,11 +748,11 @@ function closeModal(){document.getElementById('stageModal').classList.remove('op
 let html5Qr=null;
 function openScanner(){
   const user=getCurrentUser();
-  if(!user){showToast('請先登入再掃描<span class="en-sub">Please log in before scanning</span>');return}
+  if(!user){showToast('<span class="i18n-zh">請先登入再掃描</span><span class="i18n-en">Please log in before scanning</span>');return}
   document.getElementById('scannerOverlay').classList.add('open');
   document.getElementById('pageLangSwitch').style.display='none';
   document.getElementById('scannerStatus').className='scanner-status';
-  document.getElementById('scannerStatus').innerHTML='正在啟動後鏡頭…<span class="en-sub">Starting camera…</span>';
+  document.getElementById('scannerStatus').innerHTML='<span class="i18n-zh">正在啟動後鏡頭…</span><span class="i18n-en">Starting camera…</span>';
   startQrScanner();
 }
 function closeScanner(){
@@ -769,10 +769,10 @@ function startQrScanner(){
     onScanSuccess,
     ()=>{}
   ).then(()=>{
-    document.getElementById('scannerStatus').innerHTML='✓ 就緒 — 對準 QR Code<span class="en-sub">Ready — point at the QR code</span>';
+    document.getElementById('scannerStatus').innerHTML='<span class="i18n-zh">✓ 就緒 — 對準 QR Code</span><span class="i18n-en">Ready — point at the QR code</span>';
   }).catch(e=>{
     document.getElementById('scannerStatus').className='scanner-status error';
-    document.getElementById('scannerStatus').innerHTML='無法存取後鏡頭。請允許相機權限後重試。<span class="en-sub">Can\'t access the camera. Please allow permission and try again.</span>';
+    document.getElementById('scannerStatus').innerHTML='<span class="i18n-zh">無法存取後鏡頭。請允許相機權限後重試。</span><span class="i18n-en">Can\'t access the camera. Please allow permission and try again.</span>';
   });
 }
 function stopQrScanner(){
@@ -782,7 +782,7 @@ function stopQrScanner(){
 }
 function onScanSuccess(text){
   stopQrScanner();
-  document.getElementById('scannerStatus').innerHTML='✓ 掃描成功！跳轉中…<span class="en-sub">Scanned! Redirecting…</span>';
+  document.getElementById('scannerStatus').innerHTML='<span class="i18n-zh">✓ 掃描成功！跳轉中…</span><span class="i18n-en">Scanned! Redirecting…</span>';
   setTimeout(()=>{
     closeScanner();
     navigateFromQr(text.trim());
@@ -802,7 +802,7 @@ function navigateFromQr(text){
   const m=text.match(/level[=:]?\s*(\d)/i);
   if(m){window.location.href=m[1]==='4'?'vote.html':`quiz.html?level=${m[1]}`;return}
   if(/vote/i.test(text)){window.location.href='vote.html';return}
-  showToast('無法識別的 QR Code<span class="en-sub">QR code not recognized</span>');
+  showToast('<span class="i18n-zh">無法識別的 QR Code</span><span class="i18n-en">QR code not recognized</span>');
 }
 
 // ── Toast ──
