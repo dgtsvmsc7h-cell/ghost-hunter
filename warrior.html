@@ -260,12 +260,12 @@ body::before{
 <!-- Reward overlay -->
 <div class="reward-overlay" id="rewardOverlay">
   <div class="reward-box">
-    <div class="rb-badge">// 寶箱開啟 //</div>
-    <div class="rb-title"><span class="cjk-bold">獲得裝備！</span></div>
+    <div class="rb-badge"><span class="i18n-zh">// 寶箱開啟 //</span><span class="i18n-en">// Chest Opened //</span></div>
+    <div class="rb-title"><span class="cjk-bold i18n-zh">獲得裝備！</span><span class="cjk-bold i18n-en">Equipment Obtained!</span></div>
     <img class="rb-chest-img" src="已開啟寶箱.png" alt="寶箱"/>
     <div class="rb-name" id="rbName"><span class="cjk-bold">聖劍</span></div>
     <div class="rb-desc" id="rbDesc">傳說武器</div>
-    <button class="rb-btn" onclick="closeReward()">⚡ 收下裝備！</button>
+    <button class="rb-btn" onclick="closeReward()"><span class="i18n-zh">⚡ 收下裝備！</span><span class="i18n-en">⚡ Claim Equipment!</span></button>
   </div>
 </div>
 
@@ -277,7 +277,7 @@ body::before{
       <div class="warrior-battle" id="warriorSprite">🧙</div>
       <div class="boss-battle" id="bossSprite">😈</div>
     </div>
-    <div style="font-family:'Share Tech Mono',monospace;font-size:14px;color:var(--red);letter-spacing:2px;animation:bossFlash 0.5s infinite alternate;text-align:center" id="battleMsg">激烈戰鬥中…</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:14px;color:var(--red);letter-spacing:2px;animation:bossFlash 0.5s infinite alternate;text-align:center" id="battleMsg"><span class="i18n-zh">激烈戰鬥中…</span><span class="i18n-en">Fierce battle underway…</span></div>
   </div>
 </div>
 
@@ -297,11 +297,11 @@ body::before{
   <div class="victory-box">
     <span class="vb-icon"><img src="獎盃元素.png" style="width:74px;height:74px;object-fit:contain"></span>
     <div class="vb-title">VICTORY!</div>
-    <div class="vb-msg">魔王已被擊敗！<br>校園平安了，勇者萬歲！</div>
-    <div class="vb-msg">請前往領取獎品：</div>
-    <div class="vb-loc">📍 <span class="cjk-bold">管院 8 樓</span><br><span class="cjk-bold">人文科學觀摩室</span></div>
-    <div class="vb-hint">// 憑此畫面或學號領取 //</div>
-    <button class="vb-btn" onclick="closeVictory()">🎊 太棒了！</button>
+    <div class="vb-msg"><span class="i18n-zh">魔王已被擊敗！<br>校園平安了，勇者萬歲！</span><span class="i18n-en">The BOSS has been defeated!<br>The campus is safe. Hail the hero!</span></div>
+    <div class="vb-msg"><span class="i18n-zh">請前往領取獎品：</span><span class="i18n-en">Please head over to claim your prize:</span></div>
+    <div class="vb-loc"><span class="i18n-zh">📍 <span class="cjk-bold">管院 8 樓</span><br><span class="cjk-bold">人文科學觀摩室</span></span><span class="i18n-en">📍 <span class="cjk-bold">Management Building, 8F</span><br><span class="cjk-bold">Humanities Observation Room</span></span></div>
+    <div class="vb-hint"><span class="i18n-zh">// 憑此畫面或學號領取 //</span><span class="i18n-en">// Show this screen or your student ID to claim //</span></div>
+    <button class="vb-btn" onclick="closeVictory()"><span class="i18n-zh">🎊 太棒了！</span><span class="i18n-en">🎊 Awesome!</span></button>
   </div>
 </div>
 
@@ -416,10 +416,10 @@ function closeBuildingInfo(){
 
 // ─── Equipment info ───
 const EQ_INFO={
-  sword:{icon:'<img src="劍元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖劍',desc:'斬斷邪靈的傳說武器'},
-  shield:{icon:'<img src="聖盾元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖盾',desc:'抵擋黑暗咒術的光盾'},
-  grail:{icon:'<img src="聖杯元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖杯',desc:'蘊含淨化之力的神器'},
-  armor:{icon:'<img src="盔甲元素.png" style="width:48px;height:48px;object-fit:contain">',name:'盔甲',desc:'全身防禦的英雄鎧甲'}
+  sword:{icon:'<img src="劍元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖劍',desc:'斬斷邪靈的傳說武器',descEn:'A legendary blade that cleaves evil spirits'},
+  shield:{icon:'<img src="聖盾元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖盾',desc:'抵擋黑暗咒術的光盾',descEn:'A shield of light that wards off dark curses'},
+  grail:{icon:'<img src="聖杯元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖杯',desc:'蘊含淨化之力的神器',descEn:'A sacred relic imbued with purifying power'},
+  armor:{icon:'<img src="盔甲元素.png" style="width:48px;height:48px;object-fit:contain">',name:'盔甲',desc:'全身防禦的英雄鎧甲',descEn:'Hero\'s armor offering full-body protection'}
 };
 
 // ─── Map building definitions ───
@@ -1030,7 +1030,7 @@ function showRewardPopup(eqKey){
   return new Promise(resolve=>{
     const info=EQ_INFO[eqKey]||{icon:'?',name:'?',desc:'?'};
     document.getElementById('rbName').innerHTML='<span class="cjk-bold">'+info.name+'</span>';
-    document.getElementById('rbDesc').textContent=info.desc;
+    document.getElementById('rbDesc').textContent=pageLang==='en'?(info.descEn||info.desc):info.desc;
     document.getElementById('rewardOverlay').classList.add('open');
     launchConfetti();
     window._rewardResolve=resolve;
