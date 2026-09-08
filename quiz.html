@@ -449,7 +449,7 @@ function renderQuiz(){
           </button>`).join('')}
       </div>
       <div class="feedback" id="feedback"></div>
-      <button class="next-btn" id="nextBtn" onclick="nextQ()">${currentQ===total-1?'查看結果 🏆 View Results':'下一題 → Next Question'}</button>
+      <button class="next-btn" id="nextBtn" onclick="nextQ()">${currentQ===total-1?'查看結果 🏆<br>View Results':'下一題 →<br>Next Question'}</button>
     </div>`;
 }
 
@@ -460,12 +460,12 @@ function selectOpt(idx){
   const fb=document.getElementById('feedback');
   if(idx===q.ans){
     btns[idx].classList.add('correct');
-    fb.className='feedback correct'; fb.textContent='✓ 正確！Correct!';
+    fb.className='feedback correct'; fb.innerHTML='✓ 正確！<br>Correct!';
     userAnswers.push(true);
   } else {
     btns[idx].classList.add('wrong');
     btns[q.ans].classList.add('correct');
-    fb.className='feedback wrong'; fb.textContent=`✗ 答錯了！正確答案是 ${String.fromCharCode(65+q.ans)}　Wrong! The correct answer is ${String.fromCharCode(65+q.ans)}.`;
+    fb.className='feedback wrong'; fb.innerHTML=`✗ 答錯了！正確答案是 ${String.fromCharCode(65+q.ans)}<br>Wrong! The correct answer is ${String.fromCharCode(65+q.ans)}.`;
     userAnswers.push(false);
   }
   document.getElementById('nextBtn').classList.add('show');
