@@ -307,10 +307,10 @@ const QUIZZES={
 
 const EQUIPMENT_POOL=['sword','shield','grail','armor'];
 const EQUIP_INFO={
-  sword:{icon:'<img src="劍元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖劍'},
-  shield:{icon:'<img src="聖盾元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖盾'},
-  grail:{icon:'<img src="聖杯元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖杯'},
-  armor:{icon:'<img src="盔甲元素.png" style="width:48px;height:48px;object-fit:contain">',name:'盔甲'}
+  sword:{icon:'<img src="劍元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖劍',nameEn:'HOLY SWORD'},
+  shield:{icon:'<img src="聖盾元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖盾',nameEn:'HOLY SHIELD'},
+  grail:{icon:'<img src="聖杯元素.png" style="width:48px;height:48px;object-fit:contain">',name:'聖杯',nameEn:'HOLY GRAIL'},
+  armor:{icon:'<img src="盔甲元素.png" style="width:48px;height:48px;object-fit:contain">',name:'盔甲',nameEn:'ARMOR'}
 };
 
 let currentQ=0, userAnswers=[], quizData=null, userData=null;
@@ -404,7 +404,7 @@ async function quickLogin(){
 
 function renderAlreadyDone(qd,user){
   const p=user.progress['level'+level];
-  const eq=EQUIP_INFO[p.equipment]||{icon:'?',name:'?'};
+  const eq=EQUIP_INFO[p.equipment]||{icon:'?',name:'?',nameEn:'?'};
   document.getElementById('quizContent').innerHTML=`
     <div class="stage-header">
       <a href="index.html" class="back-btn">← 返回 Back</a>
@@ -415,7 +415,7 @@ function renderAlreadyDone(qd,user){
       <span class="ac-icon">✅</span>
       <h3><span class="cjk-bold">已完成此關！Stage Completed!</span></h3>
       <p>分數 Score：${p.score} / ${qd.questions.length}</p>
-      <div style="display:inline-flex;align-items:center;gap:8px;margin-top:8px">已獲得裝備 Equipment earned：${eq.icon}<span>${eq.name}</span></div>
+      <div style="display:inline-flex;align-items:center;gap:8px;margin-top:8px">已獲得裝備 Equipment earned：${eq.icon}<span>${eq.name}<span style="display:block;font-size:11px;opacity:0.7;letter-spacing:1px">${eq.nameEn}</span></span></div>
       <a href="warrior.html"><button class="result-btn main" style="margin-bottom:10px">⚔️ 查看勇者地圖 View Hero Map</button></a>
       <a href="index.html"><button class="result-btn sec">🏠 回首頁 Back to Home</button></a>
     </div>`;
