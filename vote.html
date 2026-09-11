@@ -157,7 +157,8 @@ body{background:#000;}
   <div class="vote-header">
     <h1><span class="cjk-bold">打卡牆</span><br><span class="cjk-bold">投票站</span></h1>
     <div class="sub">Ghost Mode ON 🎃</div>
-    <p class="desc">歡迎來到活動打卡牆！投票選出你最愛的展區，獲得最後一件裝備！</p>
+    <div style="font-size:13px;opacity:0.7;letter-spacing:1px;margin-bottom:4px">Check-in Wall · Voting Station</div>
+    <p class="desc">歡迎來到活動打卡牆！投票選出你最愛的展區，獲得最後一件裝備！<br><span style="font-size:12px;opacity:0.7">Welcome to the event check-in wall! Vote for your favorite zone to earn your final piece of equipment.</span></p>
   </div>
   <div id="pageContent"></div>
 </div>
@@ -246,18 +247,18 @@ for(let i=0;i<30;i++){
 });
 
 const VOTE_OPTIONS=[
-  {key:'zone1',icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',name:'Origin.exe 展區',loc:'第一醫學大樓'},
-  {key:'zone2',icon:'<img src="關卡二元素.png" style="width:28px;height:28px;object-fit:contain">',name:'Ghost Database 展區',loc:'管理大樓'},
-  {key:'zone3',icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',name:'Pumpkin Code 展區',loc:'圖書館'},
-  {key:'zone4',icon:'📸',name:'Ghost Mode ON 最終區域',loc:'活動中心三樓'},
+  {key:'zone1',icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',name:'Origin.exe 展區',nameEn:'Origin.exe Zone',loc:'第一醫學大樓',locEn:'The 1st Medical Science Building'},
+  {key:'zone2',icon:'<img src="關卡二元素.png" style="width:28px;height:28px;object-fit:contain">',name:'Ghost Database 展區',nameEn:'Ghost Database Zone',loc:'管理大樓',locEn:'Management Building'},
+  {key:'zone3',icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',name:'Pumpkin Code 展區',nameEn:'Pumpkin Code Zone',loc:'圖書館',locEn:'Library'},
+  {key:'zone4',icon:'📸',name:'Ghost Mode ON 最終區域',nameEn:'Ghost Mode ON Final Zone',loc:'活動中心三樓',locEn:'Student Activity Center, 3F'},
 ];
 
 let selectedVote=null;
 
 const LEVEL_INFO={
-  1:{icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',name:'萬聖節的起源',loc:'第一醫學大樓'},
-  2:{icon:'<img src="關卡二元素.png" style="width:28px;height:28px;object-fit:contain">',name:'世界鬼怪文化',loc:'管理大樓'},
-  3:{icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',name:'南瓜燈的秘密',loc:'圖書館'},
+  1:{icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',name:'萬聖節的起源',nameEn:'The Origin of Halloween',loc:'第一醫學大樓',locEn:'The 1st Medical Science Building'},
+  2:{icon:'<img src="關卡二元素.png" style="width:28px;height:28px;object-fit:contain">',name:'世界鬼怪文化',nameEn:'World Ghost Culture',loc:'管理大樓',locEn:'Management Building'},
+  3:{icon:'<img src="關卡三元素.png" style="width:28px;height:28px;object-fit:contain">',name:'南瓜燈的秘密',nameEn:"The Secret of the Jack-o'-Lantern",loc:'圖書館',locEn:'Library'},
 };
 
 function init(){
@@ -278,17 +279,17 @@ function renderLockedForm(user,incomplete){
       border-radius:10px;padding:11px 14px;margin-bottom:8px">
       <span style="font-size:22px">${info.icon}</span>
       <div>
-        <div style="font-size:13px;font-weight:700;color:var(--cream)">STAGE 0${lv}｜${info.name}</div>
-        <div style="font-size:11px;color:var(--subtext);margin-top:2px">📍 ${info.loc}</div>
+        <div style="font-size:13px;font-weight:700;color:var(--cream)">STAGE 0${lv}｜${info.name}<br><span style="font-size:11px;font-weight:400;opacity:0.7">${info.nameEn}</span></div>
+        <div style="font-size:11px;color:var(--subtext);margin-top:2px">📍 ${info.loc}<br><span style="font-size:10px;opacity:0.7">${info.locEn}</span></div>
       </div>
       <span style="margin-left:auto;font-size:11px;font-weight:700;
-        color:var(--orange);letter-spacing:1px">未完成</span>
+        color:var(--orange);letter-spacing:1px">未完成 Incomplete</span>
     </div>`;
   }).join('');
 
   const completed=[1,2,3].filter(lv=>!incomplete.includes(lv));
   const completedSection=completed.length>0?`
-    <div style="font-size:11px;color:var(--subtext);letter-spacing:2px;text-align:center;margin-bottom:8px">已完成關卡</div>
+    <div style="font-size:11px;color:var(--subtext);letter-spacing:2px;text-align:center;margin-bottom:8px">已完成關卡 Completed Stages</div>
     ${completed.map(lv=>{
       const info=LEVEL_INFO[lv];
       return`<div style="display:flex;align-items:center;gap:12px;
@@ -296,48 +297,48 @@ function renderLockedForm(user,incomplete){
         border-radius:10px;padding:11px 14px;margin-bottom:8px">
         <span style="font-size:22px">${info.icon}</span>
         <div>
-          <div style="font-size:13px;font-weight:700;color:var(--cream)">STAGE 0${lv}｜${info.name}</div>
-          <div style="font-size:11px;color:var(--subtext);margin-top:2px">📍 ${info.loc}</div>
+          <div style="font-size:13px;font-weight:700;color:var(--cream)">STAGE 0${lv}｜${info.name}<br><span style="font-size:11px;font-weight:400;opacity:0.7">${info.nameEn}</span></div>
+          <div style="font-size:11px;color:var(--subtext);margin-top:2px">📍 ${info.loc}<br><span style="font-size:10px;opacity:0.7">${info.locEn}</span></div>
         </div>
         <span style="margin-left:auto;font-size:11px;font-weight:700;
-          color:var(--green);letter-spacing:1px">已完成</span>
+          color:var(--green);letter-spacing:1px">已完成 Done</span>
       </div>`;
     }).join('')}`:'';
 
   document.getElementById('pageContent').innerHTML=`
     <div class="section-card" style="border-color:rgba(255,80,0,0.5)">
       <div style="font-size:11px;letter-spacing:3px;color:var(--subtext);margin-bottom:14px;text-align:center">
-        勇者 ${user.name}（${user.sid}）
+        勇者 Hero｜${user.name}（${user.sid}）
       </div>
       <div style="text-align:center;font-size:48px;margin-bottom:10px">🔒</div>
       <div style="font-family:'Bangers','Noto Sans TC',cursive;font-size:26px;letter-spacing:2px;
-        color:var(--orange2);text-align:center;margin-bottom:6px"><span class="cjk-bold">第四關尚未解鎖</span></div>
+        color:var(--orange2);text-align:center;margin-bottom:6px"><span class="cjk-bold">第四關尚未解鎖<br><span style="font-size:14px;opacity:0.8">Stage 4 Locked</span></span></div>
       <div style="font-size:14px;color:var(--text);text-align:center;line-height:1.7;margin-bottom:18px">
-        請先至其他關卡取得裝備，<br>再來挑戰第四關!!
+        請先至其他關卡取得裝備，<br>再來挑戰第四關!!<br><span style="font-size:12px;opacity:0.7">Earn equipment from the other stages first, then come back to challenge Stage 4!</span>
       </div>
       <div style="margin-bottom:18px">${rows}</div>
       ${completedSection}
     </div>
     <a href="index.html" style="display:block;text-align:center;margin-top:14px;
       font-family:'Bangers','Noto Sans TC',cursive;font-size:20px;letter-spacing:2px;
-      color:var(--orange2);text-decoration:none">← <span class="cjk-bold">回首頁繼續闖關</span></a>`;
+      color:var(--orange2);text-decoration:none">← <span class="cjk-bold">回首頁繼續闖關 Back to Home</span></a>`;
 }
 
 function renderLoginForm(){
   document.getElementById('pageContent').innerHTML=`
     <div class="login-box">
       <div style="text-align:center;font-size:50px;margin-bottom:14px">🔐</div>
-      <div style="text-align:center;font-family:'Bangers','Noto Sans TC',cursive;font-size:26px;color:var(--gold);letter-spacing:2px;margin-bottom:8px"><span class="cjk-bold">請先登入</span></div>
-      <div style="text-align:center;font-size:13px;color:var(--subtext);margin-bottom:18px;line-height:1.6">輸入學號與姓名開始投票</div>
-      <input type="text" id="pSid" placeholder="學號" autocomplete="off" autocapitalize="off">
-      <input type="text" id="pName" placeholder="姓名">
-      <button onclick="quickLogin()" class="submit-btn">🗳️ 登入並投票</button>
+      <div style="text-align:center;font-family:'Bangers','Noto Sans TC',cursive;font-size:26px;color:var(--gold);letter-spacing:2px;margin-bottom:8px"><span class="cjk-bold">請先登入<br><span style="font-size:14px;opacity:0.8">Please Log In</span></span></div>
+      <div style="text-align:center;font-size:13px;color:var(--subtext);margin-bottom:18px;line-height:1.6">輸入學號與姓名開始投票<br><span style="font-size:11px;opacity:0.7">Enter your ID and name to vote</span></div>
+      <input type="text" id="pSid" placeholder="學號 ID" autocomplete="off" autocapitalize="off">
+      <input type="text" id="pName" placeholder="姓名 Name">
+      <button onclick="quickLogin()" class="submit-btn">🗳️ 登入並投票<br>Log In & Vote</button>
     </div>`;
 }
 async function quickLogin(){
   const sid=document.getElementById('pSid').value.trim();
   const name=document.getElementById('pName').value.trim();
-  if(!sid||!name){alert('請填入學號與姓名');return}
+  if(!sid||!name){alert('請填入學號與姓名 Please enter your ID and name');return}
   const btn=document.querySelector('[onclick="quickLogin()"]');
   if(btn) btn.disabled=true;
   try{
@@ -362,7 +363,7 @@ async function quickLogin(){
       // 已存在帳號：必須驗證姓名
       const canonicalName=(cloudUser?.name||localUser?.name||'').trim();
       if(name!==canonicalName){
-        alert('學號／工號或姓名有誤，請確認後再試一次');
+        alert('學號／工號或姓名有誤，請確認後再試一次 ID or name does not match. Please check and try again.');
         return;
       }
       // 姓名驗證通過：同步進度
@@ -385,21 +386,21 @@ async function quickLogin(){
 function renderVoteForm(user){
   document.getElementById('pageContent').innerHTML=`
     <div class="section-card">
-      <div style="font-size:11px;letter-spacing:3px;color:var(--subtext);margin-bottom:6px;text-align:center">勇者 ${user.name}（${user.sid}）</div>
-      <div class="section-title">🗳️ <span class="cjk-bold">你最喜歡哪個展區？</span></div>
+      <div style="font-size:11px;letter-spacing:3px;color:var(--subtext);margin-bottom:6px;text-align:center">勇者 Hero｜${user.name}（${user.sid}）</div>
+      <div class="section-title">🗳️ <span class="cjk-bold">你最喜歡哪個展區？</span><br><span style="font-size:13px;font-weight:400;opacity:0.75">Which zone did you like best?</span></div>
       <div class="vote-options" id="voteOpts">
         ${VOTE_OPTIONS.map((o,i)=>`
           <button class="vote-opt" onclick="selectVote('${o.key}',this)" data-key="${o.key}">
             <span class="vo-icon">${o.icon}</span>
             <div class="vo-text">
-              <div class="vo-name">${o.name}</div>
-              <div class="vo-loc">📍 ${o.loc}</div>
+              <div class="vo-name">${o.name}<br><span style="font-size:11px;font-weight:400;opacity:0.7">${o.nameEn}</span></div>
+              <div class="vo-loc">📍 ${o.loc} ${o.locEn}</div>
             </div>
             <span class="vo-check">✓</span>
           </button>`).join('')}
       </div>
-      <button class="submit-btn" id="submitBtn" onclick="submitVote()" disabled style="margin-top:14px">選擇後投票</button>
-      <div style="font-size:12px;color:var(--subtext);text-align:center;margin-top:10px">每位勇者只能投票一次，投票後不可修改</div>
+      <button class="submit-btn" id="submitBtn" onclick="submitVote()" disabled style="margin-top:14px">選擇後投票<br>Select an Option to Vote</button>
+      <div style="font-size:12px;color:var(--subtext);text-align:center;margin-top:10px">每位勇者只能投票一次，投票後不可修改<br><span style="opacity:0.7">Each hero can vote only once, and votes cannot be changed afterward.</span></div>
     </div>`;
 }
 
@@ -408,12 +409,12 @@ function selectVote(key,btn){
   document.querySelectorAll('.vote-opt').forEach(b=>b.classList.remove('selected'));
   btn.classList.add('selected');
   const sb=document.getElementById('submitBtn');
-  sb.disabled=false; sb.textContent='🗳️ 確認投票';
+  sb.disabled=false; sb.innerHTML='🗳️ 確認投票<br>Confirm Vote';
 }
 
 function submitVote(){
   if(!selectedVote) return;
-  if(!confirm('確定投給這個展區嗎？投票後不可修改。')) return;
+  if(!confirm('確定投給這個展區嗎？投票後不可修改。 Are you sure you want to vote for this zone? Your vote cannot be changed.')) return;
   const user=getCurrentUser(); if(!user) return;
   
   // Assign armor (calculated first to guard before any writes)
@@ -449,15 +450,15 @@ function showVictory(user,eq,redirectUrl){
   document.getElementById('pageContent').innerHTML=`
     <div class="victory-screen show">
       <span class="victory-anim">🎊</span>
-      <div class="victory-title"><span class="cjk-bold">投票成功！</span></div>
-      <div class="victory-msg">感謝你的投票！你獲得了第四件裝備：</div>
+      <div class="victory-title"><span class="cjk-bold">投票成功！<br><span style="font-size:16px">Vote Submitted!</span></span></div>
+      <div class="victory-msg">感謝你的投票！你獲得了第四件裝備：<br><span style="font-size:12px;opacity:0.75">Thank you for voting! You've earned your fourth piece of equipment:</span></div>
       <div class="victory-eq">
         <span class="ve-icon">${info.icon}</span>
         <span class="ve-name">${info.name}</span>
       </div>
-      <div class="victory-msg" style="margin-bottom:18px">即將前往勇者地圖，查看你的完整通關紀錄…</div>
-      <a href="${redirectUrl}" class="action-btn" style="display:block;text-align:center;text-decoration:none">⚔️ 立即前往勇者地圖</a>
-      <a href="index.html" class="action-btn sec" style="display:block;text-align:center;text-decoration:none;margin-top:10px">🏠 回首頁</a>
+      <div class="victory-msg" style="margin-bottom:18px">即將前往勇者地圖，查看你的完整通關紀錄…<br><span style="font-size:12px;opacity:0.7">Heading to the Hero Map to see your full progress…</span></div>
+      <a href="${redirectUrl}" class="action-btn" style="display:block;text-align:center;text-decoration:none">⚔️ 立即前往勇者地圖<br>Go to Hero Map</a>
+      <a href="index.html" class="action-btn sec" style="display:block;text-align:center;text-decoration:none;margin-top:10px">🏠 回首頁 Back to Home</a>
     </div>`;
 }
 
@@ -467,13 +468,13 @@ function renderAlreadyVoted(user){
   document.getElementById('pageContent').innerHTML=`
     <div class="voted-card">
       <div style="font-size:60px;text-align:center;display:block;margin-bottom:14px">✅</div>
-      <div style="font-family:'Bangers','Noto Sans TC',cursive;font-size:28px;color:var(--green);text-align:center;letter-spacing:1px;margin-bottom:8px"><span class="cjk-bold">已完成投票</span></div>
+      <div style="font-family:'Bangers','Noto Sans TC',cursive;font-size:28px;color:var(--green);text-align:center;letter-spacing:1px;margin-bottom:8px"><span class="cjk-bold">已完成投票<br><span style="font-size:16px">Vote Completed</span></span></div>
       <p style="font-size:14px;color:var(--subtext);text-align:center;line-height:1.6;margin-bottom:18px">
-        你投給了：${voted.icon} ${voted.name}<br>
-        <span style="font-size:12px;opacity:0.7">進度已儲存，可隨時回首頁查看通關紀錄。</span>
+        你投給了 You voted for：${voted.icon} ${voted.name}<br>
+        <span style="font-size:12px;opacity:0.7">進度已儲存，可隨時回首頁查看通關紀錄。<br>Your progress is saved — return to the home page anytime to view your record.</span>
       </p>
-      <a href="warrior.html" class="action-btn">⚔️ 查看勇者地圖</a>
-      <a href="index.html" class="action-btn sec">🏠 回首頁</a>
+      <a href="warrior.html" class="action-btn">⚔️ 查看勇者地圖<br>View Hero Map</a>
+      <a href="index.html" class="action-btn sec">🏠 回首頁 Back to Home</a>
     </div>`;
 }
 
