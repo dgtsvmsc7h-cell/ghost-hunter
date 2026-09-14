@@ -301,7 +301,8 @@ body::before{
     <div class="vb-msg"><span class="i18n-zh">請前往領取獎品：</span><span class="i18n-en">Please head over to claim your prize:</span></div>
     <div class="vb-loc"><span class="i18n-zh">📍 <span class="cjk-bold">管院 8 樓</span><br><span class="cjk-bold">人文科學觀摩室</span></span><span class="i18n-en">📍 <span class="cjk-bold">Management Building, 8F</span><br><span class="cjk-bold">Humanities Observation Room</span></span></div>
     <div class="vb-hint"><span class="i18n-zh">// 憑此畫面或學號領取 //</span><span class="i18n-en">// Show this screen or your student ID to claim //</span></div>
-    <button class="vb-btn" onclick="closeVictory()"><span class="i18n-zh">🎊 太棒了！</span><span class="i18n-en">🎊 Awesome!</span></button>
+    <div class="vb-hint"><span class="i18n-zh">5 秒後自動前往問卷，或點擊按鈕立即前往</span><span class="i18n-en">Redirecting to the survey in 5 seconds — or tap the button to go now</span></div>
+    <button class="vb-btn" onclick="closeVictory()"><span class="i18n-zh">🎊 太棒了！前往問卷</span><span class="i18n-en">🎊 Awesome! Go to Survey</span></button>
   </div>
 </div>
 
@@ -337,6 +338,7 @@ body::before{
 const DB_KEY='ghost_hunter_db_v1';
 const SESSION_KEY='ghost_hunter_session';
 const LANG_KEY='gh_lang_pref';
+const SURVEY_URL='https://forms.cloud.microsoft/pages/responsepage.aspx?id=qjVW2kse_ESSFFlrQmXkU3ZbUyT4GK5DjVAQZJk_LIhURENVTlhOT0hJV05YMzZXMUJCVUFCVkc2VS4u&route=shorturl';
 const pageLang=localStorage.getItem(LANG_KEY)||'zh';
 document.documentElement.setAttribute('data-lang',pageLang);
 document.documentElement.setAttribute('lang', pageLang==='en'?'en':'zh-TW');
@@ -1024,6 +1026,7 @@ async function animateBossFight(user,currentPos,currentState){
   // Show victory
   document.getElementById('victoryOverlay').classList.add('open');
   launchConfetti();
+  window._surveyRedirectTimer=setTimeout(()=>{ window.location.href=SURVEY_URL; },5000);
 }
 
 function showRewardPopup(eqKey){
@@ -1044,6 +1047,8 @@ function closeReward(){
 
 function closeVictory(){
   document.getElementById('victoryOverlay').classList.remove('open');
+  if(window._surveyRedirectTimer) clearTimeout(window._surveyRedirectTimer);
+  window.location.href=SURVEY_URL;
 }
 
 function goNextQr(){
