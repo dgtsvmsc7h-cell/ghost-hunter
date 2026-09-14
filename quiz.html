@@ -313,7 +313,7 @@ const EQUIP_INFO={
   armor:{icon:'<img src="盔甲元素.png" style="width:48px;height:48px;object-fit:contain">',name:'盔甲',nameEn:'ARMOR'}
 };
 
-let currentQ=0, userAnswers=[], quizData=null, userData=null;
+let currentQ=0, userAnswers=[], quizData=null, userData=null, quizFinished=false;
 
 function init(){
   const user=getCurrentUser();
@@ -323,7 +323,7 @@ function init(){
   sanitizeUser(user);
   if(user.progress['level'+level].completed){renderAlreadyDone(qd,user); return}
   quizData=qd; userData=user;
-  currentQ=0; userAnswers=[];
+  currentQ=0; userAnswers=[]; quizFinished=false;
   renderQuiz();
 }
 
@@ -472,12 +472,16 @@ function selectOpt(idx){
 }
 
 function nextQ(){
+  const btn=document.getElementById('nextBtn');
+  if(btn) btn.disabled=true;
   currentQ++;
   if(currentQ>=quizData.questions.length) finishQuiz();
   else renderQuiz();
 }
 
 function finishQuiz(){
+  if(quizFinished) return;
+  quizFinished=true;
   const correct=userAnswers.filter(a=>a).length;
   const total=quizData.questions.length;
   const pass=correct>=quizData.questions.length;
