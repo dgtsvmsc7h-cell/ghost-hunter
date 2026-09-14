@@ -253,7 +253,7 @@ const VOTE_OPTIONS=[
   {key:'zone4',icon:'📸',name:'Ghost Mode ON 最終區域',nameEn:'Ghost Mode ON Final Zone',loc:'活動中心三樓',locEn:'Student Activity Center, 3F'},
 ];
 
-let selectedVote=null;
+let selectedVote=null, voteSubmitting=false;
 
 const LEVEL_INFO={
   1:{icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',name:'萬聖節的起源',nameEn:'The Origin of Halloween',loc:'第一醫學大樓',locEn:'The 1st Medical Science Building'},
@@ -394,7 +394,7 @@ function renderVoteForm(user){
             <span class="vo-icon">${o.icon}</span>
             <div class="vo-text">
               <div class="vo-name">${o.name}<br><span style="font-size:11px;font-weight:400;opacity:0.7">${o.nameEn}</span></div>
-              <div class="vo-loc">📍 ${o.loc} ${o.locEn}</div>
+              <div class="vo-loc">📍 ${o.loc}<br><span style="font-size:10px;opacity:0.7">${o.locEn}</span></div>
             </div>
             <span class="vo-check">✓</span>
           </button>`).join('')}
@@ -413,17 +413,19 @@ function selectVote(key,btn){
 }
 
 function submitVote(){
-  if(!selectedVote) return;
+  if(!selectedVote||voteSubmitting) return;
   if(!confirm('確定投給這個展區嗎？投票後不可修改。 Are you sure you want to vote for this zone? Your vote cannot be changed.')) return;
+  voteSubmitting=true;
   const user=getCurrentUser(); if(!user) return;
-  
-  // Assign armor (calculated first to guard before any writes)
+  const sb=document.getElementById('submitBtn');
+  if(sb) sb.disabled=true;
+
+  // Assign armor if any type is still missing (calculated first to guard before any writes)
   const owned=user.equipmentOrder||[];
   const available=['sword','shield','grail','armor'].filter(e=>!owned.includes(e));
   const newEq=available.length>0?available[Math.floor(Math.random()*available.length)]:null;
-  if(!newEq) return;
 
-  // Save vote
+  // Save vote — this always happens, even if the player already owns every piece of equipment
   const db=getDB();
   if(!db.voteStats) db.voteStats={zone1:0,zone2:0,zone3:0,zone4:0};
   db.voteStats[selectedVote]=(db.voteStats[selectedVote]||0)+1;
@@ -431,31 +433,34 @@ function submitVote(){
   incrementVoteInCloud(selectedVote);
   const now=new Date().toISOString();
   user.progress.level4={completed:true,vote:selectedVote,completedAt:now,equipment:newEq};
-  user.equipmentOrder=[...owned,newEq];
+  if(newEq) user.equipmentOrder=[...owned,newEq];
   saveUser(user);
-  
+
   // Confetti
   launchConfetti();
-  
-  // Redirect to warrior with reward
-  const redirectUrl=`warrior.html?reward=${newEq}&level=4&score=voted`;
+
+  // Redirect to warrior (only pass a reward param if a new item was actually granted)
+  const redirectUrl=newEq?`warrior.html?reward=${newEq}&level=4&score=voted`:`warrior.html?level=4&score=voted`;
   setTimeout(()=>{ window.location.href=redirectUrl; }, 1800);
 
   showVictory(user,newEq,redirectUrl);
 }
 
 function showVictory(user,eq,redirectUrl){
-  const eqInfo={sword:{icon:'<img src="劍元素.png" style="width:54px;height:54px;object-fit:contain">',name:'聖劍'},shield:{icon:'<img src="聖盾元素.png" style="width:54px;height:54px;object-fit:contain">',name:'聖盾'},grail:{icon:'<img src="聖杯元素.png" style="width:54px;height:54px;object-fit:contain">',name:'聖杯'},armor:{icon:'<img src="盔甲元素.png" style="width:54px;height:54px;object-fit:contain">',name:'盔甲'}};
-  const info=eqInfo[eq]||{icon:'<img src="盔甲元素.png" style="width:54px;height:54px;object-fit:contain">',name:'盔甲'};
+  const eqInfo={sword:{icon:'<img src="劍元素.png" style="width:54px;height:54px;object-fit:contain">',name:'聖劍',nameEn:'HOLY SWORD'},shield:{icon:'<img src="聖盾元素.png" style="width:54px;height:54px;object-fit:contain">',name:'聖盾',nameEn:'HOLY SHIELD'},grail:{icon:'<img src="聖杯元素.png" style="width:54px;height:54px;object-fit:contain">',name:'聖杯',nameEn:'HOLY GRAIL'},armor:{icon:'<img src="盔甲元素.png" style="width:54px;height:54px;object-fit:contain">',name:'盔甲',nameEn:'ARMOR'}};
+  const info=eq?(eqInfo[eq]||{icon:'<img src="盔甲元素.png" style="width:54px;height:54px;object-fit:contain">',name:'盔甲',nameEn:'ARMOR'}):null;
+  const eqBlock=info?`
+      <div class="victory-msg">感謝你的投票！你獲得了第四件裝備：<br><span style="font-size:12px;opacity:0.75">Thank you for voting! You've earned your fourth piece of equipment:</span></div>
+      <div class="victory-eq">
+        <span class="ve-icon">${info.icon}</span>
+        <span class="ve-name">${info.name}<br><span style="font-size:13px;opacity:0.7;letter-spacing:1px">${info.nameEn}</span></span>
+      </div>`:`
+      <div class="victory-msg">感謝你的投票！你已經擁有全部裝備，這次投票就不再額外發放裝備囉。<br><span style="font-size:12px;opacity:0.75">Thank you for voting! You already have every piece of equipment, so this vote won't grant a new one.</span></div>`;
   document.getElementById('pageContent').innerHTML=`
     <div class="victory-screen show">
       <span class="victory-anim">🎊</span>
       <div class="victory-title"><span class="cjk-bold">投票成功！<br><span style="font-size:16px">Vote Submitted!</span></span></div>
-      <div class="victory-msg">感謝你的投票！你獲得了第四件裝備：<br><span style="font-size:12px;opacity:0.75">Thank you for voting! You've earned your fourth piece of equipment:</span></div>
-      <div class="victory-eq">
-        <span class="ve-icon">${info.icon}</span>
-        <span class="ve-name">${info.name}</span>
-      </div>
+      ${eqBlock}
       <div class="victory-msg" style="margin-bottom:18px">即將前往勇者地圖，查看你的完整通關紀錄…<br><span style="font-size:12px;opacity:0.7">Heading to the Hero Map to see your full progress…</span></div>
       <a href="${redirectUrl}" class="action-btn" style="display:block;text-align:center;text-decoration:none">⚔️ 立即前往勇者地圖<br>Go to Hero Map</a>
       <a href="index.html" class="action-btn sec" style="display:block;text-align:center;text-decoration:none;margin-top:10px">🏠 回首頁 Back to Home</a>
@@ -464,13 +469,13 @@ function showVictory(user,eq,redirectUrl){
 
 function renderAlreadyVoted(user){
   const p=user.progress?.level4;
-  const voted=VOTE_OPTIONS.find(o=>o.key===p.vote)||{icon:'🗳️',name:'已投票'};
+  const voted=VOTE_OPTIONS.find(o=>o.key===p.vote)||{icon:'🗳️',name:'已投票',nameEn:'Voted'};
   document.getElementById('pageContent').innerHTML=`
     <div class="voted-card">
       <div style="font-size:60px;text-align:center;display:block;margin-bottom:14px">✅</div>
       <div style="font-family:'Bangers','Noto Sans TC',cursive;font-size:28px;color:var(--green);text-align:center;letter-spacing:1px;margin-bottom:8px"><span class="cjk-bold">已完成投票<br><span style="font-size:16px">Vote Completed</span></span></div>
       <p style="font-size:14px;color:var(--subtext);text-align:center;line-height:1.6;margin-bottom:18px">
-        你投給了 You voted for：${voted.icon} ${voted.name}<br>
+        你投給了 You voted for：${voted.icon} ${voted.name}<br><span style="font-size:12px;opacity:0.7">${voted.nameEn}</span><br>
         <span style="font-size:12px;opacity:0.7">進度已儲存，可隨時回首頁查看通關紀錄。<br>Your progress is saved — return to the home page anytime to view your record.</span>
       </p>
       <a href="warrior.html" class="action-btn">⚔️ 查看勇者地圖<br>View Hero Map</a>
