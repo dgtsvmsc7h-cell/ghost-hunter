@@ -298,10 +298,8 @@ body::before{
     <span class="vb-icon"><img src="獎盃元素.png" style="width:74px;height:74px;object-fit:contain"></span>
     <div class="vb-title">VICTORY!</div>
     <div class="vb-msg"><span class="i18n-zh">魔王已被擊敗！<br>校園平安了，勇者萬歲！</span><span class="i18n-en">The BOSS has been defeated!<br>The campus is safe. Hail the hero!</span></div>
-    <div class="vb-msg"><span class="i18n-zh">請前往領取獎品：</span><span class="i18n-en">Please head over to claim your prize:</span></div>
-    <div class="vb-loc"><span class="i18n-zh">📍 <span class="cjk-bold">管院 8 樓</span><br><span class="cjk-bold">人文科學觀摩室</span></span><span class="i18n-en">📍 <span class="cjk-bold">Management Building, 8F</span><br><span class="cjk-bold">Humanities Observation Room</span></span></div>
-    <div class="vb-hint"><span class="i18n-zh">5 秒後自動前往問卷，或點擊按鈕立即前往</span><span class="i18n-en">Redirecting to the survey in 5 seconds — or tap the button to go now</span></div>
-    <button class="vb-btn" onclick="closeVictory()"><span class="i18n-zh">🎊 太棒了！前往問卷</span><span class="i18n-en">🎊 Awesome! Go to Survey</span></button>
+    <div class="vb-hint"><span class="i18n-zh">📸 請截圖首頁完成畫面，至首頁「填寫問卷」連結上傳即可參加抽獎！</span><span class="i18n-en">📸 Screenshot your completed home screen and upload it via the survey link on the home page to enter the prize draw!</span></div>
+    <button class="vb-btn" onclick="closeVictory()"><span class="i18n-zh">🎊 太棒了！返回首頁</span><span class="i18n-en">🎊 Awesome! Back to Home</span></button>
   </div>
 </div>
 
@@ -1025,7 +1023,6 @@ async function animateBossFight(user,currentPos,currentState){
   // Show victory
   document.getElementById('victoryOverlay').classList.add('open');
   launchConfetti();
-  window._surveyRedirectTimer=setTimeout(()=>{ window.location.href=SURVEY_URL; },5000);
 }
 
 function showRewardPopup(eqKey){
@@ -1046,8 +1043,7 @@ function closeReward(){
 
 function closeVictory(){
   document.getElementById('victoryOverlay').classList.remove('open');
-  if(window._surveyRedirectTimer) clearTimeout(window._surveyRedirectTimer);
-  window.location.href=SURVEY_URL;
+  window.location.href='index.html';
 }
 
 function goNextQr(){
