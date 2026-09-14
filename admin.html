@@ -333,12 +333,15 @@ function getDB(){
   catch{return{users:{},voteStats:{zone1:0,zone2:0,zone3:0,zone4:0}}}
 }
 
+let autoRefreshTimer = null;
 function doLogin(){
   const pass=document.getElementById('adminPass').value;
   if(pass===ADMIN_PASS){
     document.getElementById('loginScreen').style.display='none';
     document.getElementById('adminDash').style.display='block';
     loadData();
+    if(autoRefreshTimer) clearInterval(autoRefreshTimer);
+    autoRefreshTimer = setInterval(loadData, 30000);
   } else {
     document.getElementById('loginErr').textContent='❌ 密碼錯誤，請再試一次';
     setTimeout(()=>document.getElementById('loginErr').textContent='',2500);
@@ -348,6 +351,10 @@ function doLogout(){
   document.getElementById('loginScreen').style.display='flex';
   document.getElementById('adminDash').style.display='none';
   document.getElementById('adminPass').value='';
+  if(autoRefreshTimer){
+    clearInterval(autoRefreshTimer);
+    autoRefreshTimer = null;
+  }
 }
 document.getElementById('adminPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
 
@@ -523,8 +530,6 @@ function exportCSV(){
   link.click();
 }
 
-// Auto refresh every 30s
-setInterval(loadData,30000);
 </script>
 </body>
 </html>
