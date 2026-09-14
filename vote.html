@@ -254,6 +254,7 @@ const VOTE_OPTIONS=[
 ];
 
 let selectedVote=null, voteSubmitting=false;
+const LEVEL_EQUIPMENT={1:'sword',2:'shield',3:'grail',4:'armor'};
 
 const LEVEL_INFO={
   1:{icon:'<img src="關卡一元素.png" style="width:28px;height:28px;object-fit:contain">',name:'萬聖節的起源',nameEn:'The Origin of Halloween',loc:'第一醫學大樓',locEn:'The 1st Medical Science Building'},
@@ -420,10 +421,10 @@ function submitVote(){
   const sb=document.getElementById('submitBtn');
   if(sb) sb.disabled=true;
 
-  // Assign armor if any type is still missing (calculated first to guard before any writes)
+  // Level 4 always maps to a fixed piece of equipment; only grant it if not already owned
   const owned=user.equipmentOrder||[];
-  const available=['sword','shield','grail','armor'].filter(e=>!owned.includes(e));
-  const newEq=available.length>0?available[Math.floor(Math.random()*available.length)]:null;
+  const fixedEq=LEVEL_EQUIPMENT[4];
+  const newEq=(fixedEq&&!owned.includes(fixedEq))?fixedEq:null;
 
   // Save vote — this always happens, even if the player already owns every piece of equipment
   const db=getDB();
