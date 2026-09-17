@@ -567,10 +567,8 @@ async function syncUserToCloud(user){
 }
 async function loadUserFromCloud(sid){
   if(!fbStore) return null;
-  try{
-    const snap = await fbStore.collection('users').doc(sid).get();
-    if(snap.exists) return snap.data();
-  }catch(e){ console.warn('雲端讀取失敗', e); }
+  const snap = await fbStore.collection('users').doc(sid).get();
+  if(snap.exists) return snap.data();
   return null;
 }
 const EQUIPMENT_LIST = ['sword','shield','grail','armor'];
@@ -628,9 +626,19 @@ async function handleLogin(){
   if(btn) btn.disabled=true;
   showToast('<span class="i18n-zh">⏳ 連線中…</span><span class="i18n-en">Connecting…</span>');
   try{
-    const cloudUser=await loadUserFromCloud(sid);
+    let cloudUser=null, cloudReadFailed=false;
+    try{
+      cloudUser=await loadUserFromCloud(sid);
+    }catch(e){
+      console.warn('雲端讀取失敗',e);
+      cloudReadFailed=true;
+    }
     const db=getDB();
     const localUser=db.users[sid]||null;
+    if(cloudReadFailed && !localUser){
+      showToast('<span class="i18n-zh">⚠️ 網路連線不穩，無法確認雲端資料，請檢查網路後再試一次</span><span class="i18n-en">Unstable connection — can\'t verify cloud data. Please check your network and try again.</span>');
+      return;
+    }
     const accountExists=!!(cloudUser||localUser);
     if(!accountExists){
       // 全新帳號：直接建立，不需驗證姓名
@@ -850,12 +858,16 @@ function showToast(msg,dur=2200){
   let user=getCurrentUser();
   // Session exists but localStorage is empty → try Firestore recovery
   if(sid&&!user){
-    const cloudUser=await loadUserFromCloud(sid);
-    if(cloudUser){
-      const db=getDB();
-      db.users[sid]=cloudUser;
-      saveDB(db);
-      user=cloudUser;
+    try{
+      const cloudUser=await loadUserFromCloud(sid);
+      if(cloudUser){
+        const db=getDB();
+        db.users[sid]=cloudUser;
+        saveDB(db);
+        user=cloudUser;
+      }
+    }catch(e){
+      console.warn('雲端讀取失敗，略過雲端救回',e);
     }
   }
   if(user) renderDash();
