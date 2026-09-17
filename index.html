@@ -571,6 +571,29 @@ async function loadUserFromCloud(sid){
   if(snap.exists) return snap.data();
   return null;
 }
+function mergeUserProgress(cloudUser, localUser){
+  const base = cloudUser || localUser;
+  if(!base) return null;
+  const merged = JSON.parse(JSON.stringify(base));
+  const levels = ['level1','level2','level3','level4'];
+  for(const lv of levels){
+    const c = cloudUser?.progress?.[lv];
+    const l = localUser?.progress?.[lv];
+    if(l?.completed && !c?.completed) merged.progress[lv] = l;
+    else if(c?.completed) merged.progress[lv] = c;
+    else if(l) merged.progress[lv] = l;
+  }
+  merged.bossDefeated = !!(cloudUser?.bossDefeated || localUser?.bossDefeated);
+  merged.bossDefeatedAt = cloudUser?.bossDefeatedAt || localUser?.bossDefeatedAt || null;
+  const cloudEq = cloudUser?.equipmentOrder || [];
+  const localEq = localUser?.equipmentOrder || [];
+  merged.equipmentOrder = [...cloudEq, ...localEq.filter(e=>!cloudEq.includes(e))];
+  merged.avatar = cloudUser?.avatar || localUser?.avatar;
+  merged.name = cloudUser?.name || localUser?.name;
+  merged.sid = cloudUser?.sid || localUser?.sid;
+  merged.createdAt = cloudUser?.createdAt || localUser?.createdAt;
+  return merged;
+}
 const EQUIPMENT_LIST = ['sword','shield','grail','armor'];
 const EQUIP_INFO = {
   sword:  {icon:'<img src="劍元素.png" style="width:32px;height:32px;object-fit:contain">', name:'聖劍'},
@@ -658,10 +681,14 @@ async function handleLogin(){
         showToast('<span class="i18n-zh">☁️ 歡迎回來，'+escapeHtml(cloudUser.name)+'（雲端進度已同步）</span><span class="i18n-en">Welcome back, '+escapeHtml(cloudUser.name)+'! (Synced from cloud)</span>');
       } else {
         if(cloudUser){
-          const cloudEqLen=(cloudUser.equipmentOrder||[]).length;
-          const localEqLen=(localUser.equipmentOrder||[]).length;
-          const cloudAhead=cloudEqLen>localEqLen||(cloudUser.bossDefeated&&!localUser.bossDefeated);
-          if(cloudAhead){const localAvatar=localUser.avatar;db.users[sid]=cloudUser;if(!db.users[sid].avatar&&localAvatar)db.users[sid].avatar=localAvatar;saveDB(db);}
+          const merged=mergeUserProgress(cloudUser,localUser);
+          const localAvatar=localUser.avatar;
+          if(!merged.avatar&&localAvatar) merged.avatar=localAvatar;
+          db.users[sid]=merged;
+          saveDB(db);
+          if(JSON.stringify(merged)!==JSON.stringify(cloudUser)){
+            syncUserToCloud(merged);
+          }
         }
         showToast('<span class="i18n-zh">👻 歡迎回來，'+escapeHtml(db.users[sid]?.name||name)+'</span><span class="i18n-en">Welcome back, '+escapeHtml(db.users[sid]?.name||name)+'!</span>');
       }
