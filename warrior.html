@@ -1089,16 +1089,20 @@ function launchConfetti(){
   // Always sync from Firestore first (covers both static view and reward/animation flow)
   // This prevents duplicate boss fights when bossDefeated was already saved on another device
   if(sid){
-    const cloudUser=await loadUserFromCloud(sid);
-    if(cloudUser){
-      const db=getDB();
-      const local=db.users[sid];
-      const cloudEqLen=(cloudUser.equipmentOrder||[]).length;
-      const localEqLen=(local?.equipmentOrder||[]).length;
-      if(!local||cloudEqLen>localEqLen||(cloudUser.bossDefeated&&!local?.bossDefeated)){
-        db.users[sid]=cloudUser;
-        saveDB(db);
+    try{
+      const cloudUser=await loadUserFromCloud(sid);
+      if(cloudUser){
+        const db=getDB();
+        const local=db.users[sid];
+        const cloudEqLen=(cloudUser.equipmentOrder||[]).length;
+        const localEqLen=(local?.equipmentOrder||[]).length;
+        if(!local||cloudEqLen>localEqLen||(cloudUser.bossDefeated&&!local?.bossDefeated)){
+          db.users[sid]=cloudUser;
+          saveDB(db);
+        }
       }
+    }catch(e){
+      console.warn('雲端讀取失敗，略過雲端同步',e);
     }
   }
 
