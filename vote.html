@@ -335,7 +335,7 @@ function renderLoginForm(){
     </div>`;
 }
 async function quickLogin(){
-  const sid=document.getElementById('pSid').value.trim();
+  const sid=document.getElementById('pSid').value.trim().toUpperCase();
   const name=document.getElementById('pName').value.trim();
   if(!sid||!name){alert('請填入學號與姓名 Please enter your ID and name');return}
   const btn=document.querySelector('[onclick="quickLogin()"]');
