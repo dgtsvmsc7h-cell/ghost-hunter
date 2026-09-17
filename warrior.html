@@ -369,6 +369,29 @@ async function loadUserFromCloud(sid){
   }catch(e){ console.warn('雲端讀取失敗',e); }
   return null;
 }
+function mergeUserProgress(cloudUser, localUser){
+  const base = cloudUser || localUser;
+  if(!base) return null;
+  const merged = JSON.parse(JSON.stringify(base));
+  const levels = ['level1','level2','level3','level4'];
+  for(const lv of levels){
+    const c = cloudUser?.progress?.[lv];
+    const l = localUser?.progress?.[lv];
+    if(l?.completed && !c?.completed) merged.progress[lv] = l;
+    else if(c?.completed) merged.progress[lv] = c;
+    else if(l) merged.progress[lv] = l;
+  }
+  merged.bossDefeated = !!(cloudUser?.bossDefeated || localUser?.bossDefeated);
+  merged.bossDefeatedAt = cloudUser?.bossDefeatedAt || localUser?.bossDefeatedAt || null;
+  const cloudEq = cloudUser?.equipmentOrder || [];
+  const localEq = localUser?.equipmentOrder || [];
+  merged.equipmentOrder = [...cloudEq, ...localEq.filter(e=>!cloudEq.includes(e))];
+  merged.avatar = cloudUser?.avatar || localUser?.avatar;
+  merged.name = cloudUser?.name || localUser?.name;
+  merged.sid = cloudUser?.sid || localUser?.sid;
+  merged.createdAt = cloudUser?.createdAt || localUser?.createdAt;
+  return merged;
+}
 
 function getDB(){
   try{return JSON.parse(localStorage.getItem(DB_KEY)||'{"users":{},"voteStats":{"zone1":0,"zone2":0,"zone3":0,"zone4":0}}')}
@@ -1094,11 +1117,11 @@ function launchConfetti(){
       if(cloudUser){
         const db=getDB();
         const local=db.users[sid];
-        const cloudEqLen=(cloudUser.equipmentOrder||[]).length;
-        const localEqLen=(local?.equipmentOrder||[]).length;
-        if(!local||cloudEqLen>localEqLen||(cloudUser.bossDefeated&&!local?.bossDefeated)){
-          db.users[sid]=cloudUser;
-          saveDB(db);
+        const merged=mergeUserProgress(cloudUser,local);
+        db.users[sid]=merged;
+        saveDB(db);
+        if(JSON.stringify(merged)!==JSON.stringify(cloudUser)){
+          syncUserToCloud(merged);
         }
       }
     }catch(e){
