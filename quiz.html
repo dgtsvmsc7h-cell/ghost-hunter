@@ -179,10 +179,8 @@ async function syncUserToCloud(user){
 }
 async function loadUserFromCloud(sid){
   if(!fbStore) return null;
-  try{
-    const snap = await fbStore.collection('users').doc(sid).get();
-    if(snap.exists) return snap.data();
-  }catch(e){ console.warn('雲端讀取失敗', e); }
+  const snap = await fbStore.collection('users').doc(sid).get();
+  if(snap.exists) return snap.data();
   return null;
 }
 
@@ -362,9 +360,19 @@ async function quickLogin(){
   const btn=document.querySelector('[onclick="quickLogin()"]');
   if(btn) btn.disabled=true;
   try{
-    const cloudUser=await loadUserFromCloud(sid);
+    let cloudUser=null, cloudReadFailed=false;
+    try{
+      cloudUser=await loadUserFromCloud(sid);
+    }catch(e){
+      console.warn('雲端讀取失敗',e);
+      cloudReadFailed=true;
+    }
     const db=getDB();
     const localUser=db.users[sid]||null;
+    if(cloudReadFailed && !localUser){
+      alert('⚠️ 網路連線不穩，無法確認雲端資料，請檢查網路後再試一次 Unstable connection — cannot verify cloud data. Please check your network and try again.');
+      return;
+    }
     const accountExists=!!(cloudUser||localUser);
     if(!accountExists){
       // 全新帳號：直接建立
