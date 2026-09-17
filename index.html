@@ -618,7 +618,7 @@ function createUser(sid,name){
 
 // ── Login ──
 async function handleLogin(){
-  const sid=document.getElementById('inputSid').value.trim();
+  const sid=document.getElementById('inputSid').value.trim().toUpperCase();
   const name=document.getElementById('inputName').value.trim();
   if(!sid){showToast('<span class="i18n-zh">請輸入學號／工號</span><span class="i18n-en">Please enter your ID</span>');return}
   if(!name){showToast('<span class="i18n-zh">請輸入姓名</span><span class="i18n-en">Please enter your name</span>');return}
