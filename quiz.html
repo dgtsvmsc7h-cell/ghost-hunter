@@ -346,7 +346,7 @@ function renderLoginPrompt(qd){
       <h3 style="font-family:'Bangers','Noto Sans TC',cursive;font-size:26px;color:var(--orange2);margin-bottom:8px"><span class="cjk-bold">請先登入 Please Log In</span></h3>
       <p style="font-size:14px;color:var(--subtext);margin-bottom:20px;line-height:1.6">輸入學號與姓名後即可開始挑戰 Enter your ID and name to begin<br>（若已建立帳號，自動接續進度 Existing accounts resume automatically）</p>
       <div style="margin-bottom:12px">
-        <input type="text" id="pSid" placeholder="學號 ID" style="width:100%;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);border-radius:10px;padding:13px 14px;font-size:17px;color:var(--cream);font-family:'Nunito','Noto Sans TC',sans-serif;outline:none;box-sizing:border-box;margin-bottom:10px;-webkit-appearance:none">
+        <input type="text" id="pSid" placeholder="學號 ID" autocomplete="off" autocapitalize="off" style="width:100%;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);border-radius:10px;padding:13px 14px;font-size:17px;color:var(--cream);font-family:'Nunito','Noto Sans TC',sans-serif;outline:none;box-sizing:border-box;margin-bottom:10px;-webkit-appearance:none">
         <input type="text" id="pName" placeholder="姓名 Name" style="width:100%;background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.12);border-radius:10px;padding:13px 14px;font-size:17px;color:var(--cream);font-family:'Nunito','Noto Sans TC',sans-serif;outline:none;box-sizing:border-box;-webkit-appearance:none">
       </div>
       <button onclick="quickLogin()" style="width:100%;background:linear-gradient(135deg,var(--orange),#ff3a00);border:none;border-radius:12px;padding:16px;font-family:'Bangers','Noto Sans TC',cursive;font-size:21px;letter-spacing:2px;color:white;cursor:pointer">🎮 開始挑戰 Start Challenge</button>
@@ -354,7 +354,7 @@ function renderLoginPrompt(qd){
 }
 
 async function quickLogin(){
-  const sid=document.getElementById('pSid').value.trim();
+  const sid=document.getElementById('pSid').value.trim().toUpperCase();
   const name=document.getElementById('pName').value.trim();
   if(!sid||!name){alert('請填入學號與姓名 Please enter your ID and name');return}
   const btn=document.querySelector('[onclick="quickLogin()"]');
