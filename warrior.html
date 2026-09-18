@@ -449,7 +449,8 @@ function sanitizeUser(user){
       {equipmentOrder:user.equipmentOrder,bossDefeatedAt:user.bossDefeatedAt});
     user.bossDefeated=false;
     user.bossDefeatedAt=null;
-    saveUser(user);
+    const db=getDB(); db.users[user.sid]=user; saveDB(db);
+    syncUserToCloud(user).catch(e=>console.warn('sanitizeUser 背景同步失敗',e));
   }
   return user;
 }
