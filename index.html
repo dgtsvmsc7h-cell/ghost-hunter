@@ -561,9 +561,43 @@ let fbStore = null;
   }catch(e){ console.warn('Firebase 未初始化，使用本機儲存', e); }
 })();
 async function syncUserToCloud(user){
-  if(!fbStore) return;
-  try{ await fbStore.collection('users').doc(user.sid).set(user); }
-  catch(e){ console.warn('雲端寫入失敗', e); }
+  if(!fbStore) throw new Error('Firebase 未初始化');
+  await fbStore.collection('users').doc(user.sid).set(user);
+}
+function showBlockingRetry(message){
+  return new Promise(resolve=>{
+    let overlay=document.getElementById('syncRetryOverlay');
+    if(!overlay){
+      overlay=document.createElement('div');
+      overlay.id='syncRetryOverlay';
+      overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;color:#fff;font-family:inherit';
+      document.body.appendChild(overlay);
+    }
+    overlay.innerHTML=`
+      <div style="font-size:18px;line-height:1.6;max-width:320px">${message}</div>
+      <button id="syncRetryBtn" style="background:#ff6a00;border:none;border-radius:10px;padding:14px 28px;font-size:16px;color:#fff;cursor:pointer">🔄 重新嘗試</button>
+    `;
+    overlay.style.display='flex';
+    document.getElementById('syncRetryBtn').onclick=()=>{
+      resolve(true);
+    };
+  });
+}
+function hideBlockingRetry(){
+  const overlay=document.getElementById('syncRetryOverlay');
+  if(overlay) overlay.style.display='none';
+}
+async function runCloudWriteBlocking(writeFn, message){
+  while(true){
+    try{
+      await writeFn();
+      hideBlockingRetry();
+      return;
+    }catch(e){
+      console.warn('雲端寫入失敗，等待重試',e);
+      await showBlockingRetry(message||'⚠️ 進度可能尚未同步，請確認網路後留在此頁面');
+    }
+  }
 }
 async function loadUserFromCloud(sid){
   if(!fbStore) return null;
@@ -621,9 +655,9 @@ function getCurrentUser(){
   const sid=getSession(); if(!sid) return null;
   return getDB().users[sid]||null;
 }
-function saveUser(user){
+async function saveUser(user){
   const db=getDB(); db.users[user.sid]=user; saveDB(db);
-  syncUserToCloud(user);
+  await runCloudWriteBlocking(()=>syncUserToCloud(user), '⚠️ 進度可能尚未同步，請確認網路後留在此頁面');
 }
 function createUser(sid,name){
   const avatarNum = Math.floor(Math.random()*5)+1;
@@ -666,7 +700,7 @@ async function handleLogin(){
     if(!accountExists){
       // 全新帳號：直接建立，不需驗證姓名
       const newUser=createUser(sid,name);
-      saveUser(newUser);
+      await saveUser(newUser);
       showToast('<span class="i18n-zh">🎃 帳號建立成功！</span><span class="i18n-en">Account created!</span>');
     } else {
       // 已存在帳號：必須驗證姓名
@@ -677,7 +711,7 @@ async function handleLogin(){
       }
       // 姓名驗證通過：同步進度並登入
       if(!localUser){
-        saveUser(cloudUser);
+        await saveUser(cloudUser);
         showToast('<span class="i18n-zh">☁️ 歡迎回來，'+escapeHtml(cloudUser.name)+'（雲端進度已同步）</span><span class="i18n-en">Welcome back, '+escapeHtml(cloudUser.name)+'! (Synced from cloud)</span>');
       } else {
         if(cloudUser){
@@ -687,7 +721,7 @@ async function handleLogin(){
           db.users[sid]=merged;
           saveDB(db);
           if(JSON.stringify(merged)!==JSON.stringify(cloudUser)){
-            syncUserToCloud(merged);
+            await runCloudWriteBlocking(()=>syncUserToCloud(merged), '⚠️ 進度可能尚未同步，請確認網路後留在此頁面');
           }
         }
         showToast('<span class="i18n-zh">👻 歡迎回來，'+escapeHtml(db.users[sid]?.name||name)+'</span><span class="i18n-en">Welcome back, '+escapeHtml(db.users[sid]?.name||name)+'!</span>');

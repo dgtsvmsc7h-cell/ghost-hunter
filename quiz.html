@@ -173,9 +173,43 @@ let fbStore = null;
   }catch(e){ console.warn('Firebase 未初始化，使用本機儲存', e); }
 })();
 async function syncUserToCloud(user){
-  if(!fbStore) return;
-  try{ await fbStore.collection('users').doc(user.sid).set(user); }
-  catch(e){ console.warn('雲端寫入失敗', e); }
+  if(!fbStore) throw new Error('Firebase 未初始化');
+  await fbStore.collection('users').doc(user.sid).set(user);
+}
+function showBlockingRetry(message){
+  return new Promise(resolve=>{
+    let overlay=document.getElementById('syncRetryOverlay');
+    if(!overlay){
+      overlay=document.createElement('div');
+      overlay.id='syncRetryOverlay';
+      overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;color:#fff;font-family:inherit';
+      document.body.appendChild(overlay);
+    }
+    overlay.innerHTML=`
+      <div style="font-size:18px;line-height:1.6;max-width:320px">${message}</div>
+      <button id="syncRetryBtn" style="background:#ff6a00;border:none;border-radius:10px;padding:14px 28px;font-size:16px;color:#fff;cursor:pointer">🔄 重新嘗試</button>
+    `;
+    overlay.style.display='flex';
+    document.getElementById('syncRetryBtn').onclick=()=>{
+      resolve(true);
+    };
+  });
+}
+function hideBlockingRetry(){
+  const overlay=document.getElementById('syncRetryOverlay');
+  if(overlay) overlay.style.display='none';
+}
+async function runCloudWriteBlocking(writeFn, message){
+  while(true){
+    try{
+      await writeFn();
+      hideBlockingRetry();
+      return;
+    }catch(e){
+      console.warn('雲端寫入失敗，等待重試',e);
+      await showBlockingRetry(message||'⚠️ 進度可能尚未同步，請確認網路後留在此頁面');
+    }
+  }
 }
 async function loadUserFromCloud(sid){
   if(!fbStore) return null;
@@ -217,7 +251,10 @@ function getCurrentUser(){
   const sid=localStorage.getItem(SESSION_KEY)||''; if(!sid) return null;
   return getDB().users[sid]||null;
 }
-function saveUser(user){const db=getDB();db.users[user.sid]=user;saveDB(db);syncUserToCloud(user);}
+async function saveUser(user){
+  const db=getDB(); db.users[user.sid]=user; saveDB(db);
+  await runCloudWriteBlocking(()=>syncUserToCloud(user), '⚠️ 進度可能尚未同步，請確認網路後留在此頁面');
+}
 function sanitizeUser(user){
   if(!user) return user;
   const allDone=['level1','level2','level3','level4'].every(k=>user.progress?.[k]?.completed===true);
@@ -409,7 +446,7 @@ async function quickLogin(){
         },
         equipmentOrder:[],bossDefeated:false,bossDefeatedAt:null
       };
-      saveUser(newUser);
+      await saveUser(newUser);
     } else {
       // 已存在帳號：必須驗證姓名
       const canonicalName=(cloudUser?.name||localUser?.name||'').trim();
@@ -419,13 +456,13 @@ async function quickLogin(){
       }
       // 姓名驗證通過：同步進度
       if(!localUser){
-        saveUser(cloudUser);
+        await saveUser(cloudUser);
       } else if(cloudUser){
         const merged=mergeUserProgress(cloudUser,localUser);
         db.users[sid]=merged;
         saveDB(db);
         if(JSON.stringify(merged)!==JSON.stringify(cloudUser)){
-          syncUserToCloud(merged);
+          await runCloudWriteBlocking(()=>syncUserToCloud(merged), '⚠️ 進度可能尚未同步，請確認網路後留在此頁面');
         }
       }
     }
@@ -513,7 +550,7 @@ function nextQ(){
   else renderQuiz();
 }
 
-function finishQuiz(){
+async function finishQuiz(){
   if(quizFinished) return;
   quizFinished=true;
   const correct=userAnswers.filter(a=>a).length;
@@ -526,7 +563,7 @@ function finishQuiz(){
     const now=new Date().toISOString();
     userData.progress['level'+level]={completed:true,score:correct,completedAt:now,equipment:newEq};
     if(newEq) userData.equipmentOrder=[...owned,newEq];
-    saveUser(userData);
+    await saveUser(userData);
     window.location.href=newEq
       ?`warrior.html?reward=${newEq}&level=${level}&score=${correct}_${total}`
       :`warrior.html?level=${level}&score=${correct}_${total}`;
