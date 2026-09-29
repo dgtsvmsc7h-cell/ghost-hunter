@@ -511,7 +511,7 @@ async function submitVote(){
 
   // Redirect to warrior (only pass a reward param if a new item was actually granted)
   const redirectUrl=newEq?`warrior.html?reward=${newEq}&level=4&score=voted`:`warrior.html?level=4&score=voted`;
-  setTimeout(()=>{ window.location.href=redirectUrl; }, 1800);
+  setTimeout(()=>{ window.location.href=redirectUrl; }, 2000);
 
   showVictory(user,newEq,redirectUrl);
 }

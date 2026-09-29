@@ -957,7 +957,7 @@ async function animateNewCompletion(user,newLevel,newEqKey){
 
   // 先將視窗捲動到勇者起始位置，等捲動完成後再開始移動
   scrollMapToWarrior(fromPos.x,fromPos.y,true);
-  await delay(800);
+  await delay(2000);
 
   // Walk through waypoints
   let currentPos={...fromPos};
@@ -982,13 +982,13 @@ async function animateNewCompletion(user,newLevel,newEqKey){
   document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,currentPos,{walkPath:walkPts});
 
   setStory(pageLang==='en'?'✨ Arrived! A golden light shines from the chest…':'✨ 到達目的地！寶箱發出金光…');
-  await delay(700);
+  await delay(2000);
 
   // Reveal chest
   tmpUser.progress['level'+newLevel].completed=true;
   document.getElementById('campusSvg').innerHTML=buildSvg(tmpUser,currentPos,{walkPath:walkPts});
   scrollMapToWarrior(currentPos.x,currentPos.y);
-  await delay(600);
+  await delay(2000);
 
   // Show reward popup
   await showRewardPopup(newEqKey);
