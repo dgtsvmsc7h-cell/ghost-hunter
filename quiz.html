@@ -176,7 +176,7 @@ async function syncUserToCloud(user){
   if(!fbStore) throw new Error('Firebase 未初始化');
   await fbStore.collection('users').doc(user.sid).set(user);
 }
-function showBlockingRetry(message){
+function showBlockingRetry(message, allowSkip){
   return new Promise(resolve=>{
     let overlay=document.getElementById('syncRetryOverlay');
     if(!overlay){
@@ -188,26 +188,53 @@ function showBlockingRetry(message){
     overlay.innerHTML=`
       <div style="font-size:18px;line-height:1.6;max-width:320px">${message}</div>
       <button id="syncRetryBtn" style="background:#ff6a00;border:none;border-radius:10px;padding:14px 28px;font-size:16px;color:#fff;cursor:pointer">🔄 重新嘗試</button>
+      ${allowSkip?'<button id="syncSkipBtn" style="background:transparent;border:1px solid #fff;border-radius:10px;padding:10px 24px;font-size:14px;color:#fff;cursor:pointer">先繼續遊戲（進度已存在本機，之後會自動補同步）</button>':''}
     `;
     overlay.style.display='flex';
-    document.getElementById('syncRetryBtn').onclick=()=>{
-      resolve(true);
-    };
+    document.getElementById('syncRetryBtn').onclick=()=>{ resolve(true); };
+    if(allowSkip){
+      document.getElementById('syncSkipBtn').onclick=()=>{ resolve(false); };
+    }
   });
 }
 function hideBlockingRetry(){
   const overlay=document.getElementById('syncRetryOverlay');
   if(overlay) overlay.style.display='none';
 }
+function retryCloudWriteInBackground(writeFn, delayMs){
+  delayMs=delayMs||5000;
+  setTimeout(async ()=>{
+    try{
+      await writeFn();
+      console.info('[GH] 背景補同步成功');
+    }catch(e){
+      console.warn('[GH] 背景補同步仍失敗，稍後再試',e);
+      retryCloudWriteInBackground(writeFn, Math.min(delayMs*2,60000));
+    }
+  }, delayMs);
+}
 async function runCloudWriteBlocking(writeFn, message){
+  const MAX_BLOCKING_ATTEMPTS=3;
+  let attempts=0;
   while(true){
     try{
       await writeFn();
       hideBlockingRetry();
       return;
     }catch(e){
+      attempts++;
       console.warn('雲端寫入失敗，等待重試',e);
-      await showBlockingRetry(message||'⚠️ 進度可能尚未同步，請確認網路後留在此頁面');
+      const allowSkip=attempts>=MAX_BLOCKING_ATTEMPTS;
+      const baseMsg=message||'⚠️ 進度可能尚未同步，請確認網路後留在此頁面';
+      const userWantsRetry=await showBlockingRetry(
+        allowSkip?baseMsg+'\n\n多次重試失敗，你的進度已安全存在本機，可以先繼續遊戲，系統會在背景持續補同步。':baseMsg,
+        allowSkip
+      );
+      if(!userWantsRetry){
+        hideBlockingRetry();
+        retryCloudWriteInBackground(writeFn);
+        return;
+      }
     }
   }
 }
