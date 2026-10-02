@@ -331,6 +331,40 @@ html[data-lang="zh"] .i18n-en{display:none}
   .hero h1{font-size:34px}
   .progress-stages{grid-template-columns:1fr 1fr}
 }
+
+/* ─── New account confirm modal ─── */
+.nac-overlay{
+  display:none;position:fixed;inset:0;z-index:300;
+  background:rgba(0,0,0,0.7);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
+  align-items:center;justify-content:center;padding:20px;
+}
+.nac-overlay.open{display:flex;animation:nacFadeIn 0.2s ease}
+@keyframes nacFadeIn{from{opacity:0;transform:scale(0.96)}to{opacity:1;transform:scale(1)}}
+.nac-box{
+  width:100%;max-width:360px;background:#1a0b2e;
+  border:1px solid rgba(255,255,255,0.12);border-radius:16px;padding:24px;
+}
+.nac-title{
+  font-family:'Noto Sans TC','Nunito',sans-serif;font-size:18px;font-weight:700;
+  color:var(--cream);text-align:center;margin-bottom:16px;
+}
+.nac-data{background:rgba(255,255,255,0.05);border-radius:10px;padding:14px 16px}
+.nac-row{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.nac-row+.nac-row{margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.08)}
+.nac-label{font-size:13px;color:var(--subtext);flex-shrink:0}
+.nac-value{font-size:18px;font-weight:700;color:var(--cream);letter-spacing:1px;text-align:right;word-break:break-word;overflow-wrap:anywhere}
+.nac-warning{font-size:14px;line-height:1.7;color:#f5c97a;margin-top:16px}
+.nac-warning .i18n-en{display:block;font-size:12px;opacity:0.75}
+.nac-actions{display:flex;gap:10px;margin-top:20px}
+.nac-actions button{
+  flex:1;height:48px;border-radius:12px;
+  font-family:'Noto Sans TC','Nunito',sans-serif;font-size:15px;font-weight:700;
+  letter-spacing:normal;padding:0;text-shadow:none;margin-top:0;box-shadow:none;
+}
+@media(max-width:340px){
+  .nac-actions{flex-direction:column}
+  .nac-actions .btn-primary{order:-1}
+}
 </style>
 </head>
 <body>
@@ -360,6 +394,31 @@ html[data-lang="zh"] .i18n-en{display:none}
     <div class="m-tag"><span id="modalLoc">第一醫學大樓</span></div>
     <p id="modalDesc">關卡說明</p>
     <button class="modal-close" onclick="closeModal()"><span class="i18n-zh">關閉</span><span class="i18n-en">Close</span></button>
+  </div>
+</div>
+
+<!-- New account confirm modal -->
+<div class="nac-overlay" id="newAccountConfirmModal" onclick="if(event.target===this) closeNewAccountConfirm(false)">
+  <div class="nac-box">
+    <div class="nac-title"><span class="i18n-zh">確認建立新帳號</span><span class="i18n-en">Confirm New Account</span></div>
+    <div class="nac-data">
+      <div class="nac-row">
+        <span class="nac-label">學號／工號 ID</span>
+        <span class="nac-value" id="nacSid"></span>
+      </div>
+      <div class="nac-row">
+        <span class="nac-label">姓名 Name</span>
+        <span class="nac-value" id="nacName"></span>
+      </div>
+    </div>
+    <p class="nac-warning">
+      <span class="i18n-zh">⚠️ 請確認學號及姓名正確，避免因資料錯誤導致帳號資料遭刪除</span>
+      <span class="i18n-en">⚠️ Please make sure your ID and name are correct. Incorrect information may cause your account data to be deleted.</span>
+    </p>
+    <div class="nac-actions">
+      <button class="btn-secondary" onclick="closeNewAccountConfirm(false)"><span class="i18n-zh">返回修改</span><span class="i18n-en">Edit</span></button>
+      <button class="btn-primary" onclick="closeNewAccountConfirm(true)"><span class="i18n-zh">確認建立</span><span class="i18n-en">Confirm</span></button>
+    </div>
   </div>
 </div>
 
@@ -674,6 +733,28 @@ function createUser(sid,name){
   };
 }
 
+// ── New account confirm modal ──
+let nacOpen=false;
+let nacResolve=null;
+function showNewAccountConfirm(sid,name){
+  const toast=document.getElementById('toast');
+  if(toast) toast.classList.remove('show');
+  document.getElementById('nacSid').textContent=sid;
+  document.getElementById('nacName').textContent=name;
+  document.getElementById('newAccountConfirmModal').classList.add('open');
+  nacOpen=true;
+  return new Promise(resolve=>{ nacResolve=resolve; });
+}
+function closeNewAccountConfirm(result){
+  document.getElementById('newAccountConfirmModal').classList.remove('open');
+  nacOpen=false;
+  if(!result){
+    const sidInput=document.getElementById('inputSid');
+    if(sidInput) sidInput.focus();
+  }
+  if(nacResolve){ const r=nacResolve; nacResolve=null; r(result); }
+}
+
 // ── Login ──
 async function handleLogin(){
   const sid=document.getElementById('inputSid').value.trim().toUpperCase();
@@ -699,7 +780,9 @@ async function handleLogin(){
     }
     const accountExists=!!(cloudUser||localUser);
     if(!accountExists){
-      // 全新帳號：直接建立，不需驗證姓名
+      // 全新帳號：先跳確認彈窗，確認無誤才建立，不需驗證姓名
+      const confirmed=await showNewAccountConfirm(sid,name);
+      if(!confirmed) return;
       const newUser=createUser(sid,name);
       await saveUser(newUser);
       showToast('<span class="i18n-zh">🎃 帳號建立成功！</span><span class="i18n-en">Account created!</span>');
@@ -939,7 +1022,7 @@ function showToast(msg,dur=2200){
   }
   ['inputSid','inputName'].forEach(id=>{
     document.getElementById(id).addEventListener('keydown',e=>{
-      if(e.key==='Enter') handleLogin();
+      if(e.key==='Enter' && !nacOpen) handleLogin();
     });
   });
 })();
