@@ -719,6 +719,20 @@ async function saveUser(user){
   const db=getDB(); db.users[user.sid]=user; saveDB(db);
   await runCloudWriteBlocking(()=>syncUserToCloud(user), '⚠️ 進度可能尚未同步，請確認網路後留在此頁面');
 }
+function sanitizeUser(user){
+  if(!user) return user;
+  const allDone=['level1','level2','level3','level4'].every(k=>user.progress?.[k]?.completed===true);
+  const hasAllEquip=(user.equipmentOrder||[]).length===4;
+  if(user.bossDefeated&&!(allDone&&hasAllEquip)){
+    console.warn('[GH] bossDefeated 不一致，自動重設。sid='+user.sid,
+      {equipmentOrder:user.equipmentOrder,bossDefeatedAt:user.bossDefeatedAt});
+    user.bossDefeated=false;
+    user.bossDefeatedAt=null;
+    const db=getDB(); db.users[user.sid]=user; saveDB(db);
+    syncUserToCloud(user).catch(e=>console.warn('sanitizeUser 背景同步失敗',e));
+  }
+  return user;
+}
 function createUser(sid,name){
   const avatarNum = Math.floor(Math.random()*5)+1;
   return {
@@ -827,6 +841,7 @@ function handleLogout(){
 // ── Dashboard ──
 function renderDash(){
   const user=getCurrentUser(); if(!user) return;
+  sanitizeUser(user);
   document.getElementById('loginView').style.display='none';
   document.getElementById('dashView').style.display='';
   document.getElementById('dashName').textContent=user.name;
