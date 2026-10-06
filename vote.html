@@ -269,7 +269,7 @@ async function runCloudWriteBlocking(writeFn, message){
       attempts++;
       console.warn('雲端寫入失敗，等待重試',e);
       const allowSkip=attempts>=MAX_BLOCKING_ATTEMPTS;
-      const baseMsg=message||'⚠️ 進度可能尚未同步，請確認網路後留在此頁面';
+      const baseMsg=(message||'⚠️ 進度可能尚未同步，請確認網路後留在此頁面')+'。📶 如果目前使用校園／活動現場 WiFi，建議改用行動數據（4G/5G）後再按重新嘗試';
       const userWantsRetry=await showBlockingRetry(
         allowSkip?baseMsg+'\n\n多次重試失敗，你的進度已安全存在本機，可以先繼續遊戲，系統會在背景持續補同步。':baseMsg,
         allowSkip
