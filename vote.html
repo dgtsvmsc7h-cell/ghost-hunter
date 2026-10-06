@@ -166,6 +166,37 @@ body{background:#000;}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
+const BUILD_VERSION = '2026-10-02-01'; // 每次部署前记得更新這個版本號
+
+function showVersionBanner(){
+  if(document.getElementById('versionUpdateBanner')) return;
+  const banner=document.createElement('div');
+  banner.id='versionUpdateBanner';
+  banner.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:999999;background:#ff6a00;color:#fff;padding:12px 16px;text-align:center;font-size:14px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;box-shadow:0 -2px 10px rgba(0,0,0,0.3)';
+  banner.innerHTML='<span>🔄 偵測到新版本，請重新整理以取得最新內容</span><button id="versionReloadBtn" style="background:#fff;color:#ff6a00;border:none;border-radius:8px;padding:8px 16px;font-weight:bold;cursor:pointer">立即重新整理</button>';
+  document.body.appendChild(banner);
+  document.getElementById('versionReloadBtn').onclick=()=>{
+    location.href = location.pathname + '?_v=' + Date.now();
+  };
+}
+
+function checkForNewVersion(){
+  fetch(location.pathname + '?_v=' + Date.now(), {cache:'no-store'})
+    .then(res=>res.text())
+    .then(html=>{
+      const m = html.match(/const BUILD_VERSION\s*=\s*'([^']+)'/);
+      if(m && m[1] && m[1] !== BUILD_VERSION){
+        showVersionBanner();
+      }
+    })
+    .catch(()=>{});
+}
+checkForNewVersion();
+setInterval(checkForNewVersion, 5*60*1000); // 頁面開著的話，每 5 分鐘再偵測一次
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState==='visible') checkForNewVersion();
+});
+
 const DB_KEY='ghost_hunter_db_v1';
 const SESSION_KEY='ghost_hunter_session';
 
@@ -299,7 +330,13 @@ function getCurrentUser(){
 }
 async function saveUser(user){
   const db=getDB(); db.users[user.sid]=user; saveDB(db);
-  await runCloudWriteBlocking(()=>syncUserToCloud(user), '⚠️ 進度可能尚未同步，請確認網路後留在此頁面');
+  const doWrite=async ()=>{
+    await syncUserToCloud(user);
+    user.everSyncedToCloud=true;
+    const db2=getDB();
+    if(db2.users[user.sid]){ db2.users[user.sid].everSyncedToCloud=true; saveDB(db2); }
+  };
+  await runCloudWriteBlocking(doWrite, '⚠️ 進度可能尚未同步，請確認網路後留在此頁面');
 }
 function sanitizeUser(user){
   if(!user) return user;
@@ -435,10 +472,18 @@ async function quickLogin(){
       cloudReadFailed=true;
     }
     const db=getDB();
-    const localUser=db.users[sid]||null;
+    let localUser=db.users[sid]||null;
     if(cloudReadFailed && !localUser){
       alert('⚠️ 網路連線不穩，無法確認雲端資料，請檢查網路後再試一次 Unstable connection — cannot verify cloud data. Please check your network and try again.');
       return;
+    }
+    if(!cloudReadFailed && !cloudUser && localUser && localUser.everSyncedToCloud && fbStore){
+      // 雲端讀取成功且確認查無此帳號（不是網路問題），且本機資料「曾經」成功同步過雲端，
+      // 代表這是後台已被刪除的孤兒資料，清除本機舊資料，視為全新帳號重新開始
+      console.warn('[GH] 偵測到帳號雲端文件已被刪除，清除本機孤兒資料。sid='+sid);
+      delete db.users[sid];
+      saveDB(db);
+      localUser=null;
     }
     const accountExists=!!(cloudUser||localUser);
     if(!accountExists){
@@ -451,7 +496,7 @@ async function quickLogin(){
           level3:{completed:false,score:0,completedAt:null,equipment:null},
           level4:{completed:false,vote:null,completedAt:null,equipment:null},
         },
-        equipmentOrder:[],bossDefeated:false,bossDefeatedAt:null
+        equipmentOrder:[],bossDefeated:false,bossDefeatedAt:null,everSyncedToCloud:false
       };
       await saveUser(newUser);
     } else {
@@ -463,9 +508,11 @@ async function quickLogin(){
       }
       // 姓名驗證通過：同步進度
       if(!localUser){
+        cloudUser.everSyncedToCloud=true;
         await saveUser(cloudUser);
       } else if(cloudUser){
         const merged=mergeUserProgress(cloudUser,localUser);
+        merged.everSyncedToCloud=true;
         db.users[sid]=merged;
         saveDB(db);
         if(JSON.stringify(merged)!==JSON.stringify(cloudUser)){

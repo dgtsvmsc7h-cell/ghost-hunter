@@ -332,6 +332,37 @@ body::before{
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
+const BUILD_VERSION = '2026-10-02-01'; // 每次部署前记得更新這個版本號
+
+function showVersionBanner(){
+  if(document.getElementById('versionUpdateBanner')) return;
+  const banner=document.createElement('div');
+  banner.id='versionUpdateBanner';
+  banner.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:999999;background:#ff6a00;color:#fff;padding:12px 16px;text-align:center;font-size:14px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;box-shadow:0 -2px 10px rgba(0,0,0,0.3)';
+  banner.innerHTML='<span>🔄 偵測到新版本，請重新整理以取得最新內容</span><button id="versionReloadBtn" style="background:#fff;color:#ff6a00;border:none;border-radius:8px;padding:8px 16px;font-weight:bold;cursor:pointer">立即重新整理</button>';
+  document.body.appendChild(banner);
+  document.getElementById('versionReloadBtn').onclick=()=>{
+    location.href = location.pathname + '?_v=' + Date.now();
+  };
+}
+
+function checkForNewVersion(){
+  fetch(location.pathname + '?_v=' + Date.now(), {cache:'no-store'})
+    .then(res=>res.text())
+    .then(html=>{
+      const m = html.match(/const BUILD_VERSION\s*=\s*'([^']+)'/);
+      if(m && m[1] && m[1] !== BUILD_VERSION){
+        showVersionBanner();
+      }
+    })
+    .catch(()=>{});
+}
+checkForNewVersion();
+setInterval(checkForNewVersion, 5*60*1000); // 頁面開著的話，每 5 分鐘再偵測一次
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState==='visible') checkForNewVersion();
+});
+
 const DB_KEY='ghost_hunter_db_v1';
 const SESSION_KEY='ghost_hunter_session';
 const LANG_KEY='gh_lang_pref';
@@ -424,10 +455,8 @@ async function runCloudWriteBlocking(writeFn, message){
 }
 async function loadUserFromCloud(sid){
   if(!fbStore) return null;
-  try{
-    const snap=await fbStore.collection('users').doc(sid).get();
-    if(snap.exists) return snap.data();
-  }catch(e){ console.warn('雲端讀取失敗',e); }
+  const snap=await fbStore.collection('users').doc(sid).get();
+  if(snap.exists) return snap.data();
   return null;
 }
 function mergeUserProgress(cloudUser, localUser){
@@ -465,7 +494,13 @@ function getCurrentUser(){
 }
 async function saveUser(user){
   const db=getDB(); db.users[user.sid]=user; saveDB(db);
-  await runCloudWriteBlocking(()=>syncUserToCloud(user), '⚠️ 進度可能尚未同步，請確認網路後留在此頁面');
+  const doWrite=async ()=>{
+    await syncUserToCloud(user);
+    user.everSyncedToCloud=true;
+    const db2=getDB();
+    if(db2.users[user.sid]){ db2.users[user.sid].everSyncedToCloud=true; saveDB(db2); }
+  };
+  await runCloudWriteBlocking(doWrite, '⚠️ 進度可能尚未同步，請確認網路後留在此頁面');
 }
 function sanitizeUser(user){
   if(!user) return user;
@@ -1182,15 +1217,21 @@ function launchConfetti(){
   if(sid){
     try{
       const cloudUser=await loadUserFromCloud(sid);
+      const db=getDB();
+      const local=db.users[sid];
       if(cloudUser){
-        const db=getDB();
-        const local=db.users[sid];
         const merged=mergeUserProgress(cloudUser,local);
+        merged.everSyncedToCloud=true;
         db.users[sid]=merged;
         saveDB(db);
         if(JSON.stringify(merged)!==JSON.stringify(cloudUser)){
           await runCloudWriteBlocking(()=>syncUserToCloud(merged), '⚠️ 進度可能尚未同步，請確認網路後留在此頁面');
         }
+      } else if(local && local.everSyncedToCloud && fbStore){
+        console.warn('[GH] 偵測到帳號雲端文件已被刪除，清除本機孤兒資料並登出。sid='+sid);
+        delete db.users[sid];
+        saveDB(db);
+        localStorage.removeItem(SESSION_KEY);
       }
     }catch(e){
       console.warn('雲端讀取失敗，略過雲端同步',e);
@@ -1237,8 +1278,17 @@ function launchConfetti(){
       setStory(pageLang==='en'?'<img src="獎盃元素.png" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-right:4px"> Boss defeated! Head to Management Building, 8F to claim your gift!':'<img src="獎盃元素.png" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-right:4px"> 魔王已被擊敗！前往管院 8 樓領取禮物！',true);
     } else if(order.length===0){
       setStory(pageLang==='en'?'Adventure not started yet. Scan the QR code on the display board to begin Stage 1!':'冒險尚未開始。掃描展板 QR Code，挑戰第一關！');
-    } else if([1,2,3,4].every(lv=>user.progress['level'+lv].completed)){
-      setStory(pageLang==='en'?'⚔️ All 4 pieces of equipment collected! Return to the home page to check BOSS status!':'⚔️ 四件裝備集齊！回首頁查看 BOSS 狀態！');
+    } else if([1,2,3,4].every(lv=>user.progress['level'+lv].completed) && (user.equipmentOrder||[]).length===4){
+      // 四關全過、裝備全拿齊，但魔王還沒被擊敗（例如上次動畫中途被中斷：切出APP、斷線、關掉分頁等），
+      // 不需要使用者重新操作，直接自動觸發頭目戰動畫
+      if(!animationRunning){
+        animationRunning=true;
+        setStory(pageLang==='en'?'⚔️ All 4 pieces of equipment collected! Heading to the BOSS zone at the Activity Center…':'⚔️ 四件裝備集齊！前往活動中心 BOSS 區…');
+        setTimeout(async()=>{
+          await animateBossFight(user,wpos,user);
+          animationRunning=false;
+        },800);
+      }
     } else {
       setStory(pageLang==='en'?`${order.length} / 4 stages cleared. Keep exploring campus!`:`已通過 ${order.length} / 4 關。繼續探索校園！`);
     }

@@ -300,6 +300,37 @@ tbody td{padding:10px 14px;font-size:13px;color:var(--text);white-space:nowrap}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
+const BUILD_VERSION = '2026-10-02-01'; // 每次部署前记得更新這個版本號
+
+function showVersionBanner(){
+  if(document.getElementById('versionUpdateBanner')) return;
+  const banner=document.createElement('div');
+  banner.id='versionUpdateBanner';
+  banner.style.cssText='position:fixed;left:0;right:0;bottom:0;z-index:999999;background:#ff6a00;color:#fff;padding:12px 16px;text-align:center;font-size:14px;display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;box-shadow:0 -2px 10px rgba(0,0,0,0.3)';
+  banner.innerHTML='<span>🔄 偵測到新版本，請重新整理以取得最新內容</span><button id="versionReloadBtn" style="background:#fff;color:#ff6a00;border:none;border-radius:8px;padding:8px 16px;font-weight:bold;cursor:pointer">立即重新整理</button>';
+  document.body.appendChild(banner);
+  document.getElementById('versionReloadBtn').onclick=()=>{
+    location.href = location.pathname + '?_v=' + Date.now();
+  };
+}
+
+function checkForNewVersion(){
+  fetch(location.pathname + '?_v=' + Date.now(), {cache:'no-store'})
+    .then(res=>res.text())
+    .then(html=>{
+      const m = html.match(/const BUILD_VERSION\s*=\s*'([^']+)'/);
+      if(m && m[1] && m[1] !== BUILD_VERSION){
+        showVersionBanner();
+      }
+    })
+    .catch(()=>{});
+}
+checkForNewVersion();
+setInterval(checkForNewVersion, 5*60*1000); // 頁面開著的話，每 5 分鐘再偵測一次
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState==='visible') checkForNewVersion();
+});
+
 const DB_KEY='ghost_hunter_db_v1';
 const ADMIN_PASS='halloween2026';
 
