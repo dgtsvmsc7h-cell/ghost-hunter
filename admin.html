@@ -227,6 +227,7 @@ tbody td{padding:10px 14px;font-size:13px;color:var(--text);white-space:nowrap}
 <!-- Dashboard -->
 <div id="adminDash">
   <div class="container">
+    <div id="localDataBanner" style="display:none;background:rgba(255,34,85,0.15);border:1px solid var(--red);color:var(--red);border-radius:10px;padding:12px 16px;margin-bottom:16px;font-weight:700;text-align:center">⚠️ 雲端讀取失敗，以下為本機資料，並非正式統計</div>
     <!-- Top bar -->
     <div class="top-bar">
       <div>
@@ -389,6 +390,16 @@ function doLogout(){
 }
 document.getElementById('adminPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
 
+// 以玩家資料計票：level4.completed 為 true 且 vote 為 zone1~zone4 者，每人一票
+function computeVotesFromUsers(users){
+  const votes={zone1:0,zone2:0,zone3:0,zone4:0};
+  users.forEach(u=>{
+    const l4=u.progress?.level4;
+    if(l4?.completed===true && Object.prototype.hasOwnProperty.call(votes,l4.vote)) votes[l4.vote]++;
+  });
+  return votes;
+}
+
 async function loadData(){
   if(fbStore){
     try{
@@ -397,20 +408,28 @@ async function loadData(){
         fbStore.collection('voteStats').doc('stats').get()
       ]);
       allUsers=usersSnap.docs.map(d=>d.data());
-      const votes=statsSnap.exists?statsSnap.data():{zone1:0,zone2:0,zone3:0,zone4:0};
+      const votes=computeVotesFromUsers(allUsers);
+      // voteStats/stats 只用於比對，不作為統計來源
+      const counter=statsSnap.exists?statsSnap.data():{};
+      const counterTotal=['zone1','zone2','zone3','zone4'].reduce((a,k)=>a+(Number(counter[k])||0),0);
+      const actualTotal=Object.values(votes).reduce((a,b)=>a+b,0);
       renderStats(allUsers,votes);
       renderVoteChart(votes);
       renderTable();
-      document.getElementById('lastRefresh').textContent='更新：'+new Date().toLocaleTimeString('zh-TW')+' ☁️ Firestore';
+      document.getElementById('localDataBanner').style.display='none';
+      document.getElementById('lastRefresh').textContent='更新：'+new Date().toLocaleTimeString('zh-TW')+' ☁️ Firestore'
+        +(counterTotal!==actualTotal?`　⚠️ 計數器 ${counterTotal}／實際 ${actualTotal}（以實際為準）`:'');
       return;
     }catch(e){ console.warn('Firestore 讀取失敗，使用本地資料',e); }
   }
   // fallback：localStorage
   const db=getDB();
   allUsers=Object.values(db.users||{});
-  renderStats(allUsers,db.voteStats||{});
-  renderVoteChart(db.voteStats||{});
+  const localVotes=computeVotesFromUsers(allUsers);
+  renderStats(allUsers,localVotes);
+  renderVoteChart(localVotes);
   renderTable();
+  document.getElementById('localDataBanner').style.display='block';
   document.getElementById('lastRefresh').textContent='更新：'+new Date().toLocaleTimeString('zh-TW')+' （本機）';
 }
 
