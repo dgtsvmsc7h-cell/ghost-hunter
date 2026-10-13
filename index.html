@@ -271,6 +271,10 @@ html[data-lang="zh"] .i18n-en{display:none}
   from{box-shadow:0 0 20px rgba(255,215,0,0.2)}
   to{box-shadow:0 0 40px rgba(255,215,0,0.5)}
 }
+.survey-glow{border-color:rgba(255,215,0,0.6)!important;animation:surveyPulse 3s ease-in-out infinite alternate}
+@keyframes surveyPulse{from{box-shadow:0 0 12px rgba(255,215,0,0.12)}to{box-shadow:0 0 24px rgba(255,215,0,0.32)}}
+.survey-badge{display:inline-block;background:rgba(255,122,0,0.15);border:1px solid var(--orange);border-radius:99px;padding:2px 10px;font-size:11px;font-weight:700;color:var(--orange2);letter-spacing:1px;margin-bottom:5px}
+@media (prefers-reduced-motion:reduce){.survey-glow{animation:none;box-shadow:0 0 16px rgba(255,215,0,0.2)}}
 .gift-card .gc-emoji{width:72px;height:72px;object-fit:contain;display:block;margin:0 auto 10px;
   animation:bounce 1.5s ease-in-out infinite}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -620,12 +624,13 @@ html[data-lang="zh"] .i18n-en{display:none}
     </div>
 
     <!-- Survey card -->
-    <a id="surveyCard" href="https://forms.cloud.microsoft/pages/responsepage.aspx?id=qjVW2kse_ESSFFlrQmXkU3ZbUyT4GK5DjVAQZJk_LIhURENVTlhOT0hJV05YMzZXMUJCVUFCVkc2VS4u&route=shorturl" target="_blank" rel="noopener" class="section-card"
+    <a id="surveyCard" href="https://forms.cloud.microsoft/pages/responsepage.aspx?id=qjVW2kse_ESSFFlrQmXkU3ZbUyT4GK5DjVAQZJk_LIhURENVTlhOT0hJV05YMzZXMUJCVUFCVkc2VS4u&route=shorturl" target="_blank" rel="noopener" class="section-card survey-glow"
        style="display:none;align-items:center;gap:10px;text-decoration:none;cursor:pointer;margin-bottom:16px">
       <span><img src="問卷元素.png" style="width:48px;height:48px;object-fit:contain;border-radius:10px"></span>
       <span style="flex:1">
-        <span style="display:block;font-size:13px;color:var(--cream);font-weight:700"><span class="i18n-zh">填寫問卷</span><span class="i18n-en">Fill Out Survey</span></span>
-        <span style="display:block;font-size:11px;color:var(--subtext)"><span class="i18n-zh">填寫問卷以參加抽獎</span><span class="i18n-en">Fill out the survey to enter the prize draw</span></span>
+        <span class="survey-badge"><span class="i18n-zh">🎁 限量鑰匙圈</span><span class="i18n-en">🎁 Limited Keychain</span></span>
+        <span style="display:block;font-size:15px;color:var(--cream);font-weight:700"><span class="i18n-zh">訊號觀測回饋（問卷）</span><span class="i18n-en">Signal Feedback (Survey)</span></span>
+        <span style="display:block;font-size:12px;color:var(--subtext)"><span class="i18n-zh">只需約 1 分鐘，完成即可參加抽獎</span><span class="i18n-en">Takes about 1 minute — enter the prize draw</span></span>
       </span>
       <span style="font-size:13px;color:var(--orange2);font-weight:700">›</span>
     </a>
@@ -658,7 +663,7 @@ html[data-lang="zh"] .i18n-en{display:none}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-const BUILD_VERSION = '2026-10-13-04'; // 每次部署前记得更新這個版本號
+const BUILD_VERSION = '2026-10-13-05'; // 每次部署前记得更新這個版本號
 
 function showVersionBanner(){
   if(document.getElementById('versionUpdateBanner')) return;
