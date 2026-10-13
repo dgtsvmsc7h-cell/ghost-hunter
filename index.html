@@ -111,6 +111,36 @@ body::after{
 }
 .modal-overlay.open{display:flex;animation:slideup 0.3s ease}
 @keyframes slideup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+/* Prize survey popup */
+.prize-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(4px);z-index:450;align-items:center;justify-content:center;
+  padding:20px 16px;
+}
+.prize-overlay.open{display:flex;animation:fadeIn 0.4s}
+.prize-box{
+  background:#110020;border:1px solid rgba(255,215,0,0.45);border-radius:20px;
+  box-shadow:0 0 40px rgba(255,215,0,0.15);width:100%;max-width:400px;
+  max-height:88vh;overflow-y:auto;padding:26px 20px 20px;text-align:center;
+}
+.prize-title{font-family:'Bangers','Noto Sans TC',cursive;font-size:32px;letter-spacing:2px;color:var(--gold);text-shadow:0 0 18px rgba(255,215,0,0.4);margin-bottom:8px}
+.prize-sub{font-size:15px;color:var(--cream);line-height:1.6;font-weight:700}
+.prize-divider{height:1px;margin:16px auto;width:70%;background:linear-gradient(90deg,transparent,rgba(255,215,0,0.6),transparent)}
+.prize-lead{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:14px}
+.prize-panel{background:rgba(184,78,255,0.12);border:1px solid rgba(184,78,255,0.35);border-radius:14px;padding:14px 14px;font-size:13px;color:var(--text);line-height:1.7;margin-bottom:16px}
+.prize-panel .pp-name{display:block;font-size:16px;font-weight:700;color:var(--orange2);margin:4px 0}
+.prize-item-label{font-size:12px;color:var(--subtext);letter-spacing:1px}
+.prize-item{font-size:18px;font-weight:900;color:var(--gold);margin:4px 0 6px}
+.prize-tag{font-size:12px;color:var(--orange2);letter-spacing:1px;margin-bottom:14px}
+.prize-note{font-size:12px;color:var(--cream);background:rgba(255,255,255,0.05);border-radius:10px;padding:10px 12px;line-height:1.6;margin-bottom:16px}
+.prize-btn{
+  display:block;width:100%;text-decoration:none;text-align:center;
+  background:linear-gradient(135deg,var(--orange) 0%,#ff3a00 100%);color:white;
+  border-radius:12px;padding:15px;font-size:16px;font-weight:800;letter-spacing:1px;
+  box-shadow:0 4px 20px rgba(255,80,0,0.35);margin-bottom:10px;
+}
+.prize-later{width:100%;background:transparent;border:none;color:var(--subtext);font-size:13px;padding:8px;cursor:pointer;font-family:'Nunito','Noto Sans TC',sans-serif}
 .modal-box{
   background:#110020;border:1px solid rgba(255,100,0,0.4);border-radius:20px 20px 0 0;
   padding:28px 20px 40px;width:100%;max-width:480px;
@@ -397,6 +427,26 @@ html[data-lang="zh"] .i18n-en{display:none}
   </div>
 </div>
 
+<!-- Prize survey popup -->
+<div class="prize-overlay" id="prizeOverlay">
+  <div class="prize-box">
+    <div class="prize-title"><span class="i18n-zh">恭喜勇者！</span><span class="i18n-en">Congratulations, Hero!</span></div>
+    <div class="prize-sub"><span class="i18n-zh">你已完成全校展區的<br>「午夜訊號」觀測任務！</span><span class="i18n-en">You've completed the Midnight Signal mission across all campus zones!</span></div>
+    <div class="prize-divider"></div>
+    <div class="prize-lead"><span class="i18n-zh">距離勇者最高榮譽，<br>只剩最後一步——回傳觀測紀錄。</span><span class="i18n-en">One last step to the hero's highest honor — send back your signal log.</span></div>
+    <div class="prize-panel">
+      <span class="i18n-zh">⏳ 只需約 1 分鐘，完成<span class="pp-name">【訊號觀測回饋（問卷）】</span>即可取得最終任務完成資格，<br>並有機會抽中——</span>
+      <span class="i18n-en">⏳ Just about 1 minute to complete the<span class="pp-name">Signal Feedback (Survey)</span>to qualify for final mission completion and a chance to win —</span>
+    </div>
+    <div class="prize-item-label">2026 Ghost Hunter <span class="i18n-zh">萬聖節限定</span><span class="i18n-en">Halloween Limited</span></div>
+    <div class="prize-item"><span class="i18n-zh">「午夜訊號特製鑰匙圈」</span><span class="i18n-en">"Midnight Signal Keychain"</span></div>
+    <div class="prize-tag"><span class="i18n-zh">✦ 限量發放・校園限定・非賣品 ✦</span><span class="i18n-en">✦ Limited Quantity · Campus Exclusive · Not for Sale ✦</span></div>
+    <div class="prize-note"><span class="i18n-zh">📸 填寫前請先截圖首頁完成畫面，問卷中需要上傳</span><span class="i18n-en">📸 Please screenshot your completed home screen first — you'll upload it in the survey</span></div>
+    <a class="prize-btn" id="prizeSurveyBtn" href="#" target="_blank" rel="noopener"><span class="i18n-zh">📡 立即回傳觀測紀錄 ↗</span><span class="i18n-en">📡 Send My Signal Log ↗</span></a>
+    <button class="prize-later" onclick="closePrizePopup()"><span class="i18n-zh">稍後再填</span><span class="i18n-en">Maybe later</span></button>
+  </div>
+</div>
+
 <!-- New account confirm modal -->
 <div class="nac-overlay" id="newAccountConfirmModal" onclick="if(event.target===this) closeNewAccountConfirm(false)">
   <div class="nac-box">
@@ -608,7 +658,7 @@ html[data-lang="zh"] .i18n-en{display:none}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-const BUILD_VERSION = '2026-10-13-03'; // 每次部署前记得更新這個版本號
+const BUILD_VERSION = '2026-10-13-04'; // 每次部署前记得更新這個版本號
 
 function showVersionBanner(){
   if(document.getElementById('versionUpdateBanner')) return;
@@ -641,6 +691,7 @@ document.addEventListener('visibilitychange', ()=>{
 
 const DB_KEY = 'ghost_hunter_db_v1';
 const SESSION_KEY = 'ghost_hunter_session';
+const PRIZE_POPUP_KEY_PREFIX='gh_prize_popup_shown_';
 
 // ── Firebase 設定（請替換為你的專案資訊）──
 const FIREBASE_CONFIG = {
@@ -978,6 +1029,18 @@ function renderDash(){
   const allDone4=['level1','level2','level3','level4'].every(k=>user.progress[k].completed);
   document.getElementById('giftCard').style.display=(allDone4&&user.bossDefeated)?'block':'none';
   document.getElementById('surveyCard').style.display=allDone4?'flex':'none';
+
+  // Prize survey popup：擊敗魔王後首次回到首頁時跳出，每個帳號在同一裝置只出現一次
+  if(user.bossDefeated&&allDone4){
+    let shouldShowPrize=false;
+    try{
+      if(!localStorage.getItem(PRIZE_POPUP_KEY_PREFIX+user.sid)){
+        localStorage.setItem(PRIZE_POPUP_KEY_PREFIX+user.sid,'1');
+        shouldShowPrize=true;
+      }
+    }catch(e){ shouldShowPrize=false; }
+    if(shouldShowPrize) setTimeout(openPrizePopup,600);
+  }
 }
 
 // ── Site-wide language switch ──
@@ -1008,6 +1071,14 @@ function showStageInfo(num){
   document.getElementById('stageModal').classList.add('open');
 }
 function closeModal(){document.getElementById('stageModal').classList.remove('open')}
+
+// ── Prize survey popup ──
+function openPrizePopup(){
+  document.getElementById('prizeSurveyBtn').href=document.getElementById('surveyCard').href;
+  document.getElementById('prizeOverlay').classList.add('open');
+}
+function closePrizePopup(){document.getElementById('prizeOverlay').classList.remove('open')}
+document.getElementById('prizeSurveyBtn').addEventListener('click',closePrizePopup);
 
 // ── QR Scanner ──
 let html5Qr=null;
