@@ -277,6 +277,37 @@ html[data-lang="zh"] .i18n-en{display:none}
 @keyframes surveyPulse{from{box-shadow:0 0 12px rgba(255,215,0,0.12)}to{box-shadow:0 0 24px rgba(255,215,0,0.32)}}
 .survey-badge{display:inline-block;background:rgba(255,122,0,0.15);border:1px solid var(--orange);border-radius:99px;padding:2px 10px;font-size:11px;font-weight:700;color:var(--orange2);letter-spacing:1px;margin-bottom:5px}
 @media (prefers-reduced-motion:reduce){.survey-glow{animation:none;box-shadow:0 0 16px rgba(255,215,0,0.2)}}
+
+/* Candy notice card */
+.candy-notice{
+  position:relative;overflow:hidden;text-align:center;
+  background:linear-gradient(135deg, rgba(255,122,0,0.16), rgba(138,43,226,0.14));
+  border:1px solid rgba(255,156,43,0.75);
+  animation:candy-notice-breathe 2.5s ease-in-out infinite alternate;
+}
+.candy-notice::before{
+  content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;
+  background:linear-gradient(105deg, transparent 0%, rgba(255,215,0,0.22) 50%, transparent 100%);
+  transform:skewX(-20deg);pointer-events:none;z-index:0;
+  animation:candy-notice-shimmer 3.5s ease-in-out infinite;
+}
+.candy-notice-text{
+  position:relative;z-index:1;font-size:22px;line-height:1.4;color:var(--gold);letter-spacing:1px;
+  text-shadow:0 0 8px rgba(255,156,43,0.45);
+}
+.candy-notice-text .i18n-en{font-weight:700}
+@keyframes candy-notice-breathe{
+  from{box-shadow:0 0 12px rgba(255,156,43,0.22), 0 0 0 rgba(255,215,0,0)}
+  to{box-shadow:0 0 28px rgba(255,156,43,0.55), 0 0 44px rgba(255,215,0,0.22)}
+}
+@keyframes candy-notice-shimmer{
+  0%{left:-60%}
+  60%,100%{left:130%}
+}
+@media (prefers-reduced-motion:reduce){
+  .candy-notice{animation:none;box-shadow:0 0 20px rgba(255,156,43,0.4)}
+  .candy-notice::before{animation:none;display:none}
+}
 .gift-card .gc-emoji{width:72px;height:72px;object-fit:contain;display:block;margin:0 auto 10px;
   animation:bounce 1.5s ease-in-out infinite}
 @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -501,6 +532,11 @@ html[data-lang="zh"] .i18n-en{display:none}
       </div>
     </div>
 
+    <!-- Candy notice -->
+    <div class="section-card candy-notice">
+      <div class="candy-notice-text"><span class="i18n-zh cjk-bold">萬聖節限量糖果已兌換完畢</span><span class="i18n-en">Limited Halloween candy is all gone!</span></div>
+    </div>
+
     <!-- Stage Info -->
     <div class="section-card">
       <div class="section-title"><img src="地圖.webp" style="width:24px;height:24px;object-fit:contain;vertical-align:middle;margin-right:4px"> <span class="cjk-bold i18n-zh">四大關卡</span><span class="cjk-bold i18n-en">The Four Stages</span></div>
@@ -568,6 +604,11 @@ html[data-lang="zh"] .i18n-en{display:none}
 
   <!-- ── DASHBOARD VIEW ── -->
   <div id="dashView" style="display:none">
+    <!-- Candy notice -->
+    <div class="section-card candy-notice">
+      <div class="candy-notice-text"><span class="i18n-zh cjk-bold">萬聖節限量糖果已兌換完畢</span><span class="i18n-en">Limited Halloween candy is all gone!</span></div>
+    </div>
+
     <!-- Player card -->
     <div class="section-card">
       <div class="player-header">
@@ -665,7 +706,7 @@ html[data-lang="zh"] .i18n-en{display:none}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-const BUILD_VERSION = '2026-10-14-02'; // 每次部署前记得更新這個版本號
+const BUILD_VERSION = '2026-10-28-01'; // 每次部署前记得更新這個版本號
 
 function showVersionBanner(){
   if(document.getElementById('versionUpdateBanner')) return;
