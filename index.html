@@ -296,6 +296,7 @@ html[data-lang="zh"] .i18n-en{display:none}
   text-shadow:0 0 8px rgba(255,156,43,0.45);
 }
 .candy-notice-text .i18n-en{font-weight:700}
+.candy-notice-line{display:inline-block}
 @keyframes candy-notice-breathe{
   from{box-shadow:0 0 12px rgba(255,156,43,0.22), 0 0 0 rgba(255,215,0,0)}
   to{box-shadow:0 0 28px rgba(255,156,43,0.55), 0 0 44px rgba(255,215,0,0.22)}
@@ -534,7 +535,7 @@ html[data-lang="zh"] .i18n-en{display:none}
 
     <!-- Candy notice -->
     <div class="section-card candy-notice">
-      <div class="candy-notice-text"><span class="i18n-zh cjk-bold">萬聖節限量糖果已兌換完畢</span><span class="i18n-en">Limited Halloween candy is all gone!</span></div>
+      <div class="candy-notice-text"><span class="i18n-zh cjk-bold">萬聖節限量糖果已兌換完畢<span class="candy-notice-line">破關並填寫問卷後可參加抽獎</span></span><span class="i18n-en">Limited Halloween candy is all gone — clear all stages and fill out the survey to enter the prize draw!</span></div>
     </div>
 
     <!-- Stage Info -->
@@ -606,7 +607,7 @@ html[data-lang="zh"] .i18n-en{display:none}
   <div id="dashView" style="display:none">
     <!-- Candy notice -->
     <div class="section-card candy-notice">
-      <div class="candy-notice-text"><span class="i18n-zh cjk-bold">萬聖節限量糖果已兌換完畢</span><span class="i18n-en">Limited Halloween candy is all gone!</span></div>
+      <div class="candy-notice-text"><span class="i18n-zh cjk-bold">萬聖節限量糖果已兌換完畢<span class="candy-notice-line">破關並填寫問卷後可參加抽獎</span></span><span class="i18n-en">Limited Halloween candy is all gone — clear all stages and fill out the survey to enter the prize draw!</span></div>
     </div>
 
     <!-- Player card -->
@@ -706,7 +707,7 @@ html[data-lang="zh"] .i18n-en{display:none}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <script>
-const BUILD_VERSION = '2026-10-28-01'; // 每次部署前记得更新這個版本號
+const BUILD_VERSION = '2026-10-28-02'; // 每次部署前记得更新這個版本號
 
 function showVersionBanner(){
   if(document.getElementById('versionUpdateBanner')) return;
